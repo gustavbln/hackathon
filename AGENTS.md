@@ -73,16 +73,21 @@ Data:
 
 ## Nemotron (NVIDIA side challenge)
 
-- All LLM calls go to NVIDIA's OpenAI-compatible API at `https://integrate.api.nvidia.com/v1`,
-  key in `NVIDIA_API_KEY` (get one at build.nvidia.com). Server-side only, never from the browser.
-- Models (catalog checked 2026-10-18): `nvidia/nemotron-3-super-120b-a12b` (default),
-  `nvidia/nemotron-3.5-lightning-30b-a3b` (fast), `nvidia/nemotron-3-ultra-550b-a55b` (strongest),
-  `nvidia/nemotron-3-embed-1b` (embeddings). Live list: `curl https://integrate.api.nvidia.com/v1/models`.
+- Provider: [Nebius Token Factory](https://tokenfactory.nebius.com/), OpenAI-compatible. Base URL
+  `https://api.tokenfactory.nebius.com/v1/`, key in `NEBIUS_API_KEY`. Server-side only, never from
+  the browser. One client in `lib/`, reused by the chatbot and the agents.
+- Models: Nebius hosts Nemotron 3 Nano 30B, Nano Omni, Super 120B and Ultra 550B. Copy the exact IDs
+  from `curl -H "Authorization: Bearer $NEBIUS_API_KEY" https://api.tokenfactory.nebius.com/v1/models`
+  and note them here.
+- Fallback and extras: NVIDIA's API at `https://integrate.api.nvidia.com/v1` (key `NVIDIA_API_KEY`
+  from build.nvidia.com, free, about 40 requests/min). It also has the fast
+  `nvidia/nemotron-3.5-lightning-30b-a3b`, embeddings `nvidia/nemotron-3-embed-1b` and the reranker
+  `nv-rerankqa-mistral-4b-v3` (`llama-nemotron-rerank-1b-v2` is retired).
+  Live list: `curl https://integrate.api.nvidia.com/v1/models`.
 - Show it: the UI and the video make clear the AI runs on NVIDIA Nemotron.
-- Gotchas: reasoning is on by default and slow; turn it off for quick calls with
-  `chat_template_kwargs: {"enable_thinking": false}`. Reasoning text arrives in `reasoning_content`.
-  About 40 requests/min per account (reported). Copy model IDs from `/v1/models`. The reranker
-  `llama-nemotron-rerank-1b-v2` is retired, use `nv-rerankqa-mistral-4b-v3`.
+- Gotchas: reasoning is on by default and slow. On NVIDIA's API, turn it off for quick calls with
+  `chat_template_kwargs: {"enable_thinking": false}`; check whether Nebius accepts the same.
+  Reasoning text arrives separately in `reasoning_content`. Always copy model IDs from `/v1/models`.
 
 ## Docker only
 
