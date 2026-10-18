@@ -380,12 +380,12 @@ function parseRecipe(content: string | null | undefined) {
  * Nemotron sometimes answers in prose or breaks a grounding rule; one schema-enforced retry, told what was wrong,
  * recovers the recipe. The retry is checked like the first answer.
  */
-async function repairRecipe(messages: ModelMessage[], content: string | null | undefined, problem: string | null, signal: AbortSignal, onUsage: UsageSink) {
+async function repairRecipe(messages: ModelMessage[], content: string | null | undefined, problem: string | null, outputSchema: Record<string, unknown>, signal: AbortSignal, onUsage: UsageSink) {
   const { message } = await completeNemotron([
     ...messages,
     { role: "assistant", content: content ?? "" },
     { role: "user", content: `${problem ? `That answer was rejected: ${problem} ` : ""}Return the answer now as ONLY the JSON object in the required format.` },
-  ], [], signal, z.toJSONSchema(answerRecipeSchema), { onUsage });
+  ], [], signal, outputSchema, { onUsage });
   const recipe = parseRecipe(message.content);
   if (!recipe) throw new ChatError("invalid_answer", "Nemotron returned an unreadable answer. Please retry.");
   return recipe;
@@ -445,9 +445,12 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
     const writer = (web?.sources.length ?? 0) > 0;
     const final = writer || [...evidence.values()].some((result) => "runCount" in result);
     const offered = web ? definitions.filter(({ function: { name } }) => name !== "search_context") : definitions;
+    // The writer can only cite dataset results: decoding enforces that web text never stands in for them.
+    const datasetIds = [...evidence].flatMap(([id, result]) => result === web ? [] : [id]);
+    const recipeSchema = z.toJSONSchema(writer && datasetIds.length > 0 ? answerRecipeSchema.extend({ resultId: z.enum(datasetIds) }) : answerRecipeSchema);
     const { message, model } = await step(writer ? "Writing with the web context" : round === 0 ? "Reading your question" : "Reading the results", "nemotron",
       ({ onUsage }) => final
-        ? completeNemotron(messages, [], signal, z.toJSONSchema(answerRecipeSchema), { onUsage, thinking: writer, maxTokens: writer ? 8_192 : undefined })
+        ? completeNemotron(messages, [], signal, recipeSchema, { onUsage, thinking: writer, maxTokens: writer ? 8_192 : undefined })
         : completeNemotron(messages, offered, signal, undefined, {
           onUsage, ...(round === 0 && ASKS_FOR_WEB.test(request.message) && { toolChoice: { type: "function", function: { name: "search_context" } } }),
         }),
@@ -460,7 +463,7 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
     if (answer !== null || !message.tool_calls?.length) {
       const content = answer ?? message.content;
       let recipe = parseRecipe(content)
-        ?? await step("Formatted the answer", "nemotron", ({ onUsage }) => repairRecipe(messages, content, null, signal, onUsage));
+        ?? await step("Formatted the answer", "nemotron", ({ onUsage }) => repairRecipe(messages, content, null, recipeSchema, signal, onUsage));
       let response: ChatResponse;
       try {
         response = hydrateAnswer(recipe, evidence, model, receipts);
@@ -468,7 +471,7 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
         if (!(error instanceof ChatError) || error.code !== "ungrounded_answer") throw error;
         const rejected = JSON.stringify(recipe);
         recipe = await step("Corrected an ungrounded answer", "nemotron",
-          ({ onUsage }) => repairRecipe(messages, rejected, error.message.replace(" Please retry.", ""), signal, onUsage));
+          ({ onUsage }) => repairRecipe(messages, rejected, error.message.replace(" Please retry.", ""), recipeSchema, signal, onUsage));
         response = hydrateAnswer(recipe, evidence, model, receipts);
       }
       const top = facts?.kind === "supplier_explanation" && recipe.resultId === PAGE_RESULT_ID && facts.drivers[0];
