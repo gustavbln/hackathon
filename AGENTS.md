@@ -110,6 +110,21 @@ Data:
 - Verify Nebius's supported reasoning and tool parameters before using them; don't assume NVIDIA's
   request options transfer unchanged. Reasoning text is separate from the answer.
 
+## Financial research agent (real seat makers)
+
+A buyer names a real company; the agent identifies the legal entity, maps its company group, gathers
+financial evidence and scores it. Spec: the team's "Anforderungen Financial Risk Agent" document.
+
+- Contract: `lib/market/model.ts` (spec data model, streamed events). Deterministic score:
+  `lib/market/score.ts` (four equally weighted ratios, null instead of partial averages, historic
+  after 24 months). Company groups: `lib/market/groups.ts` (current ownership and joint ventures only).
+- Pipeline: resolve (Tavily + GLEIF, Ultra decides) → group (GLEIF) → research (Lightning binds each
+  claim to an entity) → deepen (Super-VL proposes follow-ups) → judge (Ultra, thinking on) → read
+  (two independent reads, code checks quotes and numbers) → score.
+- API: `POST /api/research` streams a live run; `GET /api/research` lists recorded runs in
+  `data/research/` (the labelled cache); `GET /api/research?run=<id>` replays one.
+- The researched score is not the dataset's `Financial_Health_Score`; never show them as the same.
+
 ## Docker only
 
 Second checkout: add `-f compose.yaml -f compose.preview.yaml` to Docker Compose commands.
@@ -136,10 +151,10 @@ Split by folder so we rarely touch the same files.
 - Frontend owner: all pages and components, including chat, app shell, 3D train, explore and compare.
 - Dennis, chatbot functionality: `app/api/chat/` and shared server-side data, tools and Nemotron calls
   in `lib/`. Return typed data for supplier cards, comparisons and charts; leave frontend work to its owner.
-- Gustav, supplier benchmark and real suppliers: `app/suppliers/`, `components/leaderboard/`,
-  `lib/market/`. Ranking for the chosen component, a focus panel per supplier (risk fingerprint,
-  exact "why" breakdown, watch-outs, alternative risk profiles) and a top-20 matrix where only high
-  and critical scores are coloured.
+- Gustav, supplier benchmark and the financial research agent: `app/suppliers/`,
+  `components/leaderboard/`, `app/financial/`, `components/financial/`, `app/api/research/`,
+  `lib/market/`. The board ranks the dataset suppliers for a component (risk fingerprint, exact "why"
+  breakdown, alternatives, top-20 matrix). The research agent investigates real seat makers (below).
 
 `lib/` holds data access, scoring and tool functions: one source of truth that the UI, the chatbot
 and the agents all call. `lib/suppliers/` is the dataset foundation: `criteria.ts` (the 18 criteria
