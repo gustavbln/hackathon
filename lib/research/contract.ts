@@ -24,8 +24,10 @@ export const researchSourceSchema = z.strictObject({
   url: z.url(),
   title: z.string().trim().min(1).max(300),
   publishedAt: z.string().max(40).nullable(),
-  /** Verbatim from the search result; code checks it before saving. */
+  /** Verbatim from the page; code checks it before saving. */
   quote: z.string().trim().min(1).max(400),
+  /** The page text around the quote, so a buyer can read it in context without leaving the app. */
+  excerpt: z.strictObject({ before: z.string().max(1_000), after: z.string().max(1_000) }).nullish(),
 });
 
 /** One driver estimated from public evidence on the dataset's scale (0 = no risk, 100 = maximum). */

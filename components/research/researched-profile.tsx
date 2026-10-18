@@ -3,6 +3,7 @@ import type { ResearchedSupplier } from "@/lib/research/contract";
 import { toSupplier } from "@/lib/research/contract";
 import { CRITERION_BY_KEY, type Weights } from "@/lib/suppliers/criteria";
 import { AgentGrid, SourceChips } from "./agent-grid";
+import { SourceLink } from "./source-viewer";
 
 interface ResearchedProfileProps {
   researched: ResearchedSupplier;
@@ -70,9 +71,9 @@ export function ResearchedProfile({ researched, weights, query }: ResearchedProf
             <li key={source.id} className="grid grid-cols-[2rem_minmax(0,1fr)] gap-2">
               <span className="font-mono text-[var(--blueprint-muted)]">[{source.id}]</span>
               <span>
-                <a href={source.url} target="_blank" rel="noreferrer" className="font-medium hover:underline">
+                <SourceLink source={source} className="font-medium hover:underline">
                   {source.title}
-                </a>
+                </SourceLink>
                 <span className="text-[var(--blueprint-muted)]">
                   {" · "}
                   {new URL(source.url).hostname.replace(/^www\./, "")}

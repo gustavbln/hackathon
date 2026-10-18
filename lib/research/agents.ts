@@ -13,7 +13,7 @@ import {
   type ResearchSource,
   type ThreadEntry,
 } from "./contract.ts";
-import { extractJson, isVerbatim, mentionsCompany, relevantPassages } from "./evidence.ts";
+import { excerptAround, extractJson, isVerbatim, mentionsCompany, relevantPassages } from "./evidence.ts";
 import { readPages, type Page } from "./extract.ts";
 import { SEARCH_TERMS } from "./search-terms.ts";
 import { saveResearched } from "./store.ts";
@@ -31,6 +31,7 @@ const PARALLEL_AGENTS = 4;
 const PAGES_PER_AGENT = 4;
 const QUOTES_PER_AGENT = 5;
 const PASSAGE_CHARS = 6_000;
+const EXCERPT_CHARS = 600;
 const THIS_YEAR = new Date().getFullYear();
 const SEARCH_RETRIES = [1_000, 2_000, 4_000];
 const RUN_TIMEOUT_MS = 240_000;
@@ -121,7 +122,7 @@ async function run(input: ResearchInput, signal: AbortSignal, emit: Run["emit"])
       const key = `${page.url}\n${quote}`;
       const existing = byKey.get(key);
       if (existing) return existing;
-      const source = { id: sources.length + 1, url: page.url, title: page.title.slice(0, 300) || page.url, publishedAt: page.publishedAt, quote };
+      const source = { id: sources.length + 1, url: page.url, title: page.title.slice(0, 300) || page.url, publishedAt: page.publishedAt, quote, excerpt: excerptAround(quote, page.content, EXCERPT_CHARS) };
       sources.push(source);
       byKey.set(key, source);
       emit({ type: "source", source });

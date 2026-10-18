@@ -50,3 +50,24 @@ export function relevantPassages(text: string, topic: string[], limit: number): 
   }
   return kept.size > 0 ? scored.filter(({ index }) => kept.has(index)).map(({ line }) => line) : [text.slice(0, limit)];
 }
+
+/** The readable page text around a verbatim quote, cut at word boundaries; null when the quote is not found. */
+export function excerptAround(quote: string, text: string, chars: number): { before: string; after: string } | null {
+  const page = readable(text);
+  const needle = readable(quote).toLowerCase();
+  const at = page.toLowerCase().indexOf(needle);
+  if (needle.length === 0 || at === -1) return null;
+  const start = Math.max(0, at - chars);
+  const end = Math.min(page.length, at + needle.length + chars);
+  const before = page.slice(start, at);
+  const after = page.slice(at + needle.length, end);
+  return {
+    before: (start > 0 ? before.replace(/^\S*\s/, "") : before).trim(),
+    after: (end < page.length ? after.replace(/\s\S*$/, "") : after).trim(),
+  };
+}
+
+/** Page text as extracted is Markdown; a reader wants the words, not link targets and table pipes. */
+function readable(markdown: string): string {
+  return markdown.replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[#*_|>]+/g, " ").replace(/\s+/g, " ").trim();
+}

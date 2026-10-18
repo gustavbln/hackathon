@@ -6,6 +6,7 @@ import { LEVEL_COLOR } from "@/components/leaderboard/risk-color";
 import { CRITERIA, CRITERION_BY_KEY, riskLevel, type CriterionKey } from "@/lib/suppliers/criteria";
 import type { DriverAgent, ResearchSource, ThreadEntry } from "@/lib/research/contract";
 import { cn } from "@/lib/utils";
+import { SourceLink } from "./source-viewer";
 
 const STATUS_LABEL: Record<AgentState["status"], string> = {
   queued: "Queued",
@@ -117,18 +118,12 @@ function AgentReport({ criterion, agent, sources }: { criterion: CriterionKey; a
             <ol className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-1">
               {used.map((source) => (
                 <li key={source.id} className="w-40 shrink-0 snap-start">
-                  <a
-                    href={source.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    title={source.quote}
-                    className="flex h-full flex-col gap-1 rounded-sm border border-[var(--blueprint-rule)] p-2 text-xs hover:bg-[var(--blueprint-grid)]"
-                  >
+                  <SourceLink source={source} className="flex h-full flex-col gap-1 rounded-sm border border-[var(--blueprint-rule)] p-2 text-xs hover:bg-[var(--blueprint-grid)]">
                     <span className="line-clamp-2 font-medium">{source.title}</span>
                     <span className="mt-auto font-mono text-[10px] text-[var(--blueprint-muted)]">
                       [{source.id}] {new URL(source.url).hostname.replace(/^www\./, "")}
                     </span>
-                  </a>
+                  </SourceLink>
                 </li>
               ))}
             </ol>
@@ -181,7 +176,7 @@ function AgentReport({ criterion, agent, sources }: { criterion: CriterionKey; a
   );
 }
 
-/** Numbered links to the sources a claim rests on. */
+/** Numbered links to the sources a claim rests on; each opens in the source panel. */
 export function SourceChips({ ids, sources }: { ids: number[]; sources: ResearchSource[] }) {
   return (
     <span className="flex flex-wrap gap-1">
@@ -189,16 +184,13 @@ export function SourceChips({ ids, sources }: { ids: number[]; sources: Research
         const source = sources.find((candidate) => candidate.id === id);
         if (!source) return null;
         return (
-          <a
+          <SourceLink
             key={id}
-            href={source.url}
-            target="_blank"
-            rel="noreferrer"
-            title={source.quote}
+            source={source}
             className="rounded-sm border border-[var(--blueprint-rule)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--blueprint-muted)] hover:text-[var(--blueprint-ink)]"
           >
             [{id}] {new URL(source.url).hostname.replace(/^www\./, "")}
-          </a>
+          </SourceLink>
         );
       })}
     </span>

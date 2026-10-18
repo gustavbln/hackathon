@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { allowsFraming } from "./research/embeddable.ts";
 import { researchedIdFor, researchedSupplierSchema, toSupplier, type ResearchedSupplier } from "./research/contract.ts";
-import { extractJson, isVerbatim, mentionsCompany, relevantPassages } from "./research/evidence.ts";
+import { excerptAround, extractJson, isVerbatim, mentionsCompany, relevantPassages } from "./research/evidence.ts";
 
 test("quotes count only when they appear verbatim in the fetched text", () => {
   const page = "In 2025 the group reported   a net loss of EUR 12 million.\nRevenue grew 4%.";
@@ -68,4 +69,17 @@ test("long pages are read where they talk about the risk, not where their naviga
   const page = ["Home | Investors | Careers", ...Array.from({ length: 200 }, (_, index) => `Product line ${index} for seating.`), "Net income fell after a refinancing of the syndicated loan."].join("\n");
   const passages = relevantPassages(page, ["refinancing liquidity equity ratio", "net income results"], 400);
   assert.deepEqual(passages, ["Net income fell after a refinancing of the syndicated loan."]);
+});
+
+test("a quote is shown with the readable text around it, cut at whole words", () => {
+  const page = "Intro words here. See [the report](https://x.example/r.pdf) for details.\nGRAMMER secured EUR 762 million of financing. | Next | row";
+  assert.deepEqual(excerptAround("grammer secured EUR 762 million", page, 40), { before: "here. See the report for details.", after: "of financing. Next row" });
+  assert.equal(excerptAround("not on the page at all", page, 40), null);
+});
+
+test("only sites that allow framing open inside the app", () => {
+  assert.equal(allowsFraming(new Headers()), true);
+  assert.equal(allowsFraming(new Headers({ "X-Frame-Options": "SAMEORIGIN" })), false);
+  assert.equal(allowsFraming(new Headers({ "Content-Security-Policy": "default-src 'self'; frame-ancestors 'self' https://partner.example" })), false);
+  assert.equal(allowsFraming(new Headers({ "Content-Security-Policy": "frame-ancestors *" })), true);
 });
