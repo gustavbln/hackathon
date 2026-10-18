@@ -129,10 +129,9 @@ in the dev container (VS Code/Cursor: "Reopen in Container").
 
 Split by folder so we rarely touch the same files.
 
-- Yogos, frontend: app shell, 3D train, explore and compare views (`app/` pages except chat,
-  `components/train/`, `components/explore/`, `public/models/`).
-- Dennis, chatbot (the stakeholder's top priority): `app/chat/`, `app/api/chat/`, `components/chat/`.
-  Answers render as visual UI (supplier cards, comparisons, charts), not walls of text.
+- Frontend owner: all pages and components, including chat, app shell, 3D train, explore and compare.
+- Dennis, chatbot functionality: `app/api/chat/` and shared server-side data, tools and Nemotron calls
+  in `lib/`. Return typed data for supplier cards, comparisons and charts; leave frontend work to its owner.
 - Gustav: TBD
 
 `lib/` holds data access, scoring and tool functions: one source of truth that the UI, the chatbot
