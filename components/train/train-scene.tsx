@@ -36,8 +36,8 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
   useEffect(() => {
     if (!cabinHref) return;
     router.prefetch(cabinHref);
-    // Warm the cabin's 3D code while the visitor still looks at the train, so entering it is instant.
-    const warm = setTimeout(() => void import("./cabin-canvas"), 1_500);
+    // Warm the cabin's 3D code while the visitor still looks at the train.
+    void import("./cabin-canvas");
     let armed = false;
     let frame = 0;
     let entry: ReturnType<typeof setTimeout> | undefined;
@@ -53,10 +53,10 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
       const range = Math.max(figure.current.offsetHeight - window.innerHeight, 1);
       const next = Math.min(1, Math.max(0, -top / range));
       setProgress(next);
-      if (next < 0.98) { clearTimeout(entry); entry = undefined; }
+      if (next < 0.94) { clearTimeout(entry); entry = undefined; }
       // Wait for the zoom to settle; restoring browser scroll alone must never enter the cabin.
-      if (next >= 0.98 && armed && entry === undefined) {
-        entry = setTimeout(() => router.push(cabinHref), window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 600);
+      if (next >= 0.94 && armed && entry === undefined) {
+        entry = setTimeout(() => router.push(cabinHref), window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 120);
       }
     };
     const scroll = () => { if (!frame) frame = requestAnimationFrame(update); };
@@ -69,7 +69,6 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
     return () => {
       cancelAnimationFrame(frame);
       clearTimeout(entry);
-      clearTimeout(warm);
       window.removeEventListener("scroll", scroll);
       window.removeEventListener("resize", scroll);
       window.removeEventListener("wheel", arm);
@@ -86,7 +85,7 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
     >
       <div className={`${cabinHref ? "sticky top-0 h-svh" : "absolute inset-0 min-h-[620px]"} overflow-hidden`}
         style={cabinHref ? { height: `calc(100svh - ${topInset}px)` } : undefined}>
-        {cabinHref && <Link href={cabinHref} className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-30 focus:bg-[var(--blueprint-paper)] focus:p-3">Enter cabin</Link>}
+        {cabinHref && <Link href={cabinHref} prefetch={true} className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-30 focus:bg-[var(--blueprint-paper)] focus:p-3">Enter cabin</Link>}
         {children && <div className="relative z-10 px-2 pt-6 sm:pt-8" style={{ opacity: Math.max(0, 1 - progress * 4) }}>{children}</div>}
         {/* A fixed-size canvas: resizing it while scrolling re-renders WebGL every frame. The camera does the zoom. */}
         <div className={`${onCabinSelect ? "" : "pointer-events-none "}absolute inset-x-0 top-0 h-svh`} aria-hidden="true">
@@ -99,7 +98,7 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
           <span className="h-px w-24 bg-[var(--blueprint-rule)]"><span className="block h-full bg-[var(--blueprint-ink)]" style={{ width: `${progress * 100}%` }} /></span>
         </div>}
         {cabinHref && <div className="pointer-events-none absolute inset-0 z-20 bg-[var(--blueprint-paper)]" aria-hidden="true"
-          style={{ opacity: Math.min(1, Math.max(0, (progress - 0.85) / 0.13)) }} />}
+          style={{ opacity: Math.min(0.8, Math.max(0, (progress - 0.85) / 0.13)) }} />}
         <figcaption className="blueprint-label absolute bottom-3 left-0">HS—03 / General arrangement</figcaption>
         <span className="blueprint-label absolute right-0 bottom-3 hidden sm:block" aria-hidden="true">{progress > 0.35 ? "Passenger carriage" : "Axonometric view"}</span>
       </div>

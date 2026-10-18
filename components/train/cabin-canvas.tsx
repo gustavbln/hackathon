@@ -1,11 +1,12 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { Edges, RoundedBox, useCursor } from "@react-three/drei";
+import { useCursor } from "@react-three/drei";
 import { useRef, useState, type ReactNode } from "react";
 import { BackSide, type Group } from "three";
 import { CabinControls, type CabinView } from "./cabin-controls";
 import { CabinFocus } from "./cabin-focus";
+import { cabinBoxGeometry } from "./cabin-geometry";
 import { CABIN_CENTER, CABIN_LENGTH, CABIN_COMPONENTS, CABIN_SEATS, type CabinComponentId, type CabinSelection } from "./cabin-layout";
 import { readCabinPalette, type CabinPalette } from "./cabin-palette";
 
@@ -14,13 +15,15 @@ type Point = [number, number, number];
 function BlueprintBox({ size, position, palette, color = palette.surface, bright = false, rounded = false, opacity = 1 }: {
   size: Point; position: Point; palette: CabinPalette; color?: string; bright?: boolean; rounded?: boolean; opacity?: number;
 }) {
-  const finish = <>
+  const { body, edges } = cabinBoxGeometry(size, rounded);
+  return (
+    <mesh geometry={body} position={position}>
       <meshStandardMaterial color={color} roughness={opacity < 1 ? 0.25 : 0.85} transparent={opacity < 1} opacity={opacity} depthWrite={opacity === 1} />
-      <Edges color={palette.line} transparent opacity={opacity < 1 ? 0.15 : bright ? 1 : 0.45} raycast={() => null} />
-    </>;
-  return rounded
-    ? <RoundedBox args={size} radius={Math.min(0.035, Math.min(...size) / 3)} smoothness={2} position={position}>{finish}</RoundedBox>
-    : <mesh position={position}><boxGeometry args={size} />{finish}</mesh>;
+      <lineSegments geometry={edges} raycast={() => null}>
+        <lineBasicMaterial color={palette.line} transparent opacity={opacity < 1 ? 0.15 : bright ? 1 : 0.45} />
+      </lineSegments>
+    </mesh>
+  );
 }
 
 export function Seat({ id, position, palette, selectedSeatId, onSeatSelect }: {
