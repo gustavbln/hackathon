@@ -4,11 +4,11 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowDown } from "lucide-react";
-import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
+import { Component, useEffect, useRef, useState, type ReactNode } from "react";
 import { preload } from "react-dom";
 import { TrainFallback } from "./train-fallback";
 import { TRAIN_MODEL_URL } from "./train-asset";
-import { TrainCapabilities } from "./train-capabilities";
 
 const TrainCanvas = dynamic(() => import("./train-canvas"), { ssr: false });
 
@@ -31,19 +31,20 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
   const figure = useRef<HTMLElement>(null);
   const [progress, setProgress] = useState(0);
   const [topInset, setTopInset] = useState(128);
-  const enterCabin = useCallback(() => { if (cabinHref) router.push(cabinHref); }, [cabinHref, router]);
-  const onCabinSelect = cabinHref ? enterCabin : undefined;
+  const onCabinSelect = cabinHref ? () => router.push(cabinHref) : undefined;
 
   useEffect(() => {
     if (!cabinHref) return;
     router.prefetch(cabinHref);
-    // Warm the cabin's 3D code while the visitor still looks at the train.
-    void import("./cabin-canvas");
+    // Warm the cabin's 3D code while the visitor still looks at the train, so entering it is instant.
+    const warm = setTimeout(() => void import("./cabin-canvas"), 1_500);
     let armed = false;
     let frame = 0;
     let entry: ReturnType<typeof setTimeout> | undefined;
-    let touchY = 0;
-    const cancelEntry = () => { armed = false; clearTimeout(entry); entry = undefined; };
+    const arm = () => { armed = true; };
+    const key = (event: KeyboardEvent) => {
+      if (["ArrowDown", "PageDown", "End", " "].includes(event.key)) arm();
+    };
     const update = () => {
       frame = 0;
       if (!figure.current) return;
@@ -52,40 +53,27 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
       const range = Math.max(figure.current.offsetHeight - window.innerHeight, 1);
       const next = Math.min(1, Math.max(0, -top / range));
       setProgress(next);
-      if (next < 0.94) { clearTimeout(entry); entry = undefined; }
+      if (next < 0.98) { clearTimeout(entry); entry = undefined; }
       // Wait for the zoom to settle; restoring browser scroll alone must never enter the cabin.
-      if (next >= 0.94 && armed && entry === undefined) {
-        entry = setTimeout(() => router.push(cabinHref), window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 120);
+      if (next >= 0.98 && armed && entry === undefined) {
+        entry = setTimeout(() => router.push(cabinHref), window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 600);
       }
     };
     const scroll = () => { if (!frame) frame = requestAnimationFrame(update); };
-    const forward = () => { armed = true; scroll(); };
-    const wheel = (event: WheelEvent) => { if (event.deltaY > 0) forward(); else if (event.deltaY < 0) cancelEntry(); };
-    const touchStart = (event: TouchEvent) => { touchY = event.touches[0]?.clientY ?? 0; cancelEntry(); };
-    const touchMove = (event: TouchEvent) => {
-      const nextY = event.touches[0]?.clientY ?? touchY;
-      if (nextY < touchY) forward(); else if (nextY > touchY) cancelEntry();
-      touchY = nextY;
-    };
-    const key = (event: KeyboardEvent) => {
-      if (["ArrowDown", "PageDown", "End"].includes(event.key) || (event.key === " " && !event.shiftKey)) forward();
-      if (["ArrowUp", "PageUp", "Home"].includes(event.key) || (event.key === " " && event.shiftKey)) cancelEntry();
-    };
     window.addEventListener("scroll", scroll, { passive: true });
     window.addEventListener("resize", scroll);
-    window.addEventListener("wheel", wheel, { passive: true });
-    window.addEventListener("touchstart", touchStart, { passive: true });
-    window.addEventListener("touchmove", touchMove, { passive: true });
+    window.addEventListener("wheel", arm, { passive: true });
+    window.addEventListener("touchstart", arm, { passive: true });
     window.addEventListener("keydown", key);
     update();
     return () => {
       cancelAnimationFrame(frame);
       clearTimeout(entry);
+      clearTimeout(warm);
       window.removeEventListener("scroll", scroll);
       window.removeEventListener("resize", scroll);
-      window.removeEventListener("wheel", wheel);
-      window.removeEventListener("touchstart", touchStart);
-      window.removeEventListener("touchmove", touchMove);
+      window.removeEventListener("wheel", arm);
+      window.removeEventListener("touchstart", arm);
       window.removeEventListener("keydown", key);
     };
   }, [cabinHref, router]);
@@ -93,28 +81,28 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
   return (
     <figure
       ref={figure}
-      className={`blueprint-scene relative my-5 ${cabinHref ? "h-[190svh] shrink-0" : "min-h-[680px] flex-1 sm:min-h-[620px]"}`}
-      aria-label="Face the high-speed train. Scroll straight through the windshield into the passenger cabin."
+      className={`blueprint-scene relative my-3 ${cabinHref ? "h-[160svh] shrink-0" : "min-h-[680px] flex-1 sm:min-h-[620px]"}`}
+      aria-label="Explore the high-speed train. Scroll down to zoom into its passenger cabin."
     >
       <div className={`${cabinHref ? "sticky top-0 h-svh" : "absolute inset-0 min-h-[620px]"} overflow-hidden`}
         style={cabinHref ? { height: `calc(100svh - ${topInset}px)` } : undefined}>
-        {cabinHref && <Link href={cabinHref} prefetch={true} className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-30 focus:bg-[var(--blueprint-paper)] focus:p-3">Enter cabin</Link>}
         {children && <div className="relative z-10 px-2 pt-6 sm:pt-8" style={{ opacity: Math.max(0, 1 - progress * 4) }}>{children}</div>}
         {/* A fixed-size canvas: resizing it while scrolling re-renders WebGL every frame. The camera does the zoom. */}
-        <div className={`${onCabinSelect ? "" : "pointer-events-none "}absolute inset-x-0 top-0 h-svh`}
-          style={cabinHref ? { top: -topInset } : undefined} aria-hidden="true">
+        <div className={`${onCabinSelect ? "" : "pointer-events-none "}absolute inset-x-0 h-svh`}
+          style={{ top: -topInset / 2 }} aria-hidden="true">
           <SceneBoundary><TrainCanvas onCabinSelect={onCabinSelect} progress={progress} /></SceneBoundary>
         </div>
-        <div className="absolute inset-0 hidden sm:block" style={{ opacity: Math.max(0, 1 - progress * 3), pointerEvents: "none" }}><TrainCapabilities /></div>
-        {cabinHref && <div className="pointer-events-none absolute inset-x-0 bottom-12 flex flex-col items-center gap-2" aria-hidden="true">
-          <span className="blueprint-label">Scroll to enter the cabin</span>
-          <ArrowDown className="size-4 text-[var(--blueprint-muted)]" strokeWidth={1.25} />
-          <span className="h-px w-24 bg-[var(--blueprint-rule)]"><span className="block h-full bg-[var(--blueprint-ink)]" style={{ width: `${progress * 100}%` }} /></span>
+        {cabinHref && <div className="absolute inset-x-0 bottom-12 z-30 flex flex-col items-center gap-3">
+          <Button asChild variant="outline" size="lg" className="rounded-none border-[var(--blueprint-ink)] bg-[var(--blueprint-paper)] px-6 text-[var(--blueprint-ink)] hover:bg-[var(--blueprint-grid)] hover:text-[var(--blueprint-ink)]">
+            <Link href={cabinHref}>Enter cabin <ArrowDown strokeWidth={1.25} /></Link>
+          </Button>
+          <span className="blueprint-label" aria-hidden="true">Or scroll to explore</span>
+          <span className="h-px w-24 bg-[var(--blueprint-rule)]" aria-hidden="true"><span className="block h-full bg-[var(--blueprint-ink)]" style={{ width: `${progress * 100}%` }} /></span>
         </div>}
         {cabinHref && <div className="pointer-events-none absolute inset-0 z-20 bg-[var(--blueprint-paper)]" aria-hidden="true"
-          style={{ opacity: Math.min(0.8, Math.max(0, (progress - 0.85) / 0.13)) }} />}
+          style={{ opacity: Math.min(1, Math.max(0, (progress - 0.85) / 0.13)) }} />}
         <figcaption className="blueprint-label absolute bottom-3 left-0">HS—03 / General arrangement</figcaption>
-        <span className="blueprint-label absolute right-0 bottom-3 hidden sm:block" aria-hidden="true">{progress > 0.35 ? "Through the windshield" : "Front view"}</span>
+        <span className="blueprint-label absolute right-0 bottom-3 hidden sm:block" aria-hidden="true">{progress > 0.35 ? "Passenger carriage" : "Axonometric view"}</span>
       </div>
     </figure>
   );
