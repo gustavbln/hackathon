@@ -32,8 +32,8 @@ remain separate filters. These are AI-suggested preferences, not validated engin
 Repeated runs can agree and still be wrong. The endpoint does not alter the original risk index
 or supplier ranking automatically.
 The chatbot can call this evaluator too: ask "What are the most important criteria for train
-seats?". The answer includes the averaged priorities and an optional `seatCriteria` response
-field for a future criteria panel. Existing chat rendering displays the answer without changes.
+seats?". Its `seatCriteria` response renders as a compact priorities card with importance bars,
+brief reasons, and expandable details for all 18 criteria and all three evaluation scores.
 
 Checks: `docker compose exec web npm run lint`, `npm run typecheck`, `npm test`, `npm run build`
 (run each inside the container). Tests use synthetic suppliers; private data is not needed in CI.

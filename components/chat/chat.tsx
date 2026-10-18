@@ -33,8 +33,8 @@ export function ChatThread({ messages, status, error }: ChatThreadProps) {
         <p className="max-w-sm text-sm leading-relaxed">
           Hi, I&apos;m {assistantName}.{" "}
           <span className="text-[var(--blueprint-muted)]">
-            Ask me about any supplier, risk score or ranking. Every number I give you comes
-            straight from the supplier dataset.
+            Ask me about suppliers, risk scores, rankings or seat sourcing priorities.
+            Supplier facts come from the dataset; seat priorities are labeled AI suggestions.
           </span>
         </p>
       </div>
@@ -59,7 +59,7 @@ export function ChatThread({ messages, status, error }: ChatThreadProps) {
               <Trace>
                 <TraceLine status="running" className="text-[var(--blueprint-muted)]">
                   <AssistantAvatar thinking className="size-5" />
-                  <TraceTitle>{assistantName} is checking the supplier dataset…</TraceTitle>
+                  <TraceTitle>{assistantName} is preparing your answer…</TraceTitle>
                 </TraceLine>
               </Trace>
             )}
