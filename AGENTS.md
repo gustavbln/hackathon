@@ -58,8 +58,9 @@ What the Siemens stakeholder told us (our talk, 2026-10-18):
   special contracts and buys from other data vendors. Their real ask: present it beautifully, in a
   UI that supports decisions, and show them how others would do it. "Anyone vibe-codes a mid-quality
   UI in an hour. A really good UI is hard, and the difference shows."
-- **Chatbot is a must:** buyers ask questions about the dataset. It may live inside the UI instead of
-  being a separate app.
+- **Chatbot is a must:** buyers ask questions about the dataset. One chat can cover both CSV
+  questions and real-company research inside the UI; label the source of each answer. Never infer
+  real identities for anonymized suppliers.
 - **The research agent is the real agentic use case:** "We only have fake data. I'd love real data.
   Can an agent get it?" A crawler that connects data about real companies, with traceable, reliable
   sources. Narrowing is fine (e.g. only German public sources, only environmental data). Nobody is
@@ -100,20 +101,13 @@ Data:
 ## Nemotron (NVIDIA side challenge)
 
 - Provider: [Nebius Token Factory](https://tokenfactory.nebius.com/), OpenAI-compatible. Base URL
-  `https://api.tokenfactory.nebius.com/v1/`, key in `NEBIUS_API_KEY`. Server-side only, never from
-  the browser. One client in `lib/`, reused by the chatbot and the agents.
-- Models: Nebius hosts Nemotron 3 Nano 30B, Nano Omni, Super 120B and Ultra 550B. Copy the exact IDs
-  from `curl -H "Authorization: Bearer $NEBIUS_API_KEY" https://api.tokenfactory.nebius.com/v1/models`
-  and note them here.
-- Fallback and extras: NVIDIA's API at `https://integrate.api.nvidia.com/v1` (key `NVIDIA_API_KEY`
-  from build.nvidia.com, free, about 40 requests/min). It also has the fast
-  `nvidia/nemotron-3.5-lightning-30b-a3b`, embeddings `nvidia/nemotron-3-embed-1b` and the reranker
-  `nv-rerankqa-mistral-4b-v3` (`llama-nemotron-rerank-1b-v2` is retired).
-  Live list: `curl https://integrate.api.nvidia.com/v1/models`.
+  `https://api.tokenfactory.nebius.com/v1/`, key in `NEBIUS_API_KEY`, model ID in `NEBIUS_MODEL`.
+  Server-side only, never from the browser. One client in `lib/`, reused by the chatbot and agents.
+- Model: `nvidia/Nemotron-3-Ultra-550b-a55b`, verified against Nebius's authenticated `/v1/models`
+  endpoint on 2026-10-18. Use Nebius for all LLM calls, with no automatic provider fallback.
 - Show it: the UI and the video make clear the AI runs on NVIDIA Nemotron.
-- Gotchas: reasoning is on by default and slow. On NVIDIA's API, turn it off for quick calls with
-  `chat_template_kwargs: {"enable_thinking": false}`; check whether Nebius accepts the same.
-  Reasoning text arrives separately in `reasoning_content`. Always copy model IDs from `/v1/models`.
+- Verify Nebius's supported reasoning and tool parameters before using them; don't assume NVIDIA's
+  request options transfer unchanged. Reasoning text is separate from the answer.
 
 ## Docker only
 
