@@ -67,7 +67,7 @@ export function SeatShortlistPanel({ seatId, initialWeights = null, onClose }: S
     <section
       aria-label="Seat supplier shortlist"
       onKeyDown={(event) => event.key === "Escape" && onClose()}
-      className="@container/shortlist flex min-h-[40rem] min-w-0 flex-col border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] text-[var(--blueprint-ink)] animate-in fade-in-0 slide-in-from-right-4 duration-500 motion-reduce:animate-none"
+      className="@container/shortlist flex min-h-[40rem] min-w-0 flex-col @min-[720px]:h-full @min-[720px]:min-h-0 border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] text-[var(--blueprint-ink)] animate-in fade-in-0 slide-in-from-right-4 duration-500 motion-reduce:animate-none"
     >
       <header className="flex items-center justify-between gap-4 border-b border-[var(--blueprint-rule)] py-2 pr-2 pl-5">
         <div className="min-w-0">
@@ -88,7 +88,7 @@ export function SeatShortlistPanel({ seatId, initialWeights = null, onClose }: S
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
         {load.state === "loading" && <ShortlistLoading />}
         {load.state === "error" && (
           <div role="alert" className="flex flex-col items-start gap-3 p-5 text-sm">
@@ -196,7 +196,7 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
   const focusCriterion = shortlist.criteria.find(({ key }) => key === focus);
 
   return (
-    <div className="flex flex-col gap-6 p-5">
+    <div className="grid flex-1 gap-6 p-5 @min-[860px]/shortlist:min-h-0 @min-[860px]/shortlist:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <SupplierColumns
         suppliers={top}
         supplierCount={shortlist.supplierCount}
@@ -204,7 +204,7 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
         onOpen={(id) => router.push(`/suppliers/${id}?${query}`)}
       />
 
-      <div className="grid gap-6 border-t border-[var(--blueprint-rule)] pt-5 @min-[680px]/shortlist:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)]">
+      <div className="flex min-w-0 flex-col gap-4 border-t border-[var(--blueprint-rule)] pt-5 @min-[860px]/shortlist:min-h-0 @min-[860px]/shortlist:overflow-y-auto @min-[860px]/shortlist:border-t-0 @min-[860px]/shortlist:border-l @min-[860px]/shortlist:pt-0 @min-[860px]/shortlist:pl-6">
         <section aria-labelledby="seat-criteria-heading" className="flex min-w-0 flex-col items-center gap-2">
           <h3 id="seat-criteria-heading" className="blueprint-label self-start">Priorities · drag a point to reweight</h3>
           <WeightSpider
@@ -275,24 +275,17 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
           >
             Reset weighting
           </Button>
-          <details className="text-xs">
-            <summary className="blueprint-label cursor-pointer hover:text-[var(--blueprint-ink)]">
-              All {keys.length} weights as a table
-            </summary>
-            <table className="mt-2 w-full">
-              <caption className="sr-only">Current risk driver weights</caption>
-              <tbody>
-                {keys.map((key) => (
-                  <tr key={key} className="border-t border-[var(--blueprint-rule)]">
-                    <th scope="row" className="py-1 text-left font-normal">
-                      <Link href={`/drivers/${key}?${query}`} className="hover:underline">{CRITERION_BY_KEY[key].label}</Link>
-                    </th>
-                    <td className="py-1 text-right font-mono tabular-nums">{(weights[key] * 100).toFixed(1)}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </details>
+          <section aria-labelledby="seat-weights-heading" className="text-xs">
+            <h3 id="seat-weights-heading" className="blueprint-label mb-1">All {keys.length} weights</h3>
+            <ul className="grid grid-cols-2 gap-x-5">
+              {keys.map((key) => (
+                <li key={key} className="flex justify-between gap-2 border-t border-[var(--blueprint-rule)] py-1">
+                  <Link href={`/drivers/${key}?${query}`} className="truncate hover:underline">{CRITERION_BY_KEY[key].label}</Link>
+                  <span className="font-mono tabular-nums">{(weights[key] * 100).toFixed(1)}%</span>
+                </li>
+              ))}
+            </ul>
+          </section>
         </aside>
       </div>
     </div>

@@ -77,7 +77,7 @@ export function WeightSpider({ keys, values, active, onActive, onChange, onCommi
     <svg
       ref={svg}
       viewBox={`${-LABEL_PAD} 0 ${SIZE + 2 * LABEL_PAD} ${SIZE}`}
-      className="w-full max-w-[36rem] touch-none overflow-visible select-none"
+      className="max-h-[min(26rem,44svh)] w-full max-w-[36rem] touch-none overflow-visible select-none"
       aria-label="Risk driver weights"
     >
       {RINGS.map((share) => (
