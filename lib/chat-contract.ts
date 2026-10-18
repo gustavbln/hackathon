@@ -92,6 +92,11 @@ export const explainSupplierSchema = z.strictObject({
   openAlternative: z.boolean().default(false),
 });
 export const explainDriverSchema = z.strictObject({ driverKey: criterionKeySchema });
+/** Web context for one risk driver. Queries are guarded on the server against naming dataset suppliers. */
+export const searchContextSchema = z.strictObject({
+  driverKey: criterionKeySchema,
+  queries: z.array(z.string().trim().min(3).max(120)).min(1).max(2),
+});
 export const chatRequestSchema = z.strictObject({
   message: z.string().trim().min(1).max(4_000),
   history: z.array(z.strictObject({ role: z.enum(["user", "assistant"]), content: z.string().max(2_000) })).max(12).default([]),
@@ -128,7 +133,19 @@ export const answerRecipeSchema = z.strictObject({
   resultId: z.string().max(200).nullable(),
   supplierIds: z.array(supplierIdSchema).max(20),
   metricKeys: z.array(metricKeySchema).max(24),
+  /** General web context, citing search_context sources as [n]; null without web sources. */
+  webText: z.string().trim().min(1).max(1_500).nullable().default(null),
 });
+/** A web source the answer cites as [n]; title, URL and date come from Tavily, the quote is checked against its text. */
+export const webSourceSchema = z.object({
+  n: z.number().int().positive(),
+  title: z.string(),
+  url: z.url({ protocol: /^https?$/ }),
+  domain: z.string(),
+  publishedDate: z.string().nullable(),
+  quote: z.string().max(300),
+});
+export type WebSource = z.infer<typeof webSourceSchema>;
 export const chatResponseSchema = z.object({
   answer: z.string(),
   model: z.string(),
@@ -145,6 +162,8 @@ export const chatResponseSchema = z.object({
   seatCriteria: seatCriteriaResponseSchema.optional(),
   /** Changes for the page on screen, e.g. new weights after the buyer re-ranked through the chat. */
   actions: z.array(pageActionSchema).default([]),
+  /** General context from the web, labelled apart from the dataset answer; never about a dataset supplier. */
+  webContext: z.object({ text: z.string(), sources: z.array(webSourceSchema).min(1) }).nullable().default(null),
 });
 export type ChatResponse = z.infer<typeof chatResponseSchema>;
 

@@ -204,9 +204,9 @@ function promptsFor(page: PageContext | null): string[] {
   if (page.page === "seat") return ["Why is #1 on top?", "Make quality matter more"]
   if (page.page === "driver") {
     const driver = CRITERION_BY_KEY[page.driverKey].label.toLowerCase()
-    return [`What does ${driver} mean for seats?`, `Worst of my top 20 on ${driver}`]
+    return [`What does ${driver} mean for seats?`, `Worst of my top 20 on ${driver}`, "Related standards (web)"]
   }
-  return ["Why is there this risk?", "Show a safer alternative"]
+  return ["Why is there this risk?", "What does its top risk mean? (web)", "Show a safer alternative"]
 }
 
 function describePage(page: PageContext): string {

@@ -50,7 +50,7 @@ test("alternatives are the page's: clearly better on the top driver, lowest risk
 test("a prose answer may only name suppliers its explanation covers", () => {
   assert.ok(entry);
   const evidence = new Map([["call_1", explainSupplier(entry, ranked, weights)]]);
-  const recipe = { text: "Compliance drives the risk.", resultId: "call_1", supplierIds: ["SUPP_00001", "SUPP_00002"], metricKeys: [] };
+  const recipe = { text: "Compliance drives the risk.", resultId: "call_1", supplierIds: ["SUPP_00001", "SUPP_00002"], metricKeys: [], webText: null };
   assert.equal(hydrateAnswer(recipe, evidence, "test", []).view, null);
   assert.throws(() => hydrateAnswer({ ...recipe, supplierIds: ["SUPP_00003"] }, evidence, "test", []), { code: "ungrounded_answer" });
 });

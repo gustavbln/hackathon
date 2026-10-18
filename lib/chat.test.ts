@@ -10,7 +10,7 @@ const result: DatasetResult = {
     values: [{ metric: "Total_Risk_Index", value: id * 10, level: "Low", contribution: null }] })),
   matchedCount: 50, missingIds: [], metricKeys: ["Total_Risk_Index"], sort: { metric: "Total_Risk_Index", direction: "asc" },
 };
-const recipe = { text: "Supplier 1 has the lowest overall risk.", resultId: "call_1", supplierIds: ["SUPP_00002", "SUPP_00001"], metricKeys: result.metricKeys };
+const recipe = { text: "Supplier 1 has the lowest overall risk.", resultId: "call_1", supplierIds: ["SUPP_00002", "SUPP_00001"], metricKeys: result.metricKeys, webText: null };
 
 test("response values and ranked order come from current tool evidence", () => {
   const response = hydrateAnswer(recipe, new Map([["call_1", result]]), "test-model", []);
@@ -43,7 +43,7 @@ test("reject stale receipts, invented IDs and unfetched metrics", () => {
 test("empty results have no fabricated cards; no-evidence prose becomes fixed help", () => {
   const response = hydrateAnswer({ ...recipe, supplierIds: [], metricKeys: [] }, new Map([["call_1", { ...result, rows: [], matchedCount: 0 }]]), "test", []);
   assert.equal(response.view, null);
-  const help = hydrateAnswer({ text: "Invented data", resultId: null, supplierIds: [], metricKeys: [] }, new Map(), "test", []);
+  const help = hydrateAnswer({ text: "Invented data", resultId: null, supplierIds: [], metricKeys: [], webText: null }, new Map(), "test", []);
   assert.ok(!help.answer.includes("Invented data"));
 });
 
@@ -96,7 +96,7 @@ test("seat-priority questions use three evaluations and return grounded prioriti
   }])) };
   let evaluations = 0;
   let routingCalls = 0;
-  const finalRecipe = { text: "For train seats, quality has an average importance of 9/10 across three runs. These are AI-suggested priorities.", resultId: "seat_2", supplierIds: [], metricKeys: [] };
+  const finalRecipe = { text: "For train seats, quality has an average importance of 9/10 across three runs. These are AI-suggested priorities.", resultId: "seat_2", supplierIds: [], metricKeys: [], webText: null };
   t.mock.method(globalThis, "fetch", async (_url: string, init: RequestInit) => {
     const request = JSON.parse(String(init.body));
     let message;

@@ -37,8 +37,8 @@ export type UsageSink = (call: ModelCall) => void;
 /** Per-call choices for pipelines that use several Nemotron models; defaults keep the chat's behaviour. */
 export type NemotronOptions = {
   model?: string; thinking?: boolean; mediumEffort?: boolean; maxTokens?: number; onUsage?: UsageSink;
-  /** "required" makes every reply a tool call, e.g. when the final answer is a tool too. */
-  toolChoice?: "auto" | "required";
+  /** "required" makes the reply a tool call; a named function makes it that call. */
+  toolChoice?: "auto" | "required" | { type: "function"; function: { name: string } };
 };
 
 export async function completeNemotron(messages: ModelMessage[], tools: ModelTool[], signal: AbortSignal, outputSchema?: Record<string, unknown>, options: NemotronOptions = {}) {
