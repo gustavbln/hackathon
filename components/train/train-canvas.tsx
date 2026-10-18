@@ -6,6 +6,7 @@ import { Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStor
 import type { Group } from "three";
 import { TrainModel } from "./train-model";
 import { TrainFallback } from "./train-fallback";
+import { CabinTarget } from "@/components/cabin/cabin-target";
 
 const ROTATION_SECONDS = 20;
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
@@ -20,7 +21,7 @@ function getReducedMotion() {
   return window.matchMedia(REDUCED_MOTION).matches;
 }
 
-function TrainArrangement({ reducedMotion, onReady }: { reducedMotion: boolean; onReady: () => void }) {
+function TrainArrangement({ reducedMotion, onReady, onCabinSelect }: { reducedMotion: boolean; onReady: () => void; onCabinSelect?: () => void }) {
   const group = useRef<Group>(null);
   useEffect(onReady, [onReady]);
   useFrame((_, delta) => {
@@ -32,7 +33,7 @@ function TrainArrangement({ reducedMotion, onReady }: { reducedMotion: boolean; 
 
   return (
     <group ref={group} rotation={[0, -0.2, 0]}>
-      <TrainModel />
+      {onCabinSelect ? <CabinTarget onSelect={onCabinSelect}><TrainModel /></CabinTarget> : <TrainModel />}
     </group>
   );
 }
@@ -56,7 +57,7 @@ function SceneCamera() {
   );
 }
 
-export default function TrainCanvas() {
+export default function TrainCanvas({ onCabinSelect }: { onCabinSelect?: () => void }) {
   const reducedMotion = useSyncExternalStore(subscribeMotion, getReducedMotion, () => true);
   const [loaded, setLoaded] = useState(false);
   const handleReady = useCallback(() => setLoaded(true), []);
@@ -76,7 +77,7 @@ export default function TrainCanvas() {
         <ambientLight intensity={1.8} />
         <directionalLight position={[12, 25, 18]} intensity={2} />
         <Suspense fallback={null}>
-          <TrainArrangement reducedMotion={reducedMotion} onReady={handleReady} />
+          <TrainArrangement reducedMotion={reducedMotion} onReady={handleReady} onCabinSelect={onCabinSelect} />
         </Suspense>
       </Canvas>
     </>

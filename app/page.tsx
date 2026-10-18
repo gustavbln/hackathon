@@ -1,4 +1,3 @@
-import { ChatDock } from "@/components/chat/chat-dock";
 import type { Metadata } from "next";
 import { TrainScene } from "@/components/train/train-scene";
 import { ArrowRight } from "lucide-react";
@@ -17,10 +16,9 @@ export default function Home() {
         <h1 id="landing-heading" className="text-[clamp(1.1rem,5.4vw,3rem)] leading-[1.12] font-medium tracking-[-0.035em] whitespace-nowrap">
           Financial Risk Assessment
         </h1>
-        <ChatDock />
       </section>
 
-      <TrainScene>
+      <TrainScene cabinHref="/cabin">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-lg font-medium tracking-tight sm:text-2xl">
             Know your suppliers. Keep production moving.

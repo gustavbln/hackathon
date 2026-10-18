@@ -3,9 +3,11 @@
 import dynamic from "next/dynamic";
 import { Component, useState, type ReactNode } from "react";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
-import { CABIN_SEATS } from "./cabin-layout";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, RotateCcw } from "lucide-react";
+import { ComponentPreviewPanel } from "@/components/cabin/component-preview-panel";
+import { SeatShortlistPanel } from "@/components/cabin/seat-shortlist-panel";
+import { CABIN_COMPONENTS, CABIN_SEATS, type CabinComponentId } from "./cabin-layout";
 
 function CabinFallback({ loading = false }: { loading?: boolean }) {
   return (
@@ -32,13 +34,20 @@ export function CabinScene() {
   const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
   const [resetView, setResetView] = useState(0);
+  const [selectedComponentId, setSelectedComponentId] = useState<CabinComponentId | null>(null);
+  // One selection at a time: a seat or one of the preview parts.
+  const selectSeat = (id: string | null) => { setSelectedSeatId(id); setSelectedComponentId(null); };
+  const selectComponent = (id: CabinComponentId | null) => { setSelectedComponentId(id); setSelectedSeatId(null); };
+  const componentLabel = CABIN_COMPONENTS.find(({ id }) => id === selectedComponentId)?.label;
 
   return (
     <section className="mt-6 flex flex-1 flex-col" aria-label="Interactive blueprint cabin">
       <div className="relative min-h-[420px] flex-1 overflow-hidden rounded-sm border border-[var(--blueprint-rule)] sm:min-h-[480px]">
         <div className="absolute inset-0">
           <CabinBoundary>
-            <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={setSelectedSeatId} zoom={zoom} setZoom={setZoom} resetView={resetView} fallback={<CabinFallback />} />
+            <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={selectSeat}
+              selectedComponentId={selectedComponentId} onComponentSelect={selectComponent}
+              zoom={zoom} setZoom={setZoom} resetView={resetView} fallback={<CabinFallback />} />
           </CabinBoundary>
         </div>
         <span className="blueprint-label pointer-events-none absolute top-4 left-4">Cabin 01 / Perspective</span>
@@ -52,16 +61,18 @@ export function CabinScene() {
       <p className="blueprint-label mt-3">Drag to look around · Scroll or pinch to zoom</p>
       <footer className="flex flex-wrap items-center justify-between gap-4 py-5">
         <p className="text-sm text-[var(--blueprint-muted)]" role="status" aria-live="polite">
-          {selectedSeatId ? `Seat ${selectedSeatId} selected` : "Select any seat to begin"}
+          {selectedSeatId ? `Seat ${selectedSeatId} selected` : componentLabel ? `${componentLabel} selected (preview)` : "Select any seat to begin"}
         </p>
         <div className="flex items-center gap-3">
           <label htmlFor="cabin-seat" className="blueprint-label">Seat</label>
-          <NativeSelect id="cabin-seat" value={selectedSeatId ?? ""} onChange={(event) => setSelectedSeatId(event.target.value || null)}>
+          <NativeSelect id="cabin-seat" value={selectedSeatId ?? ""} onChange={(event) => selectSeat(event.target.value || null)}>
             <NativeSelectOption value="">None selected</NativeSelectOption>
             {CABIN_SEATS.map((seat) => <NativeSelectOption key={seat.id} value={seat.id}>Seat {seat.id}</NativeSelectOption>)}
           </NativeSelect>
         </div>
       </footer>
+      {selectedSeatId && <SeatShortlistPanel onClose={() => selectSeat(null)} />}
+      {selectedComponentId && <ComponentPreviewPanel componentId={selectedComponentId} onClose={() => selectComponent(null)} />}
     </section>
   );
 }

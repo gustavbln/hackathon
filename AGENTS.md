@@ -150,6 +150,8 @@ Uses `zod`, `csv-parse`, `server-only`; focused backend checks run with `npm tes
 Seat preferences: `POST /api/seat-criteria` runs Nemotron three times and averages criterion
 importance. Frontend contract: `lib/seat-criteria-contract.ts`. AI suggestions, not engineering validation.
 Chat tool `evaluate_seat_criteria` reuses it; `/api/chat` may return optional `seatCriteria` data.
+Cabin shortlist: `GET /api/seat-shortlist?source=rules|nemotron`; contract in `lib/seat-shortlist-contract.ts`.
+Chat layout: wrap the page in `ChatWorkspace` when using the `ChatDock` header button.
 
 ## Git on a shared main
 

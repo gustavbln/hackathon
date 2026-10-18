@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { Edges, RoundedBox, useCursor } from "@react-three/drei";
 import { useRef, useState, type ReactNode } from "react";
 import { CabinControls, type CabinView } from "./cabin-controls";
-import { CABIN_SEATS, type CabinSelection } from "./cabin-layout";
+import { CABIN_COMPONENTS, CABIN_SEATS, type CabinComponentId, type CabinSelection } from "./cabin-layout";
 import type { TrainPalette } from "./create-train";
 
 type Point = [number, number, number];
@@ -23,7 +23,7 @@ function BlueprintBox({ size, position, palette, color = palette.surface, bright
 
 function Seat({ id, position, palette, selectedSeatId, onSeatSelect }: {
   id: string; position: Point; palette: TrainPalette;
-} & CabinSelection) {
+} & Pick<CabinSelection, "selectedSeatId" | "onSeatSelect">) {
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
   const active = hovered || selectedSeatId === id;
@@ -65,18 +65,13 @@ function CabinShell({ palette }: { palette: TrainPalette }) {
   return (
     // Solid cabin surfaces block pointer hits on geometry behind them.
     <group onPointerOver={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
-      <BlueprintBox {...box} color={palette.mechanical} size={[3.8, 0.1, 13]} position={[0, -0.06, -1.5]} />
       <BlueprintBox {...box} size={[3.8, 0.1, 13]} position={[0, 2.65, -1.5]} />
       <BlueprintBox {...box} size={[3.8, 2.7, 0.1]} position={[0, 1.3, -8]} />
       <BlueprintBox {...box} size={[3.8, 2.7, 0.1]} position={[0, 1.3, 5]} />
-      <BlueprintBox {...box} color={palette.mechanical} size={[0.95, 2.2, 0.04]} position={[0, 1.1, 4.93]} />
-      <BlueprintBox {...box} color={palette.mechanical} size={[0.95, 2.2, 0.04]} position={[0, 1.1, -7.93]} />
-      <BlueprintBox {...box} color={palette.glass} size={[0.6, 0.8, 0.04]} position={[0, 1.55, -7.89]} />
       {[-1, 1].map((side) => (
         <group key={side}>
           <BlueprintBox {...box} size={[0.1, 0.9, 13]} position={[side * 1.85, 0.4, -1.5]} />
           <BlueprintBox {...box} size={[0.1, 0.6, 13]} position={[side * 1.85, 2.4, -1.5]} />
-          <BlueprintBox {...box} color={palette.glass} size={[0.04, 1.25, 13]} position={[side * 1.88, 1.48, -1.5]} />
           {Array.from({ length: 8 }, (_, index) => (
             <BlueprintBox key={index} {...box} size={[0.14, 1.3, 0.09]} position={[side * 1.82, 1.48, 4.8 - index * 1.8]} />
           ))}
@@ -103,6 +98,38 @@ function CabinShell({ palette }: { palette: TrainPalette }) {
   );
 }
 
+type PartBox = { size: Point; position: Point; color: keyof TrainPalette };
+
+const CABIN_PARTS: Record<CabinComponentId, PartBox[]> = {
+  windows: [-1, 1].map((side) => ({ size: [0.04, 1.25, 13], position: [side * 1.88, 1.48, -1.5], color: "glass" })),
+  door: [
+    { size: [0.95, 2.2, 0.04], position: [0, 1.1, 4.93], color: "mechanical" },
+    { size: [0.95, 2.2, 0.04], position: [0, 1.1, -7.93], color: "mechanical" },
+    { size: [0.6, 0.8, 0.04], position: [0, 1.55, -7.89], color: "glass" },
+  ],
+  flooring: [{ size: [3.8, 0.1, 13], position: [0, -0.06, -1.5], color: "mechanical" }],
+};
+
+function CabinPart({ id, boxes, palette, selectedComponentId, onComponentSelect }: {
+  id: CabinComponentId; boxes: PartBox[]; palette: TrainPalette;
+} & Pick<CabinSelection, "selectedComponentId" | "onComponentSelect">) {
+  const [hovered, setHovered] = useState(false);
+  useCursor(hovered);
+  const active = hovered || selectedComponentId === id;
+
+  return (
+    <group name={`part-${id}`}
+      onPointerOver={(event) => { event.stopPropagation(); setHovered(true); }}
+      onPointerOut={() => setHovered(false)}
+      onClick={(event) => { event.stopPropagation(); if (event.delta <= 5) onComponentSelect(id); }}>
+      {boxes.map((part, index) => (
+        <BlueprintBox key={index} palette={palette} size={part.size} position={part.position}
+          color={active ? palette.glass : palette[part.color]} bright={active} />
+      ))}
+    </group>
+  );
+}
+
 export default function CabinCanvas({ fallback, zoom, setZoom, resetView, ...selection }: CabinSelection & CabinView & { fallback: ReactNode }) {
   const dragged = useRef(false);
   const [palette] = useState<TrainPalette>(() => {
@@ -113,12 +140,17 @@ export default function CabinCanvas({ fallback, zoom, setZoom, resetView, ...sel
 
   return (
     <Canvas camera={{ position: [0, 1.65, 4.6], near: 0.05, far: 40 }} dpr={[1, 1.5]} frameloop="demand" gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-      fallback={fallback} style={{ touchAction: "none" }} aria-label="Inside the blueprint train cabin. Click a seat to select it.">
+      fallback={fallback} style={{ touchAction: "none" }} aria-label="Inside the blueprint train cabin. Click a seat, a window, the door or the floor to select it."
+      onPointerMissed={() => { if (!dragged.current) { selection.onSeatSelect(null); selection.onComponentSelect(null); } }}>
       <CabinControls zoom={zoom} setZoom={setZoom} resetView={resetView} dragged={dragged} />
       <ambientLight intensity={1.4} />
       <directionalLight position={[0, 2.5, 3]} intensity={1.6} />
       <CabinShell palette={palette} />
       {CABIN_SEATS.map((seat) => <Seat key={seat.id} {...seat} {...selection} onSeatSelect={(id) => { if (!dragged.current) selection.onSeatSelect(id); }} palette={palette} />)}
+      {CABIN_COMPONENTS.map(({ id }) => (
+        <CabinPart key={id} id={id} boxes={CABIN_PARTS[id]} {...selection}
+          onComponentSelect={(part) => { if (!dragged.current) selection.onComponentSelect(part); }} palette={palette} />
+      ))}
     </Canvas>
   );
 }

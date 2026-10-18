@@ -7,8 +7,12 @@ From the landing scene, choose **Enter cabin** to open `/cabin`: a blueprint int
 16 clickable seats, overhead luggage racks and ICE-inspired seat detailing. Drag to look around
 from a fixed position; scroll, pinch or use the zoom buttons to zoom. Reset view returns to the aisle.
 With the panorama focused, arrow keys look around and +/- zoom. Click/tap a seat or use the
-keyboard-accessible seat selector to highlight it. Selection does not trigger supplier or AI requests.
+keyboard-accessible seat selector to highlight it.
 The interior is a stylised original, informed by [DB’s ICE 4 overview](https://www.bahn.de/service/ueber-uns/zugtypen/ice-4), not an exact vehicle replica.
+Selecting a seat opens its top-20 supplier shortlist. Switch between the shared seat profile and
+three averaged Nemotron evaluations. Windows, the door and flooring open clearly labelled previews.
+Open Gauge in the cabin header: on desktop it docks beside the resized workspace; on phones it
+fills the screen. Closing and reopening keeps the conversation for the current page session.
 
 The chat backend uses NVIDIA Nemotron through Nebius. Copy the private hackathon files into
 `data/supplier_risk_dataset.csv` and `data/risk_criteria_description.md` (gitignored).
@@ -41,6 +45,10 @@ or supplier ranking automatically.
 The chatbot can call this evaluator too: ask "What are the most important criteria for train
 seats?". Its `seatCriteria` response renders as a compact priorities card with importance bars,
 brief reasons, and expandable details for all 18 criteria and all three evaluation scores.
+
+Seat shortlist: `GET /api/seat-shortlist?source=rules` uses the shared seat profile;
+`source=nemotron` uses the averaged AI weights. Both rank the dataset and return up to 20 suppliers
+with their three biggest risk contributions. The typed response is in `lib/seat-shortlist-contract.ts`.
 
 Checks: `docker compose exec web npm run lint`, `npm run typecheck`, `npm test`, `npm run build`
 (run each inside the container). Tests use synthetic suppliers; private data is not needed in CI.

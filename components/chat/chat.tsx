@@ -28,7 +28,7 @@ type ChatThreadProps = {
 export function ChatThread({ messages, status, error }: ChatThreadProps) {
   if (messages.length === 0) {
     return (
-      <div className="flex min-h-[min(50svh,24rem)] flex-col items-center justify-center gap-4 px-8 py-10 text-center">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-8 py-10 text-center">
         <AssistantAvatar className="size-16" />
         <p className="max-w-sm text-sm leading-relaxed">
           Hi, I&apos;m {assistantName}.{" "}
@@ -43,7 +43,7 @@ export function ChatThread({ messages, status, error }: ChatThreadProps) {
 
   return (
     <MessageScrollerProvider>
-      <MessageScroller className="h-[min(60svh,36rem)]">
+      <MessageScroller className="min-h-0 flex-1">
         <MessageScrollerViewport>
           <MessageScrollerContent className="gap-6 p-4">
             {messages.map((message) => (

@@ -1,9 +1,11 @@
 "use client"
 
-import { useState } from "react"
-import { XIcon } from "lucide-react"
+import { useState, type CSSProperties, type ReactNode } from "react"
+import { ArrowLeftIcon, XIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
+import { Sidebar, SidebarProvider, useSidebar } from "@/components/ui/sidebar"
 import { chatResponseSchema } from "@/lib/chat-contract"
 
 import { AssistantAvatar, assistantName } from "./assistant-avatar"
@@ -39,16 +41,48 @@ async function askChat(text: string, previous: ChatMessage[]) {
   return chatResponseSchema.parse(body)
 }
 
-// Header button; the panel drops below it without dimming the page.
+export function ChatWorkspace({ children }: { children: ReactNode }) {
+  return (
+    <SidebarProvider defaultOpen={false} style={{ "--sidebar-width": "min(420px, 42vw)" } as CSSProperties}>
+      {children}
+      <ChatPanel />
+    </SidebarProvider>
+  )
+}
+
 export function ChatDock() {
+  const { isMobile, open, openMobile, toggleSidebar } = useSidebar()
+  const expanded = isMobile ? openMobile : open
+  return (
+    <Button
+      id="supplier-assistant-trigger"
+      variant="ghost"
+      size="icon-lg"
+      onClick={toggleSidebar}
+      aria-expanded={expanded}
+      aria-controls="supplier-assistant"
+      aria-label={expanded ? `Close ${assistantName}` : `Ask ${assistantName}, the supplier assistant`}
+      className="text-[var(--blueprint-ink)] transition-transform hover:-translate-y-0.5 hover:bg-transparent hover:text-[var(--blueprint-ink)] aria-expanded:bg-transparent aria-expanded:text-[var(--blueprint-ink)]"
+    >
+      <AssistantAvatar className="size-8" />
+    </Button>
+  )
+}
+
+function ChatPanel() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [status, setStatus] = useState<ChatStatus>("ready")
   const [error, setError] = useState<string | null>(null)
-  const [open, setOpen] = useState(false)
+  const { isMobile, open, setOpen, openMobile, setOpenMobile } = useSidebar()
+
+  function close() {
+    if (isMobile) setOpenMobile(false)
+    else setOpen(false)
+    document.getElementById("supplier-assistant-trigger")?.focus()
+  }
 
   async function send(text: string) {
     const previous = messages
-    setOpen(true)
     setStatus("pending")
     setError(null)
     setMessages([...previous, { id: crypto.randomUUID(), role: "user", text }])
@@ -62,43 +96,49 @@ export function ChatDock() {
     }
   }
 
-  return (
-    <div onKeyDown={(event) => event.key === "Escape" && setOpen(false)}>
-      {open && (
-        <section
-          id="supplier-assistant"
-          aria-label="Supplier assistant"
-          className="fixed top-[5.5rem] right-5 z-40 flex w-[min(32rem,calc(100vw-2.5rem))] flex-col sm:right-10 lg:right-16 border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)]/95 text-[var(--blueprint-ink)] backdrop-blur-sm animate-in fade-in-0 slide-in-from-top-2"
+  const panel = (
+    <section
+      id="supplier-assistant"
+      aria-label="Supplier assistant"
+      onKeyDown={(event) => event.key === "Escape" && close()}
+      className="flex h-full min-h-0 flex-col bg-[var(--blueprint-paper-deep)] text-[var(--blueprint-ink)]"
+    >
+      <header className="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--blueprint-rule)] py-4 pr-3 pl-4">
+        <h2 className="blueprint-label">{assistantName} / Runs on NVIDIA Nemotron</h2>
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={close}
+          aria-label={isMobile ? "Back to cabin" : "Close assistant"}
+          className="hover:bg-[var(--blueprint-grid)] hover:text-[var(--blueprint-ink)]"
         >
-          <header className="flex items-center justify-between border-b border-[var(--blueprint-rule)] py-1 pr-1 pl-4">
-            <span className="blueprint-label">{assistantName} / Runs on NVIDIA Nemotron</span>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => setOpen(false)}
-              aria-label="Close assistant"
-              className="hover:bg-[var(--blueprint-grid)] hover:text-[var(--blueprint-ink)]"
-            >
-              <XIcon strokeWidth={1.5} />
-            </Button>
-          </header>
-          <ChatThread messages={messages} status={status} error={error} />
-          <div className="border-t border-[var(--blueprint-rule)] focus-within:border-[var(--blueprint-muted)]">
-            <ChatComposer disabled={status === "pending"} onSend={send} />
-          </div>
-        </section>
-      )}
-      <Button
-        variant="ghost"
-        size="icon-lg"
-        onClick={() => setOpen((current) => !current)}
-        aria-expanded={open}
-        aria-controls="supplier-assistant"
-        aria-label={open ? `Close ${assistantName}` : `Ask ${assistantName}, the supplier assistant`}
-        className="text-[var(--blueprint-ink)] transition-transform hover:-translate-y-0.5 hover:bg-transparent hover:text-[var(--blueprint-ink)] aria-expanded:bg-transparent aria-expanded:text-[var(--blueprint-ink)]"
+          {isMobile ? <ArrowLeftIcon strokeWidth={1.5} /> : <XIcon strokeWidth={1.5} />}
+        </Button>
+      </header>
+      <ChatThread messages={messages} status={status} error={error} />
+      <div className="shrink-0 border-t border-[var(--blueprint-rule)] pb-[env(safe-area-inset-bottom)] focus-within:border-[var(--blueprint-muted)]">
+        <ChatComposer disabled={status === "pending"} onSend={send} />
+      </div>
+    </section>
+  )
+
+  return isMobile ? (
+    <Sheet open={openMobile} onOpenChange={setOpenMobile}>
+      <SheetContent
+        showCloseButton={false}
+        className="gap-0 border-0 p-0 data-[side=right]:h-dvh data-[side=right]:w-full data-[side=right]:sm:max-w-none"
+        onCloseAutoFocus={(event) => {
+          event.preventDefault()
+          document.getElementById("supplier-assistant-trigger")?.focus()
+        }}
       >
-        <AssistantAvatar thinking={status === "pending"} className="size-8" />
-      </Button>
-    </div>
+        <SheetTitle className="sr-only">{assistantName} supplier assistant</SheetTitle>
+        {panel}
+      </SheetContent>
+    </Sheet>
+  ) : (
+    <Sidebar side="right" className="border-[var(--blueprint-rule)]">
+      {open && panel}
+    </Sidebar>
   )
 }
