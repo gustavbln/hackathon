@@ -1,3 +1,4 @@
+import { ChatDock } from "@/components/chat/chat-dock";
 import type { Metadata } from "next";
 import { TrainFront } from "lucide-react";
 import { TrainScene } from "@/components/train/train-scene";
@@ -15,7 +16,10 @@ export default function Home() {
           <TrainFront className="size-5" strokeWidth={1.5} aria-hidden="true" />
           ComplyDo Solutions
         </div>
-        <span className="blueprint-label max-w-32 text-right sm:max-w-none">Supply Chain Financials</span>
+        <div className="flex items-center gap-6">
+          <span className="blueprint-label max-w-32 text-right sm:max-w-none">Supply Chain Financials</span>
+          <ChatDock />
+        </div>
       </header>
 
       <section className="pt-9 text-left sm:pt-12" aria-labelledby="landing-heading">
