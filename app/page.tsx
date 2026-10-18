@@ -22,11 +22,6 @@ export default function Home() {
           <p className="text-lg font-medium tracking-tight sm:text-2xl">
             Know your suppliers. Keep production moving.
           </p>
-          <ul className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-[var(--blueprint-muted)] sm:text-sm" aria-label="Platform capabilities">
-            <li>Supplier management</li>
-            <li>Risk assessment</li>
-            <li>Just-in-time planning</li>
-          </ul>
         </div>
       </TrainScene>
 
