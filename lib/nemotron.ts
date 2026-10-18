@@ -11,7 +11,7 @@ export type ModelTool = { type: "function"; function: { name: string; descriptio
 const responseSchema = z.object({ model: z.string(), choices: z.array(z.object({ message: assistantMessageSchema, finish_reason: z.string().nullable() })).min(1).max(1) });
 const envSchema = z.object({ NEBIUS_API_KEY: z.string().trim().min(1), NEBIUS_MODEL: z.string().trim().min(1).default("nvidia/Nemotron-3-Ultra-550b-a55b") });
 
-export async function completeNemotron(messages: ModelMessage[], tools: ModelTool[], signal: AbortSignal) {
+export async function completeNemotron(messages: ModelMessage[], tools: ModelTool[], signal: AbortSignal, outputSchema?: Record<string, unknown>) {
   signal.throwIfAborted();
   const config = envSchema.safeParse(process.env);
   if (!config.success) throw new ChatError("ai_not_configured", "Set NEBIUS_API_KEY in the server environment.", 503);
@@ -22,7 +22,8 @@ export async function completeNemotron(messages: ModelMessage[], tools: ModelToo
       response = await fetch("https://api.tokenfactory.nebius.com/v1/chat/completions", {
         method: "POST", signal, cache: "no-store",
         headers: { Authorization: `Bearer ${config.data.NEBIUS_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: config.data.NEBIUS_MODEL, messages, ...(tools.length ? { tools, tool_choice: "auto" } : {}), temperature: 0.1,
+        body: JSON.stringify({ model: config.data.NEBIUS_MODEL, messages, ...(tools.length ? { tools, tool_choice: "auto" } : {}),
+          ...(outputSchema ? { response_format: { type: "json_schema", json_schema: { name: "response", strict: true, schema: outputSchema } } } : {}), temperature: 0.1,
           max_tokens: 4_096, stream: false, chat_template_kwargs: { enable_thinking: false } }),
       });
     } catch {

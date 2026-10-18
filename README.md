@@ -18,5 +18,19 @@ help or no matches. Errors use `{error: {code, message}}` with a non-2xx status.
 The endpoint returns JSON (not a stream); show a pending state and use `AbortController` to cancel.
 Real-company web research is a separate feature and is not implemented in this endpoint.
 
+Seat criteria: `POST /api/seat-criteria` (no body) makes three separate Nemotron evaluations of
+the 18 shared risk criteria. Each scores importance from 0 to 10 with a
+short reason. The response gives all three `scores`, their arithmetic `meanImportance`, and
+`weightPercent = meanImportance / sum(all mean importances) * 100`, sorted most important first.
+All three runs must succeed and include every criterion. No supplier rows are sent to Nebius.
+Use [`SeatCriteriaResponse`](lib/seat-criteria-contract.ts) for the frontend side panel; format
+weights for display without rounding the stored values. Call once when requested and keep the
+response for the sourcing session rather than re-evaluating on every render.
+`weights` uses the existing `Weights` shape and sums to 1; pass it directly to `rankSuppliers`
+from `lib/suppliers/scoring.ts` for a custom seat risk ranking. Operational metrics
+remain separate filters. These are AI-suggested preferences, not validated engineering criteria.
+Repeated runs can agree and still be wrong. The endpoint does not alter the original risk index
+or supplier ranking automatically.
+
 Checks: `docker compose exec web npm run lint`, `npm run typecheck`, `npm test`, `npm run build`
 (run each inside the container). Tests use synthetic suppliers; private data is not needed in CI.

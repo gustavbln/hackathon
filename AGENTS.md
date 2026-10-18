@@ -145,6 +145,8 @@ component and train type, each boost with its reason) and `scoring.ts` (profile 
 
 Chat backend: `POST /api/chat`; request/response types and schemas in `lib/chat-contract.ts`.
 Uses `zod`, `csv-parse`, `server-only`; focused backend checks run with `npm test` in Docker.
+Seat preferences: `POST /api/seat-criteria` runs Nemotron three times and averages criterion
+importance. Frontend contract: `lib/seat-criteria-contract.ts`. AI suggestions, not engineering validation.
 
 ## Git on a shared main
 
