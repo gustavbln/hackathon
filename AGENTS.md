@@ -19,6 +19,9 @@ Before each task, ask which of these it moves. None? Skip it.
 
 Deadline: TBD
 
+Video focus: one component, done really well end to end, including real suppliers outside the
+dataset. Component: TBD (proposal: brakes for a high-speed ICE).
+
 ## Project
 
 - Idea: the Siemens brief below. Our own twist: TBD
@@ -53,8 +56,16 @@ Data:
 - `data/supplier_risk_dataset.csv`, 10,000 anonymized suppliers, 46 columns. Column meanings:
   `data/risk_criteria_description.md`. Not in git while the repo is public: copy both files from
   the hackathon materials into `data/`.
-- 19 risk scores from 0 (no risk) to 100 (max risk), each with a `_Level` column
-  (Low/Medium/High/Critical). `Total_Risk_Index` is the weighted average.
+- 18 risk scores plus `Total_Risk_Index`, all from 0 (no risk) to 100 (max risk), each with a
+  `_Level` column: Low 0–24, Medium 25–49, High 50–74, Critical 75–100.
+- `Total_Risk_Index` is exactly the sum of weight × score (verified, R² 0.9996, rounding only):
+  Financial Health, Operational Resilience, Quality 0.10; Compliance 0.08; Sub-Tier Visibility,
+  Safety Incident, Credit Rating 0.06; ESG, Governance, Geopolitical 0.05; Industry Benchmark,
+  Labor Stability, Environmental, Digital Security, Political 0.04; Media Sentiment, External
+  Intelligence, Market Sentiment 0.03. So "why is it high" has an exact answer.
+- `Safety_Incident_Score` counts workplace accidents at the supplier, not product safety. Product
+  safety shows up in Quality and Compliance.
+- 911 of the 4,803 suppliers rated Low/Medium overall (19%) hide at least one Critical sub-score.
 - Operational columns: `Purchase Order Volume (EUR)` (our exposure), `Order Change Rate`,
   `Supplier Delivery Rating`, `Order Confirmation Rate` (all 0–100%), `Sourcing Risk Level`
   (Low/Medium/High: how hard to replace), `Supply Chain Complexity` (Simple/Moderate/Complex).
@@ -68,6 +79,10 @@ Data:
   `nvidia/nemotron-3.5-lightning-30b-a3b` (fast), `nvidia/nemotron-3-ultra-550b-a55b` (strongest),
   `nvidia/nemotron-3-embed-1b` (embeddings). Live list: `curl https://integrate.api.nvidia.com/v1/models`.
 - Show it: the UI and the video make clear the AI runs on NVIDIA Nemotron.
+- Gotchas: reasoning is on by default and slow; turn it off for quick calls with
+  `chat_template_kwargs: {"enable_thinking": false}`. Reasoning text arrives in `reasoning_content`.
+  About 40 requests/min per account (reported). Copy model IDs from `/v1/models`. The reranker
+  `llama-nemotron-rerank-1b-v2` is retired, use `nv-rerankqa-mistral-4b-v3`.
 
 ## Docker only
 
@@ -87,14 +102,17 @@ in the dev container (VS Code/Cursor: "Reopen in Container").
 
 ## Who owns what
 
-Split by route folder (`app/<feature>/`) so we rarely touch the same files.
+Split by folder so we rarely touch the same files.
 
-- Person 1: TBD
-- Person 2: TBD
-- Person 3: TBD
+- Yogos, frontend: app shell, 3D train, explore and compare views (`app/` pages except chat,
+  `components/train/`, `components/explore/`, `public/models/`).
+- Dennis, chatbot (the stakeholder's top priority): `app/chat/`, `app/api/chat/`, `components/chat/`.
+  Answers render as visual UI (supplier cards, comparisons, charts), not walls of text.
+- Gustav: TBD
 
-Shared files (`app/layout.tsx`, `app/globals.css`, `components/ui/`, `package.json`): small changes
-only, tell the team.
+`lib/` holds data access, scoring and tool functions: one source of truth that the UI, the chatbot
+and the agents all call. Shared files (`lib/`, `app/layout.tsx`, `app/globals.css`, `components/ui/`,
+`package.json`): small changes only, tell the team.
 
 ## Git on a shared main
 
@@ -134,13 +152,45 @@ Rules:
 
 Each person connects the Mobbin MCP in their own agent. It does not go into this repo.
 
-## Code
+## 3D train (Yogos)
 
-- Real data and real Nemotron calls wherever the demo shows them. Judges read the repo: no fake
-  results they could spot.
-- Otherwise the simplest thing that works, readable over clever.
-- No tests unless something keeps breaking the demo.
+- Model: [ICE-3 by J-m@n](https://3dwarehouse.sketchup.com/model/e6593c7243820ab45bef0d098ed74c1d/ICE-3),
+  the real ICE 3/Velaro shape. GLB, 5.6 MB, 126k triangles, 4 cars. Units are inches: scale by 0.0254.
+- Licence (3D Warehouse General Model License): fine inside our app, never offered as a standalone
+  download. Commit the GLB only once the repo is private. Credit "ICE-3 by J-m@n, 3D Warehouse" in
+  the README and the video. No DB logos.
+- Clickable meshes: bogies, wheelsets, pantograph, windows (the groups are unnamed, so name them
+  once). Doors, brakes, coupler, HVAC and interior become hotspot markers at 3D positions.
+- Look: "Tony Stark" blueprint. Edge lines and a soft glow, each part coloured by its supplier risk,
+  smooth fly-to on click, hover callouts. Mobbin refs: Zillow 3D Home (hotspots plus side panel),
+  Magnific 3D viewer.
+- Stack, installed in the container when you start: `three`, `@react-three/fiber@9`,
+  `@react-three/drei` (`CameraControls`, `Html`, `Edges`), `@react-three/postprocessing` (glow, off
+  on phones). Load the canvas client-side only (`next/dynamic` with `ssr: false`).
+- Fallbacks: the [CC-BY ICE by gritsayilia](https://sketchfab.com/3d-models/ice-train-5718ef1a24f34e709bd6e35b7ada27b4)
+  with hotspots, or a stylised ICE built from three.js shapes. Detail zoom:
+  [Passenger Coach Bogie](https://sketchfab.com/3d-models/passenger-coach-bogie-99d906d4ec8e4b7293e560e08a4c84d8) (CC-BY-SA).
+
+## Code quality (guardrail: judges read the repo)
+
+It must read like a senior team built it, not like it was vibe coded.
+
+- Real data and real Nemotron calls wherever the demo shows them. No fake results.
+- One way to do each thing: data access, scoring and LLM calls live in `lib/` and get reused, never
+  copied into components or routes.
+- TypeScript strict: no `any`, no `@ts-ignore`, no `!` to silence errors. Types are defined once,
+  next to the data they describe.
+- Validate everything from outside at the boundary (request bodies, LLM tool arguments, API
+  responses) with a schema (zod).
+- Server-only code (Nemotron calls, keys, the CSV) starts with `import "server-only"`.
+- Small focused files and functions, names that say what they do. Comments explain why, never
+  narrate what. No dead code, commented-out code, stray `console.log` or leftover TODOs.
+- No swallowed errors: every async UI has loading, empty and error states.
+- Core logic (scoring, ranking, tool functions, memo checks) gets focused tests. No tests for markup.
+- Simplest design that works: no abstraction for a single use, no new dependency for a few lines.
 - Secrets go in `.env` (gitignored). List the variable names in `.env.example`.
+- CI (`.github/workflows/ci.yml`) runs lint, typecheck and build on every push to `main`. Red CI:
+  fix it before anything else.
 
 ## Agents
 
@@ -150,7 +200,7 @@ Each person connects the Mobbin MCP in their own agent. It does not go into this
 - Before committing: `lint` and `typecheck` pass.
 - Stay in your human's area.
 - Commit and push each working step, unless your human says otherwise.
-- Commit messages: short, what changed.
+- Commit messages: `feat: …`, `fix: …`, `chore: …`, short and specific.
 - The Next.js docs below live in the container: `docker compose exec web ls node_modules/next/dist/docs`.
 
 <!-- BEGIN:nextjs-agent-rules -->
