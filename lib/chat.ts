@@ -457,7 +457,7 @@ async function repairRecipe(messages: ModelMessage[], content: string | null | u
   const { message, model } = await completeNemotron([
     ...messages,
     { role: "assistant", content: content ?? "" },
-    { role: "user", content: `${problem ? `That answer was rejected: ${problem} ` : ""}Return the answer now as ONLY the JSON object in the required format.` },
+    { role: "user", content: `${problem ? `That answer was rejected: ${problem} ` : ""}Return the answer now as ONLY the JSON object in the required format, its text under 1,500 characters.` },
   ], [], signal, outputSchema, { onUsage });
   const recipe = parseRecipe(message.content);
   if (!recipe) throw new ChatError("invalid_answer", "Nemotron returned an unreadable answer. Please retry.");
@@ -492,7 +492,7 @@ function pageLabel(page: PageContext) {
 export async function answerChat(request: ChatRequest, signal: AbortSignal, onStep: StepSink = () => {}) {
   const step = tracer(onStep);
   const page = request.page ?? null;
-  const loaded = page && await step(pageLabel(page), "dataset", () => loadPage(page, request.message));
+  const loaded = page && await step(pageLabel(page), page.page === "researched" ? "research" : "dataset", () => loadPage(page, request.message));
   const facts = loaded?.facts ?? null;
   // The page arrives as an answered read_page call: Nemotron cites it like any tool result.
   const messages: ModelMessage[] = [
