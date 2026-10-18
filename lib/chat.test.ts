@@ -21,6 +21,17 @@ test("response values and ranked order come from current tool evidence", () => {
   assert.deepEqual(response.lastView?.supplierIds, ["SUPP_00001", "SUPP_00002"]);
 });
 
+test("reranking replies are text-only and retain grounded suppliers for follow-up questions", () => {
+  const receipts = [{ name: "rerank_seat_priorities", status: "ok" as const, resultId: "call_1" }];
+  const evidence = new Map([["call_1", result]]);
+  const response = hydrateAnswer(recipe, evidence, "test", receipts);
+  assert.equal(response.answer, recipe.text);
+  assert.equal(response.view, null);
+  assert.deepEqual(response.lastView?.supplierIds, ["SUPP_00001", "SUPP_00002"]);
+  assert.throws(() => hydrateAnswer({ ...recipe, supplierIds: ["SUPP_99999"] }, evidence, "test", receipts),
+    { code: "ungrounded_answer" });
+});
+
 test("reject stale receipts, invented IDs and unfetched metrics", () => {
   const evidence = new Map([["call_1", result]]);
   assert.throws(() => hydrateAnswer({ ...recipe, resultId: "old_call" }, evidence, "test", []));

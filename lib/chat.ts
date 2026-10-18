@@ -336,7 +336,8 @@ export function hydrateAnswer(recipe: z.infer<typeof answerRecipeSchema>, eviden
   }));
   return chatResponseSchema.parse({
     answer: recipe.text, model, tools: receipts,
-    view: { kind: suppliers.length === 1 ? "profile" : result.sort ? "ranking" : "comparison",
+    view: receipts.some(({ name, status }) => name === "rerank_seat_priorities" && status === "ok") ? null : {
+      kind: suppliers.length === 1 ? "profile" : result.sort ? "ranking" : "comparison",
       suppliers, metrics: metricKeys.map((key) => metricDefinitions.find((metric) => metric.key === key)),
       matchedCount: result.matchedCount, source: result.source, sort: result.sort },
     lastView: { supplierIds: suppliers.map(({ id }) => id), metricKeys },
