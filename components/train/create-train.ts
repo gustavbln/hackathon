@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 
 export type TrainPalette = {
   surface: string;
@@ -11,17 +10,14 @@ export type TrainPalette = {
 type Point = [number, number, number];
 
 /** Original train asset in metres: X runs along the train, Y is up, ground is Y = 0. */
-export function createTrain(palette: TrainPalette, livery?: { body: string; stripe: string; glass: string; headlight: string }) {
+export function createTrain(palette: TrainPalette) {
   const train = new THREE.Group();
   train.name = "Blueprint high-speed train";
-  const surface = livery
-    ? new THREE.MeshStandardMaterial({ color: livery.body, metalness: 0.2, roughness: 0.35 })
-    : new THREE.MeshBasicMaterial({ color: palette.surface });
-  const glass = new THREE.MeshBasicMaterial({ color: livery?.glass ?? palette.glass });
+  // Unlit materials keep the warm paper colors consistent as the model turns.
+  const surface = new THREE.MeshBasicMaterial({ color: palette.surface });
+  const glass = new THREE.MeshBasicMaterial({ color: palette.glass });
   const mechanical = new THREE.MeshBasicMaterial({ color: palette.mechanical });
-  const ink = new THREE.LineBasicMaterial({ color: palette.line, transparent: Boolean(livery), opacity: livery ? 0.18 : 1 });
-  const stripe = new THREE.MeshStandardMaterial({ color: livery?.stripe ?? palette.line, roughness: 0.35 });
-  const headlight = new THREE.MeshStandardMaterial({ color: livery?.headlight ?? palette.glass, emissive: livery?.headlight ?? palette.glass, emissiveIntensity: livery ? 3 : 0 });
+  const ink = new THREE.LineBasicMaterial({ color: palette.line });
   const strokes: number[] = [];
 
   function line(points: Point[]) {
@@ -49,8 +45,8 @@ export function createTrain(palette: TrainPalette, livery?: { body: string; stri
   function section(x: number, angle: number, cab: boolean, offset = 0): Point {
     const t = cab ? THREE.MathUtils.clamp((x - 2.2) / 3.4, 0, 1) : 0;
     const taper = t * t * (3 - 2 * t);
-    const radiusY = 1.48 * (1 - 0.84 * taper) + offset;
-    const radiusZ = 1.4 * (1 - 0.8 * taper) + offset;
+    const radiusY = 1.48 * (1 - 0.78 * taper) + offset;
+    const radiusZ = 1.4 * (1 - 0.72 * taper) + offset;
     const cosine = Math.cos(angle);
     const sine = Math.sin(angle);
     return [x, 2.48 - 0.76 * taper + radiusY * Math.sign(cosine) * Math.pow(Math.abs(cosine), 0.65),
@@ -78,7 +74,6 @@ export function createTrain(palette: TrainPalette, livery?: { body: string; stri
     }
     // Close both ends; the cab finishes in a small rounded face.
     for (const end of [0, columns]) {
-      if (cab && livery && end === columns) continue;
       const x = -5.6 + 11.2 * end / columns;
       const top = section(x, 0, cab);
       const bottom = section(x, Math.PI, cab);
@@ -90,52 +85,24 @@ export function createTrain(palette: TrainPalette, livery?: { body: string; stri
         else indices.push(centerIndex, a, a + 1);
       }
     }
-    // Stitch a shallow dome into the nose instead of ending it with a flat disc.
-    if (cab && livery) {
-      const endX = 5.6;
-      const centerY = 1.72;
-      const rings = 12;
-      let previous = columns * (sides + 1);
-      for (let ring = 1; ring < rings; ring++) {
-        const angle = ring / rings * Math.PI / 2;
-        const start = vertices.length / 3;
-        for (let side = 0; side <= sides; side++) {
-          const point = section(endX, side / sides * Math.PI * 2, cab);
-          vertices.push(...transform([endX + 0.22 * Math.sin(angle), centerY + (point[1] - centerY) * Math.cos(angle), point[2] * Math.cos(angle)]));
-        }
-        for (let side = 0; side < sides; side++) {
-          const a = previous + side;
-          const b = start + side;
-          indices.push(a, a + 1, b, b, a + 1, b + 1);
-        }
-        previous = start;
-      }
-      const pole = vertices.length / 3;
-      vertices.push(...transform([endX + 0.22, centerY, 0]));
-      for (let side = 0; side < sides; side++) indices.push(previous + side, previous + side + 1, pole);
-    }
-    const shell = new THREE.BufferGeometry();
-    shell.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-    shell.setIndex(indices);
-    const geometry = mergeVertices(shell);
-    shell.dispose();
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+    geometry.setIndex(indices);
     geometry.computeVertexNormals();
     mesh(name, geometry, surface, [0, 0, 0]);
 
     // Purposeful longitudinal curves and section ribs, without triangle diagonals.
-    const outlineColumns = livery && cab ? Math.floor(columns * 7.8 / 11.2) : columns;
     for (let side = 0; side < 12; side++) {
-      line(Array.from({ length: outlineColumns + 1 }, (_, row) =>
+      line(Array.from({ length: columns + 1 }, (_, row) =>
         transform(section(-5.6 + 11.2 * row / columns, side / 12 * Math.PI * 2, cab, 0.012))));
     }
     for (let row = 0; row <= 14; row++) {
-      if (livery && cab && -5.6 + 11.2 * row / 14 > 2.2) continue;
       line(Array.from({ length: sides + 1 }, (_, side) =>
         transform(section(-5.6 + 11.2 * row / 14, side / sides * Math.PI * 2, cab, 0.012))));
     }
 
     // Surface-following panels remain flush with the rounded shell.
-    function panel(label: string, x1: number, x2: number, a1: number, a2: number, material: THREE.Material = glass) {
+    function panel(label: string, x1: number, x2: number, a1: number, a2: number) {
       const points: number[] = [];
       const triangles: number[] = [];
       const steps = 8;
@@ -153,17 +120,13 @@ export function createTrain(palette: TrainPalette, livery?: { body: string; stri
       geometry.setAttribute("position", new THREE.Float32BufferAttribute(points, 3));
       geometry.setIndex(triangles);
       geometry.computeVertexNormals();
-      mesh(`${name} ${label}`, geometry, material, [0, 0, 0]);
+      mesh(`${name} ${label}`, geometry, glass, [0, 0, 0]);
       for (const x of [x1, x2]) line(Array.from({ length: 17 }, (_, i) =>
         transform(section(x, THREE.MathUtils.lerp(a1, a2, i / 16), cab, 0.08))));
       for (const a of [a1, a2]) line(Array.from({ length: 17 }, (_, i) =>
         transform(section(THREE.MathUtils.lerp(x1, x2, i / 16), a, cab, 0.08))));
     }
     for (const side of [0, Math.PI]) {
-      if (livery) {
-        const a = side === 0 ? 1.72 : 4.44;
-        panel("red side stripe", -5.55, cab ? 3.95 : 5.55, a, a + 0.12, stripe);
-      }
       for (let x = -3.75; x < (cab ? 1.6 : 4.2); x += 1.25) {
         const a = side === 0 ? 1.12 : 4.65;
         panel("passenger window", x, x + 0.86, a, a + 0.5);
@@ -176,9 +139,8 @@ export function createTrain(palette: TrainPalette, livery?: { body: string; stri
     }
     if (cab) {
       panel("windscreen", 2.55, 3.65, -0.88, 0.88);
-      if (livery) panel("red nose stripe", 3.95, 4.13, -1.72, 1.72, stripe);
       for (const side of [-1, 1]) {
-        panel("headlight", 4.65, 5.08, side > 0 ? 1.05 : 4.85, side > 0 ? 1.28 : 5.08, headlight);
+        panel("headlight", 4.65, 5.08, side > 0 ? 1.05 : 4.85, side > 0 ? 1.28 : 5.08);
       }
     }
     box(`${name} underfloor equipment`, [7.5, 0.4, 1.85], transform([-0.4, 0.9, 0]), mechanical);
