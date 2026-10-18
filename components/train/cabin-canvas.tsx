@@ -170,7 +170,6 @@ export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotati
     <Canvas camera={{ position: [0, 1.65, 4.6], near: 0.05, far: 160 }} dpr={[1, 1.5]} frameloop="demand" gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
       fallback={fallback} style={{ touchAction: "none" }} aria-label="Explore cabin components. Select a seat to open supplier sourcing.">
       <CabinControls zoom={zoom} setZoom={setZoom} resetView={resetView} dragged={dragged} enabled={!selection.selectedSeatId} />
-      <CabinFocus seatId={selection.selectedSeatId} world={world} seats={seats} zoom={zoom} rotating={rotating} reducedMotion={reducedMotion} />
       <ambientLight intensity={1.4} />
       <directionalLight position={[0, 2.5, 3]} intensity={1.6} />
       <group ref={world}>
@@ -186,6 +185,8 @@ export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotati
       <group ref={seats}>
         {CABIN_SEATS.map((seat) => <Seat key={seat.id} {...seat} {...selection} onSeatSelect={(id) => { if (!dragged.current) selection.onSeatSelect(id); }} palette={palette} />)}
       </group>
+      {/* After the groups: React attaches their refs in tree order, so a seat preselected from the URL finds them on mount. */}
+      <CabinFocus seatId={selection.selectedSeatId} world={world} seats={seats} zoom={zoom} rotating={rotating} reducedMotion={reducedMotion} />
     </Canvas>
   );
 }
