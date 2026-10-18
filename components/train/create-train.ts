@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { mergeVertices } from "three/addons/utils/BufferGeometryUtils.js";
 
 export type TrainPalette = {
   surface: string;
@@ -48,8 +49,8 @@ export function createTrain(palette: TrainPalette, livery?: { body: string; stri
   function section(x: number, angle: number, cab: boolean, offset = 0): Point {
     const t = cab ? THREE.MathUtils.clamp((x - 2.2) / 3.4, 0, 1) : 0;
     const taper = t * t * (3 - 2 * t);
-    const radiusY = 1.48 * (1 - 0.9 * taper) + offset;
-    const radiusZ = 1.4 * (1 - 0.91 * taper) + offset;
+    const radiusY = 1.48 * (1 - 0.84 * taper) + offset;
+    const radiusZ = 1.4 * (1 - 0.8 * taper) + offset;
     const cosine = Math.cos(angle);
     const sine = Math.sin(angle);
     return [x, 2.48 - 0.76 * taper + radiusY * Math.sign(cosine) * Math.pow(Math.abs(cosine), 0.65),
@@ -77,6 +78,7 @@ export function createTrain(palette: TrainPalette, livery?: { body: string; stri
     }
     // Close both ends; the cab finishes in a small rounded face.
     for (const end of [0, columns]) {
+      if (cab && livery && end === columns) continue;
       const x = -5.6 + 11.2 * end / columns;
       const top = section(x, 0, cab);
       const bottom = section(x, Math.PI, cab);
@@ -88,9 +90,35 @@ export function createTrain(palette: TrainPalette, livery?: { body: string; stri
         else indices.push(centerIndex, a, a + 1);
       }
     }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-    geometry.setIndex(indices);
+    // Stitch a shallow dome into the nose instead of ending it with a flat disc.
+    if (cab && livery) {
+      const endX = 5.6;
+      const centerY = 1.72;
+      const rings = 12;
+      let previous = columns * (sides + 1);
+      for (let ring = 1; ring < rings; ring++) {
+        const angle = ring / rings * Math.PI / 2;
+        const start = vertices.length / 3;
+        for (let side = 0; side <= sides; side++) {
+          const point = section(endX, side / sides * Math.PI * 2, cab);
+          vertices.push(...transform([endX + 0.22 * Math.sin(angle), centerY + (point[1] - centerY) * Math.cos(angle), point[2] * Math.cos(angle)]));
+        }
+        for (let side = 0; side < sides; side++) {
+          const a = previous + side;
+          const b = start + side;
+          indices.push(a, a + 1, b, b, a + 1, b + 1);
+        }
+        previous = start;
+      }
+      const pole = vertices.length / 3;
+      vertices.push(...transform([endX + 0.22, centerY, 0]));
+      for (let side = 0; side < sides; side++) indices.push(previous + side, previous + side + 1, pole);
+    }
+    const shell = new THREE.BufferGeometry();
+    shell.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+    shell.setIndex(indices);
+    const geometry = mergeVertices(shell);
+    shell.dispose();
     geometry.computeVertexNormals();
     mesh(name, geometry, surface, [0, 0, 0]);
 
