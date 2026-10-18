@@ -23,6 +23,7 @@ export function createTrain(palette: TrainPalette, exterior: ExteriorPalette) {
   const paint = new THREE.MeshStandardMaterial({ color: exterior.exterior, roughness: 0.27, metalness: 0.32 });
   const red = new THREE.MeshStandardMaterial({ color: exterior.livery, roughness: 0.3, metalness: 0.25 });
   const glass = new THREE.MeshStandardMaterial({ color: exterior.windshield, roughness: 0.16, metalness: 0.55 });
+  const windowGlass = new THREE.MeshStandardMaterial({ color: exterior.windshield, transparent: true, opacity: 0.12, depthWrite: false, roughness: 0.12, metalness: 0.15, side: THREE.DoubleSide });
   const rubber = new THREE.MeshStandardMaterial({ color: exterior.windshield, roughness: 0.85 });
   const steel = new THREE.MeshStandardMaterial({ color: exterior.rail, roughness: 0.36, metalness: 0.8 });
   const equipment = new THREE.MeshStandardMaterial({ color: palette.line, roughness: 0.7, metalness: 0.35 });
@@ -57,7 +58,7 @@ export function createTrain(palette: TrainPalette, exterior: ExteriorPalette) {
     const c = Math.cos(angle);
     const s = Math.sin(angle);
     return [x, 2.54 - 0.8 * t + (halfHeight + offset) * Math.sign(c) * Math.pow(Math.abs(c), 0.7),
-      (halfWidth + offset) * Math.sign(s) * Math.pow(Math.abs(s), 0.72)];
+      (halfWidth + offset) * Math.sign(s) * Math.pow(Math.abs(s), c < 0 ? 0.3 : 0.72)];
   }
 
   function carriage(center: number, direction: number, cab: boolean, name: string) {
@@ -86,7 +87,23 @@ export function createTrain(palette: TrainPalette, exterior: ExteriorPalette) {
       geometry.computeVertexNormals();
       return mesh(`${name} ${label}`, geometry, material);
     }
-    patch("body", -12.5, cab ? 13 : 12.5, 0, Math.PI * 2, paint);
+    if (cab) {
+      patch("body", -12.5, 13, 0, Math.PI * 2, paint);
+    } else {
+      // Leave real apertures: transparent panes alone would still have solid bodywork behind them.
+      patch("roof", -12.5, 12.5, -1.035, 1.035, paint);
+      patch("lower body", -12.5, 12.5, 1.58, Math.PI * 2 - 1.58, paint);
+      for (const side of [-1, 1]) {
+        const a1 = side > 0 ? 1.035 : Math.PI * 2 - 1.58;
+        const a2 = side > 0 ? 1.58 : Math.PI * 2 - 1.035;
+        let previous = -12.5;
+        for (let x = -9; x < 10; x += 1.75) {
+          patch("window pillar", previous, x, a1, a2, paint);
+          previous = x + 1.27;
+        }
+        patch("window pillar", previous, 12.5, a1, a2, paint);
+      }
+    }
     for (const end of [-12.5, cab ? 13 : 12.5]) {
       const shape = new THREE.Shape();
       for (let i = 0; i <= 64; i++) {
@@ -104,14 +121,22 @@ export function createTrain(palette: TrainPalette, exterior: ExteriorPalette) {
       sidePatch("red waist stripe", -12.45, cab ? 12.6 : 12.45, side + 1.86, side + 2.01, red, 0.018);
       sidePatch("lower skirt", -12.45, cab ? 7.6 : 12.45, side + 2.36, side + 2.49, steel, 0.02);
       for (let x = -9; x < (cab ? 5.8 : 10); x += 1.75) {
-        sidePatch("window gasket", x - 0.05, x + 1.32, side + 1.035, side + 1.58, rubber, 0.025, true);
-        sidePatch("passenger window", x, x + 1.27, side + 1.075, side + 1.54, glass, 0.04, true);
+        if (cab) {
+          sidePatch("window gasket", x - 0.05, x + 1.32, side + 1.035, side + 1.58, rubber, 0.025, true);
+        } else {
+          sidePatch("window upper seal", x - 0.05, x + 1.32, side + 1.01, side + 1.06, rubber, 0.04);
+          sidePatch("window lower seal", x - 0.05, x + 1.32, side + 1.55, side + 1.6, rubber, 0.04);
+          sidePatch("window left seal", x - 0.05, x + 0.025, side + 1.035, side + 1.58, rubber, 0.04);
+          sidePatch("window right seal", x + 1.245, x + 1.32, side + 1.035, side + 1.58, rubber, 0.04);
+        }
+        sidePatch("passenger window", x, x + 1.27, side + 1.035, side + 1.58, cab ? glass : windowGlass, 0.055, true);
       }
       for (const x of [-11.65, ...(cab ? [] : [10.6])]) {
-        sidePatch("door seal", x, x + 0.94, side + 0.92, side + 2.32, rubber, 0.023, true);
-        sidePatch("door", x + 0.035, x + 0.905, side + 0.94, side + 2.3, paint, 0.035, true);
+        sidePatch("door left seal", x, x + 0.035, side + 0.92, side + 2.32, rubber, 0.05);
+        sidePatch("door right seal", x + 0.905, x + 0.94, side + 0.92, side + 2.32, rubber, 0.05);
+        sidePatch("door upper seal", x, x + 0.94, side + 0.92, side + 0.94, rubber, 0.05);
+        sidePatch("door lower seal", x, x + 0.94, side + 2.3, side + 2.32, rubber, 0.05);
         sidePatch("door glazing", x + 0.2, x + 0.74, side + 1.08, side + 1.56, glass, 0.05, true);
-        sidePatch("door stripe", x + 0.04, x + 0.9, side + 1.86, side + 2.01, red, 0.05);
       }
     }
     if (cab) {

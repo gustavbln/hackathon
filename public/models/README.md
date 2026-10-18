@@ -7,7 +7,7 @@
 - Doors, LED headlights, windscreen wipers, gangway bellows, wheelsets, brake discs, suspension, roof ventilation and a pantograph.
 - Rails and sleepers are included. X runs along the train, Y is up; wheel contact is Y = 0.
 - Proportions and details are illustrative, not engineering measurements or a manufacturer CAD model.
-- Approximately 8 MB; no external textures, decoder or remote model service required.
+- Approximately 9 MB; no external textures, decoder or remote model service required.
 
 Edit `components/train/create-train.ts` and the `--train-*` tokens in `app/globals.css`, then regenerate inside Docker:
 
@@ -15,6 +15,8 @@ Edit `components/train/create-train.ts` and the `--train-*` tokens in `app/globa
 docker compose exec web node --experimental-strip-types scripts/export-train.mjs
 ```
 
-`components/train/train-model.tsx` loads the asset inside a client-only React Three Fiber canvas. `train-canvas.tsx` supplies studio lighting and a perspective camera that approaches the central passenger window as the visitor scrolls. `train-scene.tsx` then opens the existing interactive cabin. Reduced-motion users retain a stationary exterior and can enter with the button or by scrolling.
+`components/train/train-model.tsx` loads the asset into the same client-only React Three Fiber canvas as the interactive cabin. The central carriage has real openings and transparent glass, with the actual seats and cabin visible through them.
 
-`high-speed-train-preview.png` is the older blueprint illustration, retained as a lightweight loading and no-WebGL fallback.
+`train-countryside.tsx` supplies the shared sky, terrain, hills and trees for both exterior and interior views. `train-journey-layout.ts` aligns the exterior asset with the cabin, approaches a window, crosses the pane and settles into the normal aisle view. Focused tests verify window clearance, continuity and the final camera pose. `train-scene.tsx` enables the cabin controls without replacing the canvas or navigating away. Reduced-motion users retain a stationary exterior until entry.
+
+`high-speed-train-preview.png` is the older blueprint illustration, retained as a design reference.

@@ -2,8 +2,12 @@
 
 import { Canvas } from "@react-three/fiber";
 import { useCursor } from "@react-three/drei";
-import { useRef, useState, type ReactNode } from "react";
-import { BackSide, type Group } from "three";
+import { Suspense, useCallback, useRef, useState, type ReactNode } from "react";
+import type { Group } from "three";
+import { TrainCountryside } from "./train-countryside";
+import { TrainJourneyCamera } from "./train-journey-camera";
+import { TrainModel } from "./train-model";
+import { TRAIN_TO_CABIN } from "./train-journey-layout";
 import { CabinControls, type CabinView } from "./cabin-controls";
 import { CabinFocus } from "./cabin-focus";
 import { cabinBoxGeometry } from "./cabin-geometry";
@@ -117,32 +121,6 @@ function CabinShell({ palette, interactive }: { palette: CabinPalette; interacti
   );
 }
 
-function Outside({ palette }: { palette: CabinPalette }) {
-  return (
-    <group name="Countryside outside the windows">
-      <mesh><sphereGeometry args={[75, 20, 12]} /><meshBasicMaterial color={palette.sky} side={BackSide} /></mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.35, 0]}>
-        <planeGeometry args={[140, 140]} /><meshStandardMaterial color={palette.terrain} roughness={1} />
-      </mesh>
-      {[-1, 1].map((side) => (
-        <group key={side}>
-          {Array.from({ length: 5 }, (_, index) => (
-            <mesh key={index} position={[side * (24 + index % 2 * 8), 0.5, -42 + index * 22]} scale={[12, 4 + index % 3, 16]}>
-              <sphereGeometry args={[1, 12, 8]} /><meshStandardMaterial color={palette.hills} roughness={1} />
-            </mesh>
-          ))}
-          {Array.from({ length: 14 }, (_, index) => (
-            <group key={index} position={[side * (7 + index % 4 * 2.7), 0, -34 + index * 5.5]}>
-              <mesh position={[0, 0.75, 0]}><cylinderGeometry args={[0.1, 0.13, 1.8, 5]} /><meshStandardMaterial color={palette.line} /></mesh>
-              <mesh position={[0, 2.3, 0]}><coneGeometry args={[1 + index % 3 * 0.15, 3.2, 6]} /><meshStandardMaterial color={palette.trees} roughness={1} /></mesh>
-            </group>
-          ))}
-        </group>
-      ))}
-    </group>
-  );
-}
-
 type PartBox = { size: Point; position: Point; color: keyof CabinPalette; opacity?: number };
 
 const CABIN_PARTS: { label: string; boxes: PartBox[] }[] = [
@@ -158,35 +136,43 @@ const CABIN_PARTS: { label: string; boxes: PartBox[] }[] = [
   ] },
 ];
 
-export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotating, reducedMotion, ...selection }: CabinSelection & CabinView & {
-  fallback: ReactNode; rotating: boolean; reducedMotion: boolean;
+export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotating, reducedMotion, journeyProgress, ...selection }: CabinSelection & CabinView & {
+  fallback: ReactNode; rotating: boolean; reducedMotion: boolean; journeyProgress?: number;
 }) {
   const dragged = useRef(false);
   const world = useRef<Group>(null);
   const seats = useRef<Group>(null);
   const [palette] = useState(readCabinPalette);
+  const [trainReady, setTrainReady] = useState(false);
+  const ready = useCallback(() => setTrainReady(true), []);
+  const waiting = journeyProgress !== undefined && !trainReady;
 
   return (
-    <Canvas camera={{ position: [0, 1.65, 4.6], near: 0.05, far: 160 }} dpr={[1, 1.5]} frameloop="demand" gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-      fallback={fallback} style={{ touchAction: "none" }} aria-label="Explore cabin components. Select a seat to open supplier sourcing.">
-      <CabinControls zoom={zoom} setZoom={setZoom} resetView={resetView} dragged={dragged} enabled={!selection.selectedSeatId} />
-      <ambientLight intensity={1.4} />
-      <directionalLight position={[0, 2.5, 3]} intensity={1.6} />
-      <group ref={world}>
-        <Outside palette={palette} />
-        <CabinShell palette={palette} interactive={!selection.selectedSeatId} />
-        {CABIN_PARTS.map(({ label, boxes }) => (
-          <CabinPart key={label} label={label} enabled={!selection.selectedSeatId}>{(active) => (
-            boxes.map((part, index) => <BlueprintBox key={index} palette={palette} size={part.size} position={part.position}
-              color={active ? palette.upholstery : palette[part.color]} bright={active} opacity={active && part.opacity ? 0.3 : part.opacity} />)
-          )}</CabinPart>
-        ))}
-      </group>
-      <group ref={seats}>
-        {CABIN_SEATS.map((seat) => <Seat key={seat.id} {...seat} {...selection} onSeatSelect={(id) => { if (!dragged.current) selection.onSeatSelect(id); }} palette={palette} />)}
-      </group>
-      {/* After the groups: React attaches their refs in tree order, so a seat preselected from the URL finds them on mount. */}
-      <CabinFocus seatId={selection.selectedSeatId} world={world} seats={seats} zoom={zoom} rotating={rotating} reducedMotion={reducedMotion} />
-    </Canvas>
+    <>
+      {waiting && <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--train-sky)] text-sm" role="status">Preparing the train and countryside…</div>}
+      <Canvas camera={{ position: [0, 1.65, 4.6], near: 0.03, far: 600 }} dpr={[1, 1.5]} frameloop="demand" gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
+        fallback={fallback} style={{ touchAction: journeyProgress !== undefined ? "pan-y" : "none" }} aria-label="Explore cabin components. Select a seat to open supplier sourcing.">
+        {journeyProgress !== undefined && <TrainJourneyCamera progress={journeyProgress} reducedMotion={reducedMotion} />}
+        {journeyProgress === undefined && <CabinControls zoom={zoom} setZoom={setZoom} resetView={resetView} dragged={dragged} enabled={!selection.selectedSeatId} />}
+        <ambientLight intensity={1.4} />
+        <directionalLight position={[0, 2.5, 3]} intensity={1.6} />
+        {journeyProgress !== undefined && <Suspense fallback={null}><group matrix={TRAIN_TO_CABIN} matrixAutoUpdate={false}><TrainModel onReady={ready} /></group></Suspense>}
+        <group ref={world}>
+          <TrainCountryside palette={palette} />
+          <CabinShell palette={palette} interactive={!selection.selectedSeatId} />
+          {CABIN_PARTS.map(({ label, boxes }) => (
+            <CabinPart key={label} label={label} enabled={!selection.selectedSeatId}>{(active) => (
+              boxes.map((part, index) => <BlueprintBox key={index} palette={palette} size={part.size} position={part.position}
+                color={active ? palette.upholstery : palette[part.color]} bright={active} opacity={active && part.opacity ? 0.3 : part.opacity} />)
+            )}</CabinPart>
+          ))}
+        </group>
+        <group ref={seats}>
+          {CABIN_SEATS.map((seat) => <Seat key={seat.id} {...seat} {...selection} onSeatSelect={(id) => { if (!dragged.current) selection.onSeatSelect(id); }} palette={palette} />)}
+        </group>
+        {/* After the groups so URL-preselected seats find their mounted refs. */}
+        {journeyProgress === undefined && <CabinFocus seatId={selection.selectedSeatId} world={world} seats={seats} zoom={zoom} rotating={rotating} reducedMotion={reducedMotion} />}
+      </Canvas>
+    </>
   );
 }

@@ -44,9 +44,10 @@ interface CabinSceneProps {
   initialSeatId?: string | null;
   /** From `?w=`: the weighting the buyer set before leaving the seat view. */
   initialWeights?: Weights | null;
+  journey?: { progress: number; entered: boolean; onBack: () => void };
 }
 
-export function CabinScene({ initialSeatId = null, initialWeights = null }: CabinSceneProps) {
+export function CabinScene({ initialSeatId = null, initialWeights = null, journey }: CabinSceneProps) {
   const [selectedSeatId, setSelectedSeatId] = useState<string | null>(
     CABIN_SEATS.some(({ id }) => id === initialSeatId) ? initialSeatId : null,
   );
@@ -54,16 +55,19 @@ export function CabinScene({ initialSeatId = null, initialWeights = null }: Cabi
   const [paused, setPaused] = useState(false);
   const prefersReducedMotion = useSyncExternalStore(subscribeMotion, reducedMotion, () => true);
   const focused = selectedSeatId !== null;
+  const intro = journey !== undefined && !journey.entered;
   const rotating = focused && !paused && !prefersReducedMotion;
   const selectSeat = (id: string | null) => { setSelectedSeatId(id); setPaused(false); };
 
   return (
-    <main className="blueprint-page relative flex min-h-svh min-w-0 flex-1 flex-col px-5 sm:px-10 lg:px-16">
-      <header className="flex items-center justify-between gap-4 border-b border-[var(--blueprint-rule)] py-6">
+    <main className={`blueprint-page relative flex min-w-0 flex-1 flex-col ${journey ? `h-full min-h-0 ${focused ? "overflow-y-auto" : ""}` : "min-h-svh px-5 sm:px-10 lg:px-16"}`}>
+      <header className={`flex items-center justify-between gap-4 border-b border-[var(--blueprint-rule)] py-6 ${journey ? "absolute inset-x-0 top-0 z-30 bg-[var(--blueprint-paper)]/90 px-5 transition-opacity duration-700 sm:px-10 lg:px-16" : ""}`} style={intro ? { opacity: 0, pointerEvents: "none", visibility: "hidden" } : undefined}>
         {focused ? (
           <Button variant="ghost" onClick={() => selectSeat(null)} className="min-h-9 gap-2 px-0 text-sm">
             <ArrowLeft className="size-4" aria-hidden="true" /> Back to cabin
           </Button>
+        ) : journey ? (
+          <Button variant="ghost" onClick={journey.onBack} className="gap-2 px-0"><ArrowLeft className="size-4" /> Back to train</Button>
         ) : (
           <Link href="/" className="flex min-h-9 items-center gap-2 text-sm hover:underline focus-visible:outline-2 focus-visible:outline-offset-4">
             <ArrowLeft className="size-4" aria-hidden="true" /> Back to train
@@ -75,16 +79,16 @@ export function CabinScene({ initialSeatId = null, initialWeights = null }: Cabi
         </div>
       </header>
       <h1 className="sr-only">{focused ? "Seat sourcing" : "Passenger cabin"}</h1>
-      <section aria-label={focused ? "Seat sourcing workspace" : "Interactive blueprint cabin"} className="@container mt-6 flex min-h-0 flex-1 flex-col pb-6">
-        <div className={`grid min-w-0 transition-[grid-template-columns,gap] duration-[850ms] ease-in-out motion-reduce:transition-none ${focused ? "gap-5 @min-[720px]:grid-cols-[minmax(0,0.8fr)_minmax(0,1.8fr)]" : "gap-0 @min-[720px]:grid-cols-[minmax(0,1fr)_minmax(0,0fr)]"}`}>
+      <section aria-label={focused ? "Seat sourcing workspace" : "Interactive blueprint cabin"} className={`@container flex min-h-0 flex-1 flex-col ${journey ? focused ? "pt-24 px-5 pb-5" : "" : "mt-6 pb-6"}`}>
+        <div className={`grid min-w-0 ${journey ? "h-full" : ""} transition-[grid-template-columns,gap] duration-[850ms] ease-in-out motion-reduce:transition-none ${focused ? "gap-5 @min-[720px]:grid-cols-[minmax(0,0.8fr)_minmax(0,1.8fr)]" : "gap-0 @min-[720px]:grid-cols-[minmax(0,1fr)_minmax(0,0fr)]"}`}>
           <figure aria-label={focused ? `Seat ${selectedSeatId} preview` : "Cabin panorama"}
-            className={`relative min-w-0 overflow-hidden rounded-sm border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] transition-[height] duration-[850ms] motion-reduce:transition-none ${focused ? "h-80 @min-[720px]:h-[max(calc(100svh-8.5rem),36rem)]" : "h-[calc(100svh-10rem)] min-h-[420px]"}`}>
+            className={`relative min-w-0 overflow-hidden rounded-sm ${journey && !focused ? "" : "border border-[var(--blueprint-rule)]"} bg-[var(--blueprint-paper-deep)] transition-[height] duration-[850ms] motion-reduce:transition-none ${journey && !focused ? "h-full" : focused ? "h-80 @min-[720px]:h-[max(calc(100svh-8.5rem),36rem)]" : "h-[calc(100svh-10rem)] min-h-[420px]"}`}>
             {/* One fixed canvas size, centred and cropped by the frame: resizing WebGL during the
                 850 ms layout change painted blank grey frames. The seat stays centred, so the crop is safe. */}
-            <div className="absolute top-1/2 left-1/2 h-[max(calc(100svh-8.5rem),40rem)] w-[calc(100vw-2.5rem)] -translate-x-1/2 -translate-y-1/2">
+            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${journey ? "h-svh w-screen" : "h-[max(calc(100svh-8.5rem),40rem)] w-[calc(100vw-2.5rem)]"}`}>
               <CabinBoundary>
-                <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={selectSeat}
-                  zoom={zoom} setZoom={setZoom} resetView={0} rotating={rotating} reducedMotion={prefersReducedMotion} fallback={<CabinFallback />} />
+                <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={intro ? () => {} : selectSeat}
+                  journeyProgress={intro ? journey.progress : undefined} zoom={zoom} setZoom={setZoom} resetView={0} rotating={rotating} reducedMotion={prefersReducedMotion} fallback={<CabinFallback />} />
               </CabinBoundary>
             </div>
             {focused && (
@@ -110,7 +114,7 @@ export function CabinScene({ initialSeatId = null, initialWeights = null }: Cabi
             )}
           </div>
         </div>
-        {!focused && (
+        {!focused && !intro && (
           <>
             {/* Hidden until focused: the keyboard and screen-reader way to pick a seat without the 3D view. */}
             <footer className="sr-only focus-within:not-sr-only focus-within:flex focus-within:items-center focus-within:justify-between focus-within:gap-4 focus-within:py-5">
