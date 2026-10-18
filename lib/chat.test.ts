@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { chatRequestSchema, type DatasetResult } from "./chat-contract.ts";
 import { answerChat, hydrateAnswer } from "./chat.ts";
+import { seatCriterionKeys } from "./seat-criteria-contract.ts";
 
 const result: DatasetResult = {
   source: { name: "supplier_risk_dataset.csv", version: "fixture" },
@@ -72,5 +73,51 @@ test("tool loops stop after four lookups", async (t) => {
   await assert.rejects(answerChat(chatRequestSchema.parse({ message: "compare suppliers" }), AbortSignal.timeout(1_000)),
     { code: "tool_limit" });
   assert.equal(calls, 5);
+  t.mock.restoreAll();
+});
+
+test("seat-priority questions use three evaluations and return grounded priorities in chat", async (t) => {
+  const env = process.env;
+  process.env = { ...env, NEBIUS_API_KEY: "fixture-key" };
+  t.after(() => { process.env = env; });
+  const run = { criteria: Object.fromEntries(seatCriterionKeys.map((key) => [key, {
+    importance: key === "quality" ? 9 : 5, reason: "Consistent quality supports reliable seat procurement.",
+  }])) };
+  let evaluations = 0;
+  let routingCalls = 0;
+  const finalRecipe = { text: "For train seats, quality has an average importance of 9/10 across three runs. These are AI-suggested priorities.", resultId: "seat_2", supplierIds: [], metricKeys: [] };
+  t.mock.method(globalThis, "fetch", async (_url: string, init: RequestInit) => {
+    const request = JSON.parse(String(init.body));
+    let message;
+    if (request.response_format?.json_schema.schema.properties.criteria) {
+      evaluations++;
+      message = { role: "assistant", content: JSON.stringify(run), tool_calls: null };
+    } else if (routingCalls++ === 0) {
+      assert.ok(request.tools.some((tool: { function: { name: string } }) => tool.function.name === "evaluate_seat_criteria"));
+      message = { role: "assistant", content: null, tool_calls: ["seat_1", "seat_2"].map((id) => ({
+        id, type: "function", function: { name: "evaluate_seat_criteria", arguments: "{}" },
+      })) };
+    } else {
+      assert.equal("tools" in request, false);
+      assert.equal(request.response_format.json_schema.schema.properties.text.type, "string");
+      const outputs = request.messages.filter((message: { role: string }) => message.role === "tool");
+      assert.equal(outputs.length, 2);
+      assert.equal(JSON.parse(outputs[1].content).resultId, "seat_2");
+      message = { role: "assistant", content: JSON.stringify(finalRecipe) };
+    }
+    return Response.json({ model: "test", choices: [{ finish_reason: "stop", message }] });
+  });
+  const response = await answerChat(chatRequestSchema.parse({ message: "what are the most imporatant thingy for ttrain seats?" }), AbortSignal.timeout(1_000));
+  assert.equal(response.answer, finalRecipe.text);
+  assert.equal(response.view, null);
+  assert.equal(evaluations, 3);
+  assert.equal(routingCalls, 2);
+  const priorities = response.seatCriteria;
+  assert.ok(priorities);
+  assert.equal(priorities.runCount, 3);
+  assert.equal(priorities.criteria[0]?.key, "quality");
+  assert.equal(priorities.criteria[0]?.meanImportance, 9);
+  assert.deepEqual(response.tools.map(({ status }) => status), ["ok", "ok"]);
+  assert.throws(() => hydrateAnswer({ ...finalRecipe, supplierIds: ["SUPP_00001"] }, new Map([["seat_2", priorities]]), "test", []), { code: "ungrounded_answer" });
   t.mock.restoreAll();
 });

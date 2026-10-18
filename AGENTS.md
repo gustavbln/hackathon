@@ -147,6 +147,7 @@ Chat backend: `POST /api/chat`; request/response types and schemas in `lib/chat-
 Uses `zod`, `csv-parse`, `server-only`; focused backend checks run with `npm test` in Docker.
 Seat preferences: `POST /api/seat-criteria` runs Nemotron three times and averages criterion
 importance. Frontend contract: `lib/seat-criteria-contract.ts`. AI suggestions, not engineering validation.
+Chat tool `evaluate_seat_criteria` reuses it; `/api/chat` may return optional `seatCriteria` data.
 
 ## Git on a shared main
 

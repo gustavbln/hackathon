@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { seatCriteriaResponseSchema } from "./seat-criteria-contract.ts";
 
 export const riskDefinitions = [
   ["Financial_Health_Score", "Financial health risk", 10],
@@ -104,6 +105,7 @@ export const chatResponseSchema = z.object({
   }).nullable(),
   lastView: lastViewSchema.nullable(),
   tools: z.array(z.object({ name: z.string(), status: z.enum(["ok", "error"]), resultId: z.string() })),
+  seatCriteria: seatCriteriaResponseSchema.optional(),
 });
 export type ChatResponse = z.infer<typeof chatResponseSchema>;
 
