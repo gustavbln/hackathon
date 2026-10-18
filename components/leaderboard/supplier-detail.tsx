@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { GlobeIcon, MessageCircleQuestionIcon } from "lucide-react";
 import { useChatFocus } from "@/components/chat/chat-focus";
-import { Button } from "@/components/ui/button";
 import { CRITERIA, CRITERION_BY_KEY, riskLevel, type CriterionKey, type Weights } from "@/lib/suppliers/criteria";
 import { contributions } from "@/lib/suppliers/scoring";
 import type { Scores } from "@/lib/suppliers/types";
 import { cn } from "@/lib/utils";
+import { AskButtons } from "./ask-buttons";
 import { LEVEL_COLOR } from "./risk-color";
 import { RiskDonut, type DonutSlice } from "./risk-donut";
 
@@ -27,7 +26,7 @@ interface SupplierDetailProps {
 export function SupplierDetail({ scores, weights, query }: SupplierDetailProps) {
   // A driver, or "other" while the folded slice is hovered.
   const [active, setActive] = useState<CriterionKey | typeof OTHER | null>(null);
-  const { onAction, ask } = useChatFocus();
+  const { onAction } = useChatFocus();
   useEffect(() => onAction((action) => action.type === "highlight_driver" && setActive(action.driverKey)), [onAction]);
 
   const parts = contributions(scores, weights).filter(({ points }) => points > 0);
@@ -117,21 +116,10 @@ export function SupplierDetail({ scores, weights, query }: SupplierDetailProps) 
           </p>
         )}
 
-        <div className="flex flex-wrap gap-2">
-          <Button
-            onClick={() => ask("Why is there this risk?")}
-            className="h-9 rounded-md bg-[var(--blueprint-ink)] px-4 text-[var(--blueprint-paper)] hover:bg-[var(--blueprint-ink)]/90"
-          >
-            <MessageCircleQuestionIcon aria-hidden="true" /> Why is there this risk?
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => ask(`Context from the web: what does a high ${topLabel} risk mean for a seat supplier?`)}
-            className="h-9 rounded-md border-[var(--blueprint-rule)] bg-transparent px-4 hover:bg-[var(--blueprint-grid)]"
-          >
-            <GlobeIcon aria-hidden="true" /> Context from the web
-          </Button>
-        </div>
+        <AskButtons
+          explain={{ label: "Why is there this risk?", question: "Why is there this risk?" }}
+          webQuestion={`Context from the web: what does a high ${topLabel} risk mean for a seat supplier?`}
+        />
 
         <details className="text-xs">
           <summary className="blueprint-label cursor-pointer hover:text-[var(--blueprint-ink)]">All {CRITERIA.length} drivers as a table</summary>
