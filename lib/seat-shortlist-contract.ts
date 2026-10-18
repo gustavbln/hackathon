@@ -7,8 +7,12 @@ const criterionKeySchema = z.enum(CRITERIA.map(({ key }) => key));
 export const shortlistSourceSchema = z.enum(["rules", "nemotron"]);
 export type ShortlistSource = z.infer<typeof shortlistSourceSchema>;
 
+/** The buyer's own re-ranking request, sent to Nemotron with the weights prompt. */
+export const shortlistInstructionSchema = z.string().trim().min(1).max(300);
+
 export const seatShortlistSchema = z.object({
   source: shortlistSourceSchema,
+  instruction: z.string().nullable(),
   models: z.array(z.string()),
   criteria: z.array(z.object({
     key: criterionKeySchema,

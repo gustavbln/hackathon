@@ -2,9 +2,12 @@ import "server-only";
 import { z } from "zod";
 import {
   ChatError, answerRecipeSchema, chatResponseSchema, getSuppliersSchema,
-  metricDefinitions, querySuppliersSchema, riskDefinitions,
-  type ChatRequest, type ChatResponse, type DatasetResult,
+  metricDefinitions, nextSeatSuppliersSchema, querySuppliersSchema, rerankSeatSchema, riskDefinitions,
+  type ChatRequest, type ChatResponse, type DatasetResult, type SeatFocus,
 } from "./chat-contract.ts";
+import { nextSeatSupplierIds, seatShortlist } from "./seat-shortlist.ts";
+import type { SeatShortlist } from "./seat-shortlist-contract.ts";
+import { CRITERIA, CRITERION_BY_KEY } from "./suppliers/criteria.ts";
 import { getSuppliers, querySuppliers } from "./suppliers.ts";
 import { completeNemotron, type ModelMessage, type ModelTool } from "./nemotron.ts";
 import { evaluateSeatCriteria } from "./seat-criteria.ts";
@@ -30,6 +33,52 @@ const tools: ModelTool[] = [
     parameters: z.toJSONSchema(seatCriteriaArgs),
   } },
 ];
+
+const nextSeatSuppliersTool: ModelTool = { type: "function", function: {
+  name: "next_seat_suppliers",
+  description: "Only with a seat focus: the next-best dataset suppliers after the buyer's shortlist, ranked by the SAME focus weights. Use for 'new', 'more', 'other' or 'alternative' suppliers for this seat. offset 20 starts right after the top 20.",
+  parameters: z.toJSONSchema(nextSeatSuppliersSchema),
+} };
+
+const rerankSeatTool: ModelTool = { type: "function", function: {
+  name: "rerank_seat_priorities",
+  description: "Only with a seat focus: re-weight the seat priorities from the buyer's own wording (e.g. 'ESG matters most', 'ignore market sentiment') and re-rank all suppliers. The page shows the new shortlist. Pass the buyer's request as instruction.",
+  parameters: z.toJSONSchema(rerankSeatSchema),
+} };
+
+const focusPrompt = `When the request has a focus, the buyer is on the cabin page sourcing passenger seats for that seat.
+They see a shortlist (focus.shortlist, best first) ranked by focus.priorities, optionally re-ranked by their own
+focus.instruction. "This shortlist", "the top 3" or "#1" refer to focus.shortlist in order: fetch them with
+get_suppliers. For new, more or alternative suppliers for this seat call next_seat_suppliers. When the
+buyer wants to change what matters, re-weight or re-rank, call rerank_seat_priorities with their wording and
+summarise how the priorities and the top suppliers changed. Real companies
+outside the dataset are not available yet: say so if asked.`;
+
+/** Short, readable focus for the model; the full weights stay on the server for ranking. */
+function describeFocus(focus: SeatFocus) {
+  const priorities = CRITERIA.map(({ key, label, column }) => ({ label, column, percent: Math.round(focus.weights[key] * 1000) / 10 }))
+    .sort((a, b) => b.percent - a.percent).slice(0, 5);
+  return { seatId: focus.seatId, shortlist: focus.supplierIds, priorities, instruction: focus.instruction };
+}
+
+/** Next-best suppliers for the focus weights, with the total and the three heaviest criteria as metrics. */
+async function nextSeatSuppliers(focus: SeatFocus, input: unknown) {
+  const { offset, limit } = nextSeatSuppliersSchema.parse(input);
+  const ids = await nextSeatSupplierIds(focus.weights, offset, limit);
+  const heaviest = CRITERIA.toSorted((a, b) => focus.weights[b.key] - focus.weights[a.key]).slice(0, 3).map(({ column }) => column);
+  return getSuppliers({ ids, metrics: ["Total_Risk_Index", ...heaviest] });
+}
+
+const OUTPUT_RULES = "Tool errors are not evidence:";
+
+/** Re-weights with Nemotron, then returns the new top 10 with the total and the three heaviest criteria. */
+async function rerankSeat(input: unknown, signal: AbortSignal) {
+  const { instruction } = rerankSeatSchema.parse(input);
+  const shortlist = await seatShortlist("nemotron", instruction, signal);
+  const heaviest = shortlist.criteria.slice(0, 3).map(({ key }) => CRITERION_BY_KEY[key].column);
+  const result = await getSuppliers({ ids: shortlist.suppliers.slice(0, 10).map(({ id }) => id), metrics: ["Total_Risk_Index", ...heaviest] });
+  return { shortlist, result };
+}
 
 const systemPrompt = `You help rail procurement buyers explore an anonymized supplier risk CSV and prioritize risk criteria for train seats.
 Use tools for EVERY supplier fact; never use memory or numbers from conversation history.
@@ -105,27 +154,50 @@ export function hydrateAnswer(recipe: z.infer<typeof answerRecipeSchema>, eviden
   });
 }
 
+function parseRecipe(content: string | null | undefined) {
+  try {
+    const parsed = answerRecipeSchema.safeParse(JSON.parse((content ?? "").replace(/^```(?:json)?\s*|\s*```$/g, "")));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Nemotron sometimes answers in prose after its tool calls; one schema-enforced retry recovers the recipe. */
+async function repairRecipe(messages: ModelMessage[], content: string | null | undefined, signal: AbortSignal) {
+  const { message } = await completeNemotron([
+    ...messages,
+    { role: "assistant", content: content ?? "" },
+    { role: "user", content: "Return that answer now as ONLY the JSON object in the required format." },
+  ], [], signal, z.toJSONSchema(answerRecipeSchema));
+  const recipe = parseRecipe(message.content);
+  if (!recipe) throw new ChatError("invalid_answer", "Nemotron returned an unreadable answer. Please retry.");
+  return recipe;
+}
+
 export async function answerChat(request: ChatRequest, signal: AbortSignal) {
   const messages: ModelMessage[] = [
-    { role: "system", content: systemPrompt },
+    { role: "system", content: request.focus ? systemPrompt.replace(OUTPUT_RULES, `${focusPrompt}\n${OUTPUT_RULES}`) : systemPrompt },
     ...request.history,
-    { role: "user", content: JSON.stringify({ message: request.message, selectedIds: request.selectedIds, lastView: request.lastView }) },
+    { role: "user", content: JSON.stringify({
+      message: request.message, selectedIds: request.selectedIds, lastView: request.lastView,
+      focus: request.focus && describeFocus(request.focus),
+    }) },
   ];
+  const availableTools = request.focus ? [...tools, nextSeatSuppliersTool, rerankSeatTool] : tools;
+  let rerank: SeatShortlist | undefined;
   const evidence = new Map<string, ChatEvidence>();
   let seatEvaluation: SeatCriteriaResponse | undefined;
   const receipts: ChatResponse["tools"] = [];
   const callIds = new Set<string>();
   for (let round = 0; round < 5; round++) {
     signal.throwIfAborted();
-    const { message, model } = await completeNemotron(messages, seatEvaluation ? [] : tools, signal,
+    const { message, model } = await completeNemotron(messages, seatEvaluation ? [] : availableTools, signal,
       seatEvaluation ? z.toJSONSchema(answerRecipeSchema) : undefined);
     if (!message.tool_calls?.length) {
-      let recipe: unknown;
-      try { recipe = JSON.parse((message.content ?? "").replace(/^```(?:json)?\s*|\s*```$/g, "")); }
-      catch { throw new ChatError("invalid_answer", "Nemotron returned an unreadable answer. Please retry."); }
-      const parsed = answerRecipeSchema.safeParse(recipe);
-      if (!parsed.success) throw new ChatError("invalid_answer", "Nemotron returned an invalid answer. Please retry.");
-      return hydrateAnswer(parsed.data, evidence, model, receipts);
+      const recipe = parseRecipe(message.content) ?? await repairRecipe(messages, message.content, signal);
+      const response = hydrateAnswer(recipe, evidence, model, receipts);
+      return rerank ? { ...response, rerank } : response;
     }
     if (receipts.length + message.tool_calls.length > 4) throw new ChatError("tool_limit", "This question needs too many lookups. Try a narrower question.");
     messages.push({ ...message, content: message.content ?? null });
@@ -141,9 +213,14 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal) {
         if (call.function.name === "evaluate_seat_criteria") {
           seatCriteriaArgs.parse(args);
           result = seatEvaluation ??= await evaluateSeatCriteria(signal);
+        } else if (call.function.name === "rerank_seat_priorities" && request.focus) {
+          const reranked = await rerankSeat(args, signal);
+          rerank = reranked.shortlist;
+          result = reranked.result;
         } else {
           result = call.function.name === "query_suppliers" ? await querySuppliers(args)
-            : call.function.name === "get_suppliers" ? await getSuppliers(args) : null;
+            : call.function.name === "get_suppliers" ? await getSuppliers(args)
+            : call.function.name === "next_seat_suppliers" && request.focus ? await nextSeatSuppliers(request.focus, args) : null;
         }
         if (!result) throw new Error("Unknown tool");
         evidence.set(call.id, result);

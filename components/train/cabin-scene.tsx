@@ -53,7 +53,7 @@ export function CabinScene() {
           <div className="relative h-72 overflow-hidden rounded-sm border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] animate-in fade-in-0 slide-in-from-right-8 duration-500 motion-reduce:animate-none @min-[720px]:h-auto">
             <CabinBoundary><SeatFocusCanvas seatId={selectedSeatId} /></CabinBoundary>
           </div>
-          <SeatShortlistPanel onClose={() => selectSeat(null)} />
+          <SeatShortlistPanel seatId={selectedSeatId} onClose={() => selectSeat(null)} />
         </div>
       </section>
   ) : (

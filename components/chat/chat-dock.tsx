@@ -6,10 +6,11 @@ import { ArrowLeftIcon, XIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Sidebar, SidebarProvider, useSidebar } from "@/components/ui/sidebar"
-import { chatResponseSchema } from "@/lib/chat-contract"
+import { chatResponseSchema, type SeatFocus } from "@/lib/chat-contract"
 
 import { AssistantAvatar, assistantName } from "./assistant-avatar"
 import { ChatComposer, ChatThread } from "./chat"
+import { ChatFocusProvider, useChatFocus } from "./chat-focus"
 import type { ChatMessage, ChatStatus } from "./types"
 
 // The backend accepts at most 12 history turns of 2,000 characters each.
@@ -21,7 +22,7 @@ function toHistory(messages: ChatMessage[]) {
   )
 }
 
-async function askChat(text: string, previous: ChatMessage[]) {
+async function askChat(text: string, previous: ChatMessage[], focus: SeatFocus | null) {
   const lastAnswer = previous.findLast((message) => message.role === "assistant")
   const lastView = lastAnswer?.role === "assistant" ? lastAnswer.response.lastView : null
   const response = await fetch("/api/chat", {
@@ -31,6 +32,7 @@ async function askChat(text: string, previous: ChatMessage[]) {
       message: text,
       history: toHistory(previous),
       ...(lastView && { lastView }),
+      ...(focus && { focus }),
     }),
   })
   const body: unknown = await response.json()
@@ -44,8 +46,10 @@ async function askChat(text: string, previous: ChatMessage[]) {
 export function ChatWorkspace({ children }: { children: ReactNode }) {
   return (
     <SidebarProvider defaultOpen={false} style={{ "--sidebar-width": "min(420px, 42vw)" } as CSSProperties}>
-      {children}
-      <ChatPanel />
+      <ChatFocusProvider>
+        {children}
+        <ChatPanel />
+      </ChatFocusProvider>
     </SidebarProvider>
   )
 }
@@ -74,6 +78,7 @@ function ChatPanel() {
   const [status, setStatus] = useState<ChatStatus>("ready")
   const [error, setError] = useState<string | null>(null)
   const { isMobile, open, setOpen, openMobile, setOpenMobile } = useSidebar()
+  const { focus, applyRerank } = useChatFocus()
 
   function close() {
     if (isMobile) setOpenMobile(false)
@@ -87,7 +92,8 @@ function ChatPanel() {
     setError(null)
     setMessages([...previous, { id: crypto.randomUUID(), role: "user", text }])
     try {
-      const response = await askChat(text, previous)
+      const response = await askChat(text, previous, focus)
+      if (response.rerank) applyRerank(response.rerank)
       setMessages((current) => [...current, { id: crypto.randomUUID(), role: "assistant", response }])
       setStatus("ready")
     } catch (failure) {
@@ -104,7 +110,14 @@ function ChatPanel() {
       className="flex h-full min-h-0 flex-col bg-[var(--blueprint-paper-deep)] text-[var(--blueprint-ink)]"
     >
       <header className="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--blueprint-rule)] py-4 pr-3 pl-4">
-        <h2 className="blueprint-label">{assistantName} / Runs on NVIDIA Nemotron</h2>
+        <div className="min-w-0">
+          <h2 className="blueprint-label">{assistantName} / Runs on NVIDIA Nemotron</h2>
+          {focus && (
+            <p className="mt-1 truncate text-xs text-[var(--blueprint-muted)]">
+              Looking at seat {focus.seatId} and its top {focus.supplierIds.length} suppliers
+            </p>
+          )}
+        </div>
         <Button
           variant="ghost"
           size="icon-sm"

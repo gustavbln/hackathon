@@ -15,6 +15,8 @@ import type { ChatMessage as ChatMessageData } from "./types"
 
 const toolLabels: Record<string, string> = {
   query_suppliers: "Searched the supplier dataset",
+  next_seat_suppliers: "Ranked the next-best seat suppliers",
+  rerank_seat_priorities: "Re-weighted the seat priorities with Nemotron",
   get_suppliers: "Checked supplier profiles",
   evaluate_seat_criteria: "Evaluated seat priorities",
 }

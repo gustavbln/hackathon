@@ -1,5 +1,7 @@
 import { z } from "zod";
+import { CRITERIA } from "./suppliers/criteria.ts";
 import { seatCriteriaResponseSchema } from "./seat-criteria-contract.ts";
+import { seatShortlistSchema, shortlistInstructionSchema } from "./seat-shortlist-contract.ts";
 
 export const riskDefinitions = [
   ["Financial_Health_Score", "Financial health risk", 10],
@@ -56,11 +58,27 @@ export const querySuppliersSchema = z.strictObject({
 });
 export const getSuppliersSchema = z.strictObject({ ids: idsSchema, metrics: metricsSchema.default(defaultMetrics) });
 export const lastViewSchema = z.strictObject({ supplierIds: idsSchema, metricKeys: metricsSchema });
+const criterionKeySchema = z.enum(CRITERIA.map(({ key }) => key));
+/** What the buyer is looking at in the cabin: the seat, the active weights and the shortlist they produce. */
+export const seatFocusSchema = z.strictObject({
+  seatId: z.string().regex(/^\d{1,2}[A-Z]$/),
+  weights: z.record(criterionKeySchema, z.number().min(0).max(1))
+    .refine((weights) => Object.values(weights).some((weight) => weight > 0), "At least one weight must be positive"),
+  supplierIds: idsSchema,
+  instruction: z.string().trim().max(300).nullable(),
+});
+export type SeatFocus = z.infer<typeof seatFocusSchema>;
+export const nextSeatSuppliersSchema = z.strictObject({
+  offset: z.number().int().min(0).max(500).default(20),
+  limit: z.number().int().min(1).max(20).default(10),
+});
+export const rerankSeatSchema = z.strictObject({ instruction: shortlistInstructionSchema });
 export const chatRequestSchema = z.strictObject({
   message: z.string().trim().min(1).max(4_000),
   history: z.array(z.strictObject({ role: z.enum(["user", "assistant"]), content: z.string().max(2_000) })).max(12).default([]),
   selectedIds: z.array(supplierIdSchema).max(20).default([]),
   lastView: lastViewSchema.optional(),
+  focus: seatFocusSchema.optional(),
 });
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
 
@@ -106,6 +124,8 @@ export const chatResponseSchema = z.object({
   lastView: lastViewSchema.nullable(),
   tools: z.array(z.object({ name: z.string(), status: z.enum(["ok", "error"]), resultId: z.string() })),
   seatCriteria: seatCriteriaResponseSchema.optional(),
+  /** Set when the buyer re-ranked the seat priorities through the chat; the page shows the new shortlist. */
+  rerank: seatShortlistSchema.optional(),
 });
 export type ChatResponse = z.infer<typeof chatResponseSchema>;
 

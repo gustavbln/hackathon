@@ -24,7 +24,13 @@ export function buildShortlist(suppliers: readonly Supplier[], weights: Weights)
   }));
 }
 
-async function seatWeights(source: ShortlistSource, signal: AbortSignal) {
+/** IDs ranked by the weights, skipping the first `offset`: the next-best candidates after a shortlist. */
+export async function nextSeatSupplierIds(weights: Weights, offset: number, limit: number) {
+  const suppliers = await loadDatasetSuppliers();
+  return rankSuppliers(suppliers, weights).slice(offset, offset + limit).map(({ supplier }) => supplier.id);
+}
+
+async function seatWeights(source: ShortlistSource, instruction: string | null, signal: AbortSignal) {
   if (source === "rules") {
     const { weights, boosts } = buildProfile("seats");
     return {
@@ -37,7 +43,7 @@ async function seatWeights(source: ShortlistSource, signal: AbortSignal) {
       })),
     };
   }
-  const evaluation = await evaluateSeatCriteria(signal);
+  const evaluation = await evaluateSeatCriteria(signal, instruction);
   return {
     weights: evaluation.weights,
     models: evaluation.models,
@@ -45,10 +51,13 @@ async function seatWeights(source: ShortlistSource, signal: AbortSignal) {
   };
 }
 
-export async function seatShortlist(source: ShortlistSource, signal: AbortSignal): Promise<SeatShortlist> {
-  const [suppliers, { weights, models, criteria }] = await Promise.all([loadDatasetSuppliers(), seatWeights(source, signal)]);
+export async function seatShortlist(source: ShortlistSource, instruction: string | null, signal: AbortSignal): Promise<SeatShortlist> {
+  // Re-ranking is a Nemotron feature; the EN-standard profile is fixed.
+  const steer = source === "nemotron" ? instruction : null;
+  const [suppliers, { weights, models, criteria }] = await Promise.all([loadDatasetSuppliers(), seatWeights(source, steer, signal)]);
   return seatShortlistSchema.parse({
     source,
+    instruction: steer,
     models,
     criteria: criteria.toSorted((a, b) => b.weightPercent - a.weightPercent),
     suppliers: buildShortlist(suppliers, weights),

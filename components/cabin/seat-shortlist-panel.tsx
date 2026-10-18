@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRightIcon, XIcon } from "lucide-react";
+import { ArrowUpIcon, ArrowUpRightIcon, XIcon } from "lucide-react";
 
 import { AssistantAvatar } from "@/components/chat/assistant-avatar";
+import { useChatFocus } from "@/components/chat/chat-focus";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import type { SeatFocus } from "@/lib/chat-contract";
 import { seatShortlistSchema, type SeatShortlist, type ShortlistSource } from "@/lib/seat-shortlist-contract";
 
 const TOP_CRITERIA = 5;
@@ -17,8 +19,13 @@ type Load =
   | { state: "error"; message: string }
   | { state: "ready"; shortlist: SeatShortlist };
 
-async function fetchShortlist(source: ShortlistSource, signal: AbortSignal) {
-  const response = await fetch(`/api/seat-shortlist?source=${source}`, { signal });
+type ShortlistRequest = { source: ShortlistSource; instruction: string | null };
+
+const requestKey = ({ source, instruction }: ShortlistRequest) => `${source}:${instruction ?? ""}`;
+
+async function fetchShortlist({ source, instruction }: ShortlistRequest, signal: AbortSignal) {
+  const params = new URLSearchParams({ source, ...(instruction && { instruction }) });
+  const response = await fetch(`/api/seat-shortlist?${params}`, { signal });
   const body: unknown = await response.json();
   if (!response.ok) {
     const message = (body as { error?: { message?: string } }).error?.message;
@@ -27,31 +34,53 @@ async function fetchShortlist(source: ShortlistSource, signal: AbortSignal) {
   return seatShortlistSchema.parse(body);
 }
 
-export function SeatShortlistPanel({ onClose }: { onClose: () => void }) {
-  const [source, setSource] = useState<ShortlistSource>("rules");
-  // A missing entry means "not fetched yet"; ready and failed results stay cached per source.
-  const [loads, setLoads] = useState<Partial<Record<ShortlistSource, Load>>>({});
-  const entry = loads[source];
+export function SeatShortlistPanel({ seatId, onClose }: { seatId: string; onClose: () => void }) {
+  const [request, setRequest] = useState<ShortlistRequest>({ source: "rules", instruction: null });
+  // A missing entry means "not fetched yet"; ready and failed results stay cached per request.
+  const [loads, setLoads] = useState<Record<string, Load>>({});
+  const key = requestKey(request);
+  const entry = loads[key];
   const load = entry ?? { state: "loading" };
+  const { setFocus, onRerank } = useChatFocus();
+
+  // A re-rank asked through Gauge arrives with its result; show it as if the buyer had typed it here.
+  useEffect(() => onRerank((shortlist) => {
+    const next = { source: "nemotron" as const, instruction: shortlist.instruction };
+    setLoads((current) => ({ ...current, [requestKey(next)]: { state: "ready", shortlist } }));
+    setRequest(next);
+  }), [onRerank]);
 
   useEffect(() => {
     if (entry) return;
     const controller = new AbortController();
-    fetchShortlist(source, controller.signal).then(
-      (shortlist) => setLoads((current) => ({ ...current, [source]: { state: "ready", shortlist } })),
+    fetchShortlist(request, controller.signal).then(
+      (shortlist) => setLoads((current) => ({ ...current, [key]: { state: "ready", shortlist } })),
       (error: unknown) => {
         if (controller.signal.aborted) return;
         const message = error instanceof Error ? error.message : "The seat shortlist failed. Please retry.";
-        setLoads((current) => ({ ...current, [source]: { state: "error", message } }));
+        setLoads((current) => ({ ...current, [key]: { state: "error", message } }));
       },
     );
     return () => controller.abort();
-  }, [source, entry]);
+  }, [request, key, entry]);
+
+  // Gauge answers about whatever shortlist is on screen.
+  const shortlist = load.state === "ready" ? load.shortlist : null;
+  useEffect(() => {
+    if (!shortlist) return;
+    setFocus({
+      seatId,
+      weights: Object.fromEntries(shortlist.criteria.map(({ key, weightPercent }) => [key, weightPercent / 100])) as SeatFocus["weights"],
+      supplierIds: shortlist.suppliers.map(({ id }) => id),
+      instruction: shortlist.instruction,
+    });
+  }, [seatId, shortlist, setFocus]);
+  useEffect(() => () => setFocus(null), [setFocus]);
 
   function retry() {
     setLoads((current) => {
       const next = { ...current };
-      delete next[source];
+      delete next[key];
       return next;
     });
   }
@@ -65,13 +94,13 @@ export function SeatShortlistPanel({ onClose }: { onClose: () => void }) {
       <header className="flex items-center justify-between gap-4 border-b border-[var(--blueprint-rule)] py-2 pr-2 pl-5">
         <div className="min-w-0">
           <h2 className="text-sm font-medium tracking-tight">Seat sourcing</h2>
-          <p className="blueprint-label mt-0.5">High-speed / Passenger seats</p>
+          <p className="blueprint-label mt-0.5">Seat {seatId} / High-speed / Passenger seats</p>
         </div>
         <div className="flex items-center gap-3">
           <ToggleGroup
             type="single"
-            value={source}
-            onValueChange={(value) => value && setSource(value as ShortlistSource)}
+            value={request.source}
+            onValueChange={(value) => value && setRequest({ source: value as ShortlistSource, instruction: null })}
             aria-label="Weights"
             className="gap-4"
           >
@@ -97,8 +126,14 @@ export function SeatShortlistPanel({ onClose }: { onClose: () => void }) {
         </div>
       </header>
 
+      <RerankForm
+        instruction={request.instruction}
+        disabled={load.state === "loading"}
+        onRerank={(instruction) => setRequest({ source: "nemotron", instruction })}
+      />
+
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {load.state === "loading" && <ShortlistLoading source={source} />}
+        {load.state === "loading" && <ShortlistLoading source={request.source} />}
         {load.state === "error" && (
           <div role="alert" className="flex flex-col items-start gap-3 p-5 text-sm">
             <p>{load.message}</p>
@@ -110,6 +145,60 @@ export function SeatShortlistPanel({ onClose }: { onClose: () => void }) {
         {load.state === "ready" && <ShortlistResult shortlist={load.shortlist} />}
       </div>
     </section>
+  );
+}
+
+/** The buyer steers the weights in their own words; Nemotron re-scores, the ranking follows. */
+function RerankForm({ instruction, disabled, onRerank }: {
+  instruction: string | null; disabled: boolean; onRerank: (instruction: string | null) => void;
+}) {
+  const [draft, setDraft] = useState("");
+  const text = draft.trim();
+
+  if (instruction) {
+    return (
+      <div className="flex items-center justify-between gap-3 border-b border-[var(--blueprint-rule)] py-2 pr-2 pl-5 text-xs">
+        <p className="min-w-0 truncate">
+          <span className="blueprint-label mr-2">Re-ranked</span>
+          {instruction}
+        </p>
+        <Button variant="ghost" size="sm" className="h-7 shrink-0 rounded-none text-xs hover:bg-[var(--blueprint-grid)]" onClick={() => onRerank(null)}>
+          Reset
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <form
+      className="flex items-center gap-2 border-b border-[var(--blueprint-rule)] py-1.5 pr-2 pl-5"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (!text || disabled) return;
+        onRerank(text.slice(0, 300));
+        setDraft("");
+      }}
+    >
+      <label htmlFor="seat-rerank" className="blueprint-label shrink-0">Re-rank</label>
+      <input
+        id="seat-rerank"
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+        maxLength={300}
+        placeholder="e.g. ESG matters most, sentiment barely matters"
+        className="h-8 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--blueprint-muted)]"
+      />
+      <Button
+        type="submit"
+        variant="ghost"
+        size="icon-sm"
+        disabled={!text || disabled}
+        aria-label="Re-rank with Nemotron"
+        className="rounded-none hover:bg-[var(--blueprint-grid)] hover:text-[var(--blueprint-ink)]"
+      >
+        <ArrowUpIcon strokeWidth={1.5} />
+      </Button>
+    </form>
   );
 }
 
@@ -130,15 +219,16 @@ function ShortlistLoading({ source }: { source: ShortlistSource }) {
 }
 
 function ShortlistResult({ shortlist }: { shortlist: SeatShortlist }) {
-  const top = shortlist.criteria.slice(0, TOP_CRITERIA);
-  const maxWeight = top[0]?.weightPercent ?? 1;
+  const [showAll, setShowAll] = useState(false);
+  const visible = showAll ? shortlist.criteria : shortlist.criteria.slice(0, TOP_CRITERIA);
+  const maxWeight = shortlist.criteria[0]?.weightPercent ?? 1;
 
   return (
     <div className="grid @min-[680px]/shortlist:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
       <section aria-labelledby="seat-criteria-heading" className="min-w-0 p-5">
         <h3 id="seat-criteria-heading" className="blueprint-label mb-4">Priorities</h3>
         <ol className="flex flex-col gap-4">
-          {top.map((criterion) => (
+          {visible.map((criterion, index) => (
             <li key={criterion.key} title={criterion.reason ?? undefined}>
               <div className="flex items-baseline justify-between gap-3 text-sm">
                 <span>{criterion.label}</span>
@@ -149,17 +239,27 @@ function ShortlistResult({ shortlist }: { shortlist: SeatShortlist }) {
               <div className="mt-1.5 h-px bg-[var(--blueprint-rule)]">
                 <div className="h-px bg-[var(--blueprint-ink)]" style={{ width: `${(criterion.weightPercent / maxWeight) * 100}%` }} />
               </div>
-              <p className="mt-1.5 text-xs leading-relaxed text-[var(--blueprint-muted)]">
-                {criterion.reason ?? "Priority inherited from the dataset’s baseline weights."}
-              </p>
+              {index < TOP_CRITERIA && (
+                <p className="mt-1.5 text-xs leading-relaxed text-[var(--blueprint-muted)]">
+                  {criterion.reason ?? "Priority inherited from the dataset’s baseline weights."}
+                </p>
+              )}
             </li>
           ))}
         </ol>
-        <p className="mt-5 text-xs leading-relaxed text-[var(--blueprint-muted)]">
-          {shortlist.source === "rules"
-            ? "Dataset weights, raised where EN 45545 and seat production demand it."
-            : "AI suggestion, three Nemotron runs averaged. No supplier data was sent."}
-        </p>
+        <button
+          type="button"
+          onClick={() => setShowAll((current) => !current)}
+          aria-expanded={showAll}
+          className="blueprint-label mt-4 hover:text-[var(--blueprint-ink)]"
+        >
+          {showAll ? `Show top ${TOP_CRITERIA}` : `Show all ${shortlist.criteria.length}`}
+        </button>
+        {shortlist.source === "rules" && (
+          <p className="mt-5 text-xs leading-relaxed text-[var(--blueprint-muted)]">
+            Dataset weights, raised where EN 45545 and seat production demand it.
+          </p>
+        )}
       </section>
 
       <section aria-labelledby="seat-shortlist-heading" className="min-w-0 p-5 @min-[680px]/shortlist:border-l @min-[680px]/shortlist:border-[var(--blueprint-rule)]">
