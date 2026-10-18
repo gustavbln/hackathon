@@ -21,7 +21,7 @@ function BlueprintBox({ size, position, palette, color = palette.surface, bright
     : <mesh position={position}><boxGeometry args={size} />{finish}</mesh>;
 }
 
-function Seat({ id, position, palette, selectedSeatId, onSeatSelect }: {
+export function Seat({ id, position, palette, selectedSeatId, onSeatSelect }: {
   id: string; position: Point; palette: TrainPalette;
 } & Pick<CabinSelection, "selectedSeatId" | "onSeatSelect">) {
   const [hovered, setHovered] = useState(false);

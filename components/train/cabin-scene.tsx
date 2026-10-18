@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { Component, useState, type ReactNode } from "react";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus, RotateCcw } from "lucide-react";
+import { ArrowLeft, Minus, Plus, RotateCcw } from "lucide-react";
 import { ComponentPreviewPanel } from "@/components/cabin/component-preview-panel";
 import { SeatShortlistPanel } from "@/components/cabin/seat-shortlist-panel";
 import { CABIN_COMPONENTS, CABIN_SEATS, type CabinComponentId } from "./cabin-layout";
@@ -13,13 +13,18 @@ function CabinFallback({ loading = false }: { loading?: boolean }) {
   return (
     <div className="absolute inset-0 flex items-center justify-center p-8 text-center" role="status">
       <p className="text-sm text-[var(--blueprint-muted)]">
-        {loading ? "Preparing the cabin…" : "The 3D cabin is unavailable. You can still choose a seat below, or reload to try again."}
+        {loading ? "Preparing the preview…" : "The 3D preview is unavailable. You can still use the seat selector and supplier analysis."}
       </p>
     </div>
   );
 }
 
 const CabinCanvas = dynamic(() => import("./cabin-canvas"), {
+  ssr: false,
+  loading: () => <CabinFallback loading />,
+});
+
+const SeatFocusCanvas = dynamic(() => import("./seat-focus-canvas"), {
   ssr: false,
   loading: () => <CabinFallback loading />,
 });
@@ -39,6 +44,30 @@ export function CabinScene() {
   const selectSeat = (id: string | null) => { setSelectedSeatId(id); setSelectedComponentId(null); };
   const selectComponent = (id: CabinComponentId | null) => { setSelectedComponentId(id); setSelectedSeatId(null); };
   const componentLabel = CABIN_COMPONENTS.find(({ id }) => id === selectedComponentId)?.label;
+
+  if (selectedSeatId) {
+    return (
+      <section aria-label="Seat sourcing workspace" className="@container mt-6 flex min-h-0 flex-1 flex-col pb-6">
+        <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <Button variant="ghost" size="sm" onClick={() => selectSeat(null)} className="gap-2 px-0">
+            <ArrowLeft className="size-4" /> Back to cabin
+          </Button>
+          <div className="flex items-center gap-3">
+            <label htmlFor="cabin-seat" className="blueprint-label">Seat</label>
+            <NativeSelect id="cabin-seat" value={selectedSeatId} onChange={(event) => selectSeat(event.target.value)}>
+              {CABIN_SEATS.map((seat) => <NativeSelectOption key={seat.id} value={seat.id}>Seat {seat.id}</NativeSelectOption>)}
+            </NativeSelect>
+          </div>
+        </header>
+        <div className="grid min-w-0 gap-5 @min-[720px]:grid-cols-[minmax(0,0.8fr)_minmax(0,1.8fr)]">
+          <div className="relative h-72 overflow-hidden rounded-sm border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] animate-in fade-in-0 slide-in-from-right-8 duration-500 motion-reduce:animate-none @min-[720px]:h-auto">
+            <CabinBoundary><SeatFocusCanvas seatId={selectedSeatId} /></CabinBoundary>
+          </div>
+          <SeatShortlistPanel onClose={() => selectSeat(null)} />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="mt-6 flex flex-1 flex-col" aria-label="Interactive blueprint cabin">
@@ -71,7 +100,6 @@ export function CabinScene() {
           </NativeSelect>
         </div>
       </footer>
-      {selectedSeatId && <SeatShortlistPanel onClose={() => selectSeat(null)} />}
       {selectedComponentId && <ComponentPreviewPanel componentId={selectedComponentId} onClose={() => selectComponent(null)} />}
     </section>
   );

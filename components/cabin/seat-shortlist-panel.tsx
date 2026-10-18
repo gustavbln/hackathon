@@ -62,7 +62,7 @@ export function SeatShortlistPanel({ onClose }: { onClose: () => void }) {
     <section
       aria-label="Seat supplier shortlist"
       onKeyDown={(event) => event.key === "Escape" && onClose()}
-      className="absolute top-24 bottom-5 left-5 z-30 flex w-[min(34rem,calc(100%-2.5rem))] flex-col border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)]/95 text-[var(--blueprint-ink)] backdrop-blur-sm animate-in fade-in-0 slide-in-from-left-2 sm:left-10 sm:w-[min(34rem,calc(100%-5rem))] lg:left-16 lg:w-[min(34rem,calc(100%-8rem))]"
+      className="@container/shortlist flex h-[40rem] min-w-0 flex-col border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] text-[var(--blueprint-ink)] animate-in fade-in-0 slide-in-from-right-4 duration-500 motion-reduce:animate-none"
     >
       <header className="flex items-center justify-between border-b border-[var(--blueprint-rule)] py-1 pr-1 pl-4">
         <span className="blueprint-label">Passenger cabin / Seats / High-speed</span>
@@ -134,8 +134,8 @@ function ShortlistResult({ shortlist }: { shortlist: SeatShortlist }) {
   const maxWeight = top[0]?.weightPercent ?? 1;
 
   return (
-    <>
-      <section aria-labelledby="seat-criteria-heading" className="border-b border-[var(--blueprint-rule)] p-4">
+    <div className="grid @min-[680px]/shortlist:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <section aria-labelledby="seat-criteria-heading" className="min-w-0 border-b border-[var(--blueprint-rule)] p-4 @min-[680px]/shortlist:border-r @min-[680px]/shortlist:border-b-0">
         <h2 id="seat-criteria-heading" className="blueprint-label mb-3">
           What matters most for seats
         </h2>
@@ -162,7 +162,7 @@ function ShortlistResult({ shortlist }: { shortlist: SeatShortlist }) {
         </p>
       </section>
 
-      <section aria-labelledby="seat-shortlist-heading" className="p-4">
+      <section aria-labelledby="seat-shortlist-heading" className="min-w-0 p-4">
         <div className="mb-2 flex items-baseline justify-between gap-3">
           <h2 id="seat-shortlist-heading" className="blueprint-label">
             Top {shortlist.suppliers.length} of {shortlist.supplierCount.toLocaleString("en")} suppliers
@@ -193,6 +193,6 @@ function ShortlistResult({ shortlist }: { shortlist: SeatShortlist }) {
           Open the full seat benchmark <ArrowUpRightIcon className="size-3" />
         </Link>
       </section>
-    </>
+    </div>
   );
 }

@@ -11,6 +11,8 @@ keyboard-accessible seat selector to highlight it.
 The interior is a stylised original, informed by [DB’s ICE 4 overview](https://www.bahn.de/service/ueber-uns/zugtypen/ice-4), not an exact vehicle replica.
 Selecting a seat opens its top-20 supplier shortlist. Switch between the shared seat profile and
 three averaged Nemotron evaluations. Windows, the door and flooring open clearly labelled previews.
+The selected seat floats and rotates on the left while sourcing criteria and suppliers take the
+main panel on the right. Pause rotation or return to the cabin; reduced-motion preferences are respected.
 Open Gauge in the cabin header: on desktop it docks beside the resized workspace; on phones it
 fills the screen. Closing and reopening keeps the conversation for the current page session.
 
