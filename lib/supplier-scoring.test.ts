@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CRITERIA, TOTAL_RISK_WEIGHTS } from "./suppliers/criteria.ts";
 import { buildProfile } from "./suppliers/profiles.ts";
-import { contributions, findAlternatives, rankSuppliers, topByWeights } from "./suppliers/scoring.ts";
+import { contributions, findAlternatives, rankAmong, rankSuppliers, topByWeights } from "./suppliers/scoring.ts";
 import type { Scores, Supplier } from "./suppliers/types.ts";
 
 function supplier(id: string, overrides: Partial<Scores> = {}, base: number | null = 10): Supplier {
@@ -61,4 +61,11 @@ test("the matrix ranking used while dragging weights matches the full ranking", 
   const matrix = suppliers.flatMap((entry) => CRITERIA.map(({ key }) => entry.scores[key] ?? 0));
   const fast = topByWeights(matrix, CRITERIA.map(({ key }) => weights[key]), 20).map(({ row }) => suppliers[row]?.id);
   assert.deepEqual(fast, rankSuppliers(suppliers, weights).slice(0, 20).map((entry) => entry.supplier.id));
+});
+
+test("a researched supplier's position counts only rows with a strictly lower risk", () => {
+  const matrix = [10, 20, 30, 40];
+  assert.equal(rankAmong(matrix, [1], 25), 3);
+  assert.equal(rankAmong(matrix, [1], 5), 1);
+  assert.equal(rankAmong(matrix, [1], 10), 1);
 });

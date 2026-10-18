@@ -13,8 +13,9 @@ import type { PageContext } from "@/lib/chat-contract";
 import { seatShortlistSchema, type SeatShortlist } from "@/lib/seat-shortlist-contract";
 import { CRITERION_BY_KEY, type CriterionKey, type Weights } from "@/lib/suppliers/criteria";
 import { encodeWeights } from "@/lib/suppliers/profiles";
-import { topByWeights } from "@/lib/suppliers/scoring";
-import { SupplierColumns, type ColumnSupplier } from "./supplier-columns";
+import { rankAmong, topByWeights } from "@/lib/suppliers/scoring";
+import { SupplierColumns, type ColumnSupplier, type ResearchedColumn } from "./supplier-columns";
+import { useResearchedSuppliers } from "./use-researched-suppliers";
 import { useSupplierScores } from "./use-supplier-scores";
 import { WeightSpider } from "./weight-spider";
 
@@ -132,8 +133,9 @@ function toSpiderValues(weights: Record<CriterionKey, number>): Record<Criterion
 
 function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatShortlist; seatId: string; startWeights: Weights | null }) {
   const router = useRouter();
-  const { setPage, onAction } = useChatFocus();
+  const { setPage, onAction, ask } = useChatFocus();
   const matrix = useSupplierScores();
+  const { researched } = useResearchedSuppliers();
   const keys = useMemo(() => shortlist.criteria.map(({ key }) => key), [shortlist]);
   const initial = useMemo(
     () => toSpiderValues(Object.fromEntries(shortlist.criteria.map(({ key, weightPercent }) => [key, weightPercent])) as Record<CriterionKey, number>),
@@ -168,6 +170,31 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
         activePoints: focus ? (contributions[focus] ?? 0) : null,
       }));
 
+  // Researched companies: drivers with evidence give the best case, the rest at maximum risk the worst case.
+  const researchedColumns: ResearchedColumn[] = researched.map(({ id, name, scores }) => {
+    const order = matrix?.keys ?? keys;
+    let best = 0;
+    let unknownWeight = 0;
+    order.forEach((key, index) => {
+      const score = scores[index] ?? null;
+      if (score === null) unknownWeight += weights[key];
+      else best += weights[key] * score;
+    });
+    const worst = best + unknownWeight * 100;
+    const weightList = order.map((key) => weights[key]);
+    const focusScore = focus ? (scores[order.indexOf(focus)] ?? null) : null;
+    return {
+      id,
+      name,
+      best,
+      worst,
+      rankBest: matrix ? rankAmong(matrix.scores, weightList, best) : 0,
+      rankWorst: matrix ? rankAmong(matrix.scores, weightList, worst) : 0,
+      unknownDrivers: scores.filter((score) => score === null).length,
+      activePoints: focus && focusScore !== null ? weights[focus] * focusScore : null,
+    };
+  });
+
   const commit = useCallback((next: Record<CriterionKey, number>, nextInstruction: string | null = null) => {
     setCommitted(next);
     setInstruction(nextInstruction);
@@ -199,9 +226,11 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
     <div className="grid flex-1 gap-6 p-5 @min-[860px]/shortlist:min-h-0 @min-[860px]/shortlist:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <SupplierColumns
         suppliers={top}
+        researched={researchedColumns}
         supplierCount={shortlist.supplierCount}
         active={focus}
         onOpen={(id) => router.push(`/suppliers/${id}?${query}`)}
+        onAdd={() => ask("I want to add a new supplier.")}
       />
 
       <div className="flex min-w-0 flex-col gap-4 border-t border-[var(--blueprint-rule)] pt-5 @min-[860px]/shortlist:min-h-0 @min-[860px]/shortlist:overflow-y-auto @min-[860px]/shortlist:border-t-0 @min-[860px]/shortlist:border-l @min-[860px]/shortlist:pt-0 @min-[860px]/shortlist:pl-6">

@@ -1,0 +1,895 @@
+{
+  "id": "EXT_grammer-ag",
+  "name": "GRAMMER AG",
+  "legalName": "GRAMMER AG",
+  "website": "https://www.grammer.com",
+  "country": "DE",
+  "brief": "Makes passenger and driver seats for trains; we consider them for our seat sourcing.",
+  "researchedAt": "2026-10-18T14:36:56.497Z",
+  "summary": "GRAMMER AG runs a large, globally integrated network of over 40 production and logistics sites, giving it operational scale but also exposing it to supply‑chain opacity. A supplier‑quality bottleneck has already forced a business‑on‑hold status, signalling limited visibility into sub‑tier vendors. The company’s credit‑risk accounting shows measurable credit exposure, while market signals are mixed – revenue is falling yet operating EBIT is rising and the share trades in a wide 52‑week range. Valuation looks attractive versus peers (P/E 7.09× vs. 15.25× industry average), and ESG performance is improving with a silver EcoVadis rating, CDP B grade and a 25 % CO₂‑reduction milestone already met.",
+  "insights": [
+    {
+      "headline": "Sub‑tier visibility risk – supplier quality issues causing a supply bottleneck",
+      "criterion": "subTierVisibility",
+      "sourceIds": [
+        2
+      ]
+    },
+    {
+      "headline": "Credit‑rating exposure – credit‑risk changes recorded in OCI, indicating material credit risk",
+      "criterion": "creditRating",
+      "sourceIds": [
+        3
+      ]
+    },
+    {
+      "headline": "Market sentiment mixed – revenue down 5.8 % but operating EBIT up; share price volatile (€5.40‑€16.40 52‑wk range)",
+      "criterion": "marketSentiment",
+      "sourceIds": [
+        17,
+        18,
+        19
+      ]
+    },
+    {
+      "headline": "Industry benchmark favorable – P/E 7.09× well below sector average 15.25×",
+      "criterion": "industryBenchmark",
+      "sourceIds": [
+        7
+      ]
+    },
+    {
+      "headline": "Operational resilience moderate – 40+ integrated global facilities provide scale but no disclosed disruption history",
+      "criterion": "operationalResilience",
+      "sourceIds": [
+        1
+      ]
+    },
+    {
+      "headline": "ESG improving – EcoVadis upgraded to silver, CDP B in 2022, 25 % CO₂ cut achieved, net‑zero 2040 target set",
+      "criterion": "esg",
+      "sourceIds": [
+        4,
+        5
+      ]
+    }
+  ],
+  "agents": {
+    "compliance": {
+      "status": "no_evidence",
+      "estimate": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Legal desk searched “\"GRAMMER AG\" lawsuit fine investigation court proceedings” · “\"GRAMMER AG\" management board CEO change corporate governance”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from www.classaction.org, www.justice.gov, cand.uscourts.gov, www.calbar.ca.gov",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about compliance found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "financialHealth": {
+      "status": "no_evidence",
+      "estimate": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Finance desk searched “\"GRAMMER AG\" annual report revenue net income results 2025” · “\"GRAMMER AG\" profit warning loss restructuring refinancing credit rating”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 9 results from www.jpmorganchase.com, www.talanx.com, brenntagprod-media.e-spirit.cloud, www.strides.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about financial health found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "workplaceSafety": {
+      "status": "no_evidence",
+      "estimate": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "People & environment desk searched “\"GRAMMER AG\" sustainability report CO2 emissions EcoVadis” · “\"GRAMMER AG\" workplace accident strike union layoffs”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from www.grammer.com, reports.grammer.com, forbo.blob.core.windows.net, www.wipro.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about workplace safety found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "quality": {
+      "status": "no_evidence",
+      "estimate": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Operations desk searched “\"GRAMMER AG\" recall defect quality production problems” · “\"GRAMMER AG\" plant closure supply chain disruption cyber attack”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 8 results from www.grammer.com, reports.grammer.com, backend.orbit.dtu.dk, konbriefing.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about quality found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "operationalResilience": {
+      "status": "estimated",
+      "estimate": {
+        "value": 30,
+        "confidence": "low",
+        "rationale": "The quote indicates GRAMMER has extensive global operations with over 40 production and logistics facilities in an integrated value chain, suggesting operational complexity but also potential robustness due to geographic diversification and integration. However, there is no explicit mention of disruptions, vulnerabilities, weaknesses, or resilience challenges (e.g., supply chain fragility, single points of failure, past incidents). The absence of negative indicators suggests moderate operational",
+        "sourceIds": [
+          1
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Operations desk searched “\"GRAMMER AG\" recall defect quality production problems” · “\"GRAMMER AG\" plant closure supply chain disruption cyber attack”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 8 results from www.grammer.com, reports.grammer.com, backend.orbit.dtu.dk, konbriefing.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "GRAMMER operates over 40 production and logistic facilities worldwide, which manufacture and distribute high-quality products for the global vehicle industry in a highly integrated value chain.",
+          "sourceIds": [
+            1
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The quote indicates GRAMMER has extensive global operations with over 40 production and logistics facilities in an integrated value chain, suggesting operational complexity but also potential robustness due to geographic diversification and integration. However, there is no explicit mention of disruptions, vulnerabilities, weaknesses, or resilience challenges (e.g., supply chain fragility, single points of failure, past incidents). The absence of negative indicators suggests moderate operational",
+          "sourceIds": [
+            1
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "governance": {
+      "status": "no_evidence",
+      "estimate": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Legal desk searched “\"GRAMMER AG\" lawsuit fine investigation court proceedings” · “\"GRAMMER AG\" management board CEO change corporate governance”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from www.classaction.org, www.justice.gov, cand.uscourts.gov, www.calbar.ca.gov",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about governance found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "subTierVisibility": {
+      "status": "estimated",
+      "estimate": {
+        "value": 60,
+        "confidence": "medium",
+        "rationale": "The quote indicates an impending supply bottleneck due to quality problems at the supplier level ('Supplier-related supply [...] to C (Business on hold)'), which reflects issues within Grammer AG's supply chain that could stem from sub-tier suppliers. This suggests limited visibility into deeper tiers where such quality issues may originate, supporting a moderate-to-high risk for sub-tier visibility. However, the evidence does not explicitly confirm Tier-N (beyond direct supplier) involvement, c",
+        "sourceIds": [
+          2
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Operations desk searched “\"GRAMMER AG\" recall defect quality production problems” · “\"GRAMMER AG\" plant closure supply chain disruption cyber attack”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 8 results from www.grammer.com, reports.grammer.com, backend.orbit.dtu.dk, konbriefing.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Impending supply bottleneck due to Q-problems • Supplier-related supply [...] to C (Business on hold) in the quality performance.",
+          "sourceIds": [
+            2
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The quote indicates an impending supply bottleneck due to quality problems at the supplier level ('Supplier-related supply [...] to C (Business on hold)'), which reflects issues within Grammer AG's supply chain that could stem from sub-tier suppliers. This suggests limited visibility into deeper tiers where such quality issues may originate, supporting a moderate-to-high risk for sub-tier visibility. However, the evidence does not explicitly confirm Tier-N (beyond direct supplier) involvement, c",
+          "sourceIds": [
+            2
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "creditRating": {
+      "status": "estimated",
+      "estimate": {
+        "value": 60,
+        "confidence": "low",
+        "rationale": "The quote indicates that changes in GRAMMER Group's own credit risk are recognized in other comprehensive income rather than profit and loss, which suggests the company is subject to credit risk accounting under IFRS 9 (or similar standards). This implies that credit risk is a measurable and reported factor for the company, indicating some level of credit risk exposure. However, the quote does not specify whether the credit risk is high, low, or changing — only how it is accounted for. There is无",
+        "sourceIds": [
+          3
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Finance desk searched “\"GRAMMER AG\" annual report revenue net income results 2025” · “\"GRAMMER AG\" profit warning loss restructuring refinancing credit rating”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 9 results from www.jpmorganchase.com, www.talanx.com, brenntagprod-media.e-spirit.cloud, www.strides.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "attributable to the change in the GRAMMER Group’s own credit risk is not recognized through profit and loss but in other comprehensive income. The Group did not make use of the option to allocate financial liabilities to this category in the current financial year or in the previous year.",
+          "sourceIds": [
+            3
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The quote indicates that changes in GRAMMER Group's own credit risk are recognized in other comprehensive income rather than profit and loss, which suggests the company is subject to credit risk accounting under IFRS 9 (or similar standards). This implies that credit risk is a measurable and reported factor for the company, indicating some level of credit risk exposure. However, the quote does not specify whether the credit risk is high, low, or changing — only how it is accounted for. There is无",
+          "sourceIds": [
+            3
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "esg": {
+      "status": "estimated",
+      "estimate": {
+        "value": 30,
+        "confidence": "medium",
+        "rationale": "Evidence shows positive ESG performance improvements: Grammer advanced its EcoVadis rating from bronze to silver and earned a CDP B grade in 2022, indicating progress in environmental management. It also met an interim CO₂ reduction target (25% by 2025) and set a long-term net-zero goal for Scopes 1 and 2 by 2040. These actions reflect proactive ESG engagement rather than deficiencies. While the targets suggest ongoing challenges, the documented achievements lower perceived risk. No controversie",
+        "sourceIds": [
+          4,
+          5
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "People & environment desk searched “\"GRAMMER AG\" sustainability report CO2 emissions EcoVadis” · “\"GRAMMER AG\" workplace accident strike union layoffs”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from www.grammer.com, reports.grammer.com, forbo.blob.core.windows.net, www.wipro.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "The success of our efforts for greater sustainability is also demonstrated by improved rating agency ratings: GRAMMER improved its EcoVadis score from bronze to silver in the reporting year and received a Carbon Disclosure Project (CDP) grade of B in 2022.",
+          "sourceIds": [
+            4
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "GRAMMER has already achieved the target of reducing its total CO2 emissions in Scope 1 and 2 by 25% by 2025. The further target is to reduce CO2 emissions (Scope 1 and 2) by 100% by 2040 compared to the base year 2019.",
+          "sourceIds": [
+            5
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "Evidence shows positive ESG performance improvements: Grammer advanced its EcoVadis rating from bronze to silver and earned a CDP B grade in 2022, indicating progress in environmental management. It also met an interim CO₂ reduction target (25% by 2025) and set a long-term net-zero goal for Scopes 1 and 2 by 2040. These actions reflect proactive ESG engagement rather than deficiencies. While the targets suggest ongoing challenges, the documented achievements lower perceived risk. No controversie",
+          "sourceIds": [
+            4,
+            5
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "industryBenchmark": {
+      "status": "estimated",
+      "estimate": {
+        "value": 38,
+        "confidence": "medium",
+        "rationale": "The quote indicates GRAMMER AG's stock P/E ratio (7.09x) is below the industry average (15.25x), suggesting better valuation relative to peers—a positive signal for 'industry benchmark' risk. This implies lower risk due to favorable market positioning, so the score reflects reduced risk but not zero, as other factors may apply.",
+        "sourceIds": [
+          7
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Reputation desk searched “\"GRAMMER AG\" news controversy criticism reputation” · “\"GRAMMER AG\" market share competitors analysts share price”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from grammer.com, www.grammer.com, www.investing.com, simplywall.st",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "The stock’s ratio of 7.09x is currently well-below the industry average of 15.25x, meaning that it is trading at a cheaper price relative to its peers.",
+          "sourceIds": [
+            7
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The quote indicates GRAMMER AG's stock P/E ratio (7.09x) is below the industry average (15.25x), suggesting better valuation relative to peers—a positive signal for 'industry benchmark' risk. This implies lower risk due to favorable market positioning, so the score reflects reduced risk but not zero, as other factors may apply.",
+          "sourceIds": [
+            7
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "geopolitical": {
+      "status": "estimated",
+      "estimate": {
+        "value": 30,
+        "confidence": "medium",
+        "rationale": "The quote confirms exposure to geopolitical risks due to potential escalation in the Russia-Ukraine conflict, but explicitly states that GRAMMER Group has 'very limited activities' in those markets and expects 'no significant direct effects'. This indicates some awareness of geopolitical risk with mitigating factors, supporting a medium-low score.",
+        "sourceIds": [
+          6
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Location desk searched “\"GRAMMER AG\" plants countries production locations” · “\"GRAMMER AG\" geopolitical risk sanctions tariffs natural disaster”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from www.grammer.com, www.eqs-news.com, www.marklines.com, reports.grammer.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Geopolitical risks For GRAMMER Group, risks may arise from an intensification of geopolitical tensions, such as the escalation in the Russia-­ Ukraine conflict. Due to the very limited activities of GRAMMER Group in the Russian and Ukrainian markets, no significant direct effects on Group",
+          "sourceIds": [
+            6
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The quote confirms exposure to geopolitical risks due to potential escalation in the Russia-Ukraine conflict, but explicitly states that GRAMMER Group has 'very limited activities' in those markets and expects 'no significant direct effects'. This indicates some awareness of geopolitical risk with mitigating factors, supporting a medium-low score.",
+          "sourceIds": [
+            6
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "digitalSecurity": {
+      "status": "no_evidence",
+      "estimate": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Operations desk searched “\"GRAMMER AG\" recall defect quality production problems” · “\"GRAMMER AG\" plant closure supply chain disruption cyber attack”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 8 results from www.grammer.com, reports.grammer.com, backend.orbit.dtu.dk, konbriefing.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about digital security found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "laborStability": {
+      "status": "estimated",
+      "estimate": {
+        "value": 25,
+        "confidence": "low",
+        "rationale": "The evidence shows GRAMMER AG has policies related to working conditions, human rights, and compliance with the German Supply Chain Due Diligence Act (effective Jan 2023), which indicates proactive labor management. This suggests lower likelihood of strikes or labor disputes, supporting a reduced risk score for 'Labor stability'. However, the evidence does not explicitly confirm absence of labor issues—only preventive measures—so confidence is low.",
+        "sourceIds": [
+          8,
+          9
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "People & environment desk searched “\"GRAMMER AG\" sustainability report CO2 emissions EcoVadis” · “\"GRAMMER AG\" workplace accident strike union layoffs”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from www.grammer.com, reports.grammer.com, forbo.blob.core.windows.net, www.wipro.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Working conditions and human rights Sustainable procurement",
+          "sourceIds": [
+            8
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "This way, we are optimally prepared to implement the new German Supply Chain Due Diligence Act when it came into effect on January 1, 2023.",
+          "sourceIds": [
+            9
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The evidence shows GRAMMER AG has policies related to working conditions, human rights, and compliance with the German Supply Chain Due Diligence Act (effective Jan 2023), which indicates proactive labor management. This suggests lower likelihood of strikes or labor disputes, supporting a reduced risk score for 'Labor stability'. However, the evidence does not explicitly confirm absence of labor issues—only preventive measures—so confidence is low.",
+          "sourceIds": [
+            8,
+            9
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "environmentalExposure": {
+      "status": "no_evidence",
+      "estimate": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Location desk searched “\"GRAMMER AG\" plants countries production locations” · “\"GRAMMER AG\" geopolitical risk sanctions tariffs natural disaster”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from www.grammer.com, www.eqs-news.com, www.marklines.com, reports.grammer.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "At the same time, climate neutrality plays an important role for Grammer on its path towards becoming a green company: The plant in Shenyang is designed for sustainable production through targeted measures aimed at ensuring waste prevention, air purification and efficient energy use.",
+          "sourceIds": [
+            10
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "With a total area of around 8,000 square meters, including around 3,500 square meters of production space, the new plant in Shenyang consolidates Grammer’s footprint in northeast China and will employ around 80 people.",
+          "sourceIds": [
+            11
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "note",
+          "text": "The evidence found does not speak to environmental exposure, so it stays unscored.",
+          "sourceIds": [
+            10,
+            11
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "politicalStability": {
+      "status": "estimated",
+      "estimate": {
+        "value": 30,
+        "confidence": "medium",
+        "rationale": "The quote indicates that GRAMMER Group faces potential risks from intensified geopolitical tensions (specifically referencing the Russia-Ukraine conflict), which falls under political instability. However, it explicitly states that due to 'very limited activities' in Russian and Ukrainian markets, there are 'no significant direct effects.' This suggests exposure exists but impact is currently minimal. A score of 30 reflects low-to-medium risk — acknowledging the geopolitical vulnerability whilec",
+        "sourceIds": [
+          12
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Location desk searched “\"GRAMMER AG\" plants countries production locations” · “\"GRAMMER AG\" geopolitical risk sanctions tariffs natural disaster”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from www.grammer.com, www.eqs-news.com, www.marklines.com, reports.grammer.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Geopolitical risks For GRAMMER Group, risks may arise from an intensification of geopolitical tensions, such as the escalation in the Russia-­ Ukraine conflict. Due to the very limited activities of GRAMMER Group in the Russian and Ukrainian markets, no significant direct effects on Group [...]",
+          "sourceIds": [
+            12
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The quote indicates that GRAMMER Group faces potential risks from intensified geopolitical tensions (specifically referencing the Russia-Ukraine conflict), which falls under political instability. However, it explicitly states that due to 'very limited activities' in Russian and Ukrainian markets, there are 'no significant direct effects.' This suggests exposure exists but impact is currently minimal. A score of 30 reflects low-to-medium risk — acknowledging the geopolitical vulnerability whilec",
+          "sourceIds": [
+            12
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "externalIntelligence": {
+      "status": "no_evidence",
+      "estimate": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Reputation desk searched “\"GRAMMER AG\" news controversy criticism reputation” · “\"GRAMMER AG\" market share competitors analysts share price”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from grammer.com, www.grammer.com, www.investing.com, simplywall.st",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Other Institutional Investors | 13.14M | 88.11% | 147.11M |",
+          "sourceIds": [
+            16
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "note",
+          "text": "The evidence found does not speak to external intelligence, so it stays unscored.",
+          "sourceIds": [
+            16
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "mediaSentiment": {
+      "status": "estimated",
+      "estimate": {
+        "value": 30,
+        "confidence": "low",
+        "rationale": "The evidence includes mixed market performance indicators (stock up/down) but lacks clear negative sentiment signals like scandals, controversies, or sustained criticism. Revenue growth suggests some positivity, while stock fluctuations reflect normal volatility rather than adverse media narratives. No direct mention of reputational harm or negative coverage.",
+        "sourceIds": [
+          13,
+          14,
+          15
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Reputation desk searched “\"GRAMMER AG\" news controversy criticism reputation” · “\"GRAMMER AG\" market share competitors analysts share price”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from grammer.com, www.grammer.com, www.investing.com, simplywall.st",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "GRAMMER Group revenue increases by 6.4% to EUR 1,034.6 million, driven mainly by the Commercial Vehicles Division and positive currency effects",
+          "sourceIds": [
+            13
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "At the end of trading on September 30, 2014, the GRAMMER share stood at EUR 30.66, down just under 12 % on the closing price on the final day of trading in 2013.",
+          "sourceIds": [
+            14
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "GMM stock has increased by 116.7% and is now trading at €13.00.",
+          "sourceIds": [
+            15
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The evidence includes mixed market performance indicators (stock up/down) but lacks clear negative sentiment signals like scandals, controversies, or sustained criticism. Revenue growth suggests some positivity, while stock fluctuations reflect normal volatility rather than adverse media narratives. No direct mention of reputational harm or negative coverage.",
+          "sourceIds": [
+            13,
+            14,
+            15
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    },
+    "marketSentiment": {
+      "status": "estimated",
+      "estimate": {
+        "value": 40,
+        "confidence": "medium",
+        "rationale": "Evidence shows mixed signals for market sentiment: declining revenue (-5.8%) indicates negative pressure on public/consumer perception due to weak demand, but improving profitability (rising operating EBIT) suggests underlying operational strength that may support sentiment. Stock price stability around €10.90 with a wide 52-week range (€5.40–€16.40) reflects moderate volatility and uncertain investor outlook. Together, this points to a medium-level risk — not severe enough for high/critical,but",
+        "sourceIds": [
+          17,
+          18,
+          19
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "Reputation desk searched “\"GRAMMER AG\" news controversy criticism reputation” · “\"GRAMMER AG\" market share competitors analysts share price”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "Reading 10 results from grammer.com, www.grammer.com, www.investing.com, simplywall.st",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Persistently difficult market environment: revenue declines by 5.8% to EUR 1,386.9 million",
+          "sourceIds": [
+            17
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "Profitability improves: operating EBIT rises significantly",
+          "sourceIds": [
+            18
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "As of Oct 15, 2026, Grammer AG (GMMG) is trading at a price of 10.900 EUR, with a previous close of 10.900 EUR. The stock has fluctuated within a day range of 10.500 EUR to 11.200 EUR, while its 52-week range spans from 5.400 EUR to 16.400 EUR.",
+          "sourceIds": [
+            19
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "Evidence shows mixed signals for market sentiment: declining revenue (-5.8%) indicates negative pressure on public/consumer perception due to weak demand, but improving profitability (rising operating EBIT) suggests underlying operational strength that may support sentiment. Stock price stability around €10.90 with a wide 52-week range (€5.40–€16.40) reflects moderate volatility and uncertain investor outlook. Together, this points to a medium-level risk — not severe enough for high/critical,but",
+          "sourceIds": [
+            17,
+            18,
+            19
+          ],
+          "model": "nvidia/nemotron-3-super-120b-a12b"
+        }
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": 1,
+      "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/grammer_annual_report_2017_en.pdf",
+      "title": "Annual Report 2017",
+      "publishedAt": null,
+      "quote": "GRAMMER operates over 40 production and logistic facilities worldwide, which manufacture and distribute high-quality products for the global vehicle industry in a highly integrated value chain."
+    },
+    {
+      "id": 2,
+      "url": "https://www.grammer.com/media/01_content/08_supplier-support/purchasing/english/01_m_016_001_supplier_manual.pdf",
+      "title": "Supplier Manual",
+      "publishedAt": null,
+      "quote": "Impending supply bottleneck due to Q-problems • Supplier-related supply [...] to C (Business on hold) in the quality performance."
+    },
+    {
+      "id": 3,
+      "url": "https://reports.grammer.com/annual-report/2022/_assets/downloads/annual-report-grammer-ar22.pdf",
+      "title": "5 FOR 5 IN 2025",
+      "publishedAt": null,
+      "quote": "attributable to the change in the GRAMMER Group’s own credit risk is not recognized through profit and loss but in other comprehensive income. The Group did not make use of the option to allocate financial liabilities to this category in the current financial year or in the previous year."
+    },
+    {
+      "id": 4,
+      "url": "https://reports.grammer.com/annual-report/2022/_assets/downloads/annual-report-grammer-ar22.pdf",
+      "title": "5 FOR 5 IN 2025",
+      "publishedAt": null,
+      "quote": "The success of our efforts for greater sustainability is also demonstrated by improved rating agency ratings: GRAMMER improved its EcoVadis score from bronze to silver in the reporting year and received a Carbon Disclosure Project (CDP) grade of B in 2022."
+    },
+    {
+      "id": 5,
+      "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
+      "title": "ON POINT. AND BEYOND.",
+      "publishedAt": null,
+      "quote": "GRAMMER has already achieved the target of reducing its total CO2 emissions in Scope 1 and 2 by 25% by 2025. The further target is to reduce CO2 emissions (Scope 1 and 2) by 100% by 2040 compared to the base year 2019."
+    },
+    {
+      "id": 6,
+      "url": "https://reports.grammer.com/annual-report/2022/_assets/downloads/annual-report-grammer-ar22.pdf",
+      "title": "5 FOR 5 IN 2025",
+      "publishedAt": null,
+      "quote": "Geopolitical risks For GRAMMER Group, risks may arise from an intensification of geopolitical tensions, such as the escalation in the Russia-­ Ukraine conflict. Due to the very limited activities of GRAMMER Group in the Russian and Ukrainian markets, no significant direct effects on Group"
+    },
+    {
+      "id": 7,
+      "url": "https://simplywall.st/stocks/de/automobiles/etr-gmm/grammer-shares/news/what-does-grammer-ags-etrgmm-share-price-indicate",
+      "title": "What Does Grammer AG's (ETR:GMM) Share Price Indicate? - Simply Wall St News",
+      "publishedAt": null,
+      "quote": "The stock’s ratio of 7.09x is currently well-below the industry average of 15.25x, meaning that it is trading at a cheaper price relative to its peers."
+    },
+    {
+      "id": 8,
+      "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2023/grammer_combined_separate_non-financial_report_2023.pdf",
+      "title": "[PDF] COMBINED SEPARATE NON-FINANCIAL REPORT - Grammer",
+      "publishedAt": null,
+      "quote": "Working conditions and human rights Sustainable procurement"
+    },
+    {
+      "id": 9,
+      "url": "https://reports.grammer.com/annual-report/2022/_assets/downloads/annual-report-grammer-ar22.pdf",
+      "title": "5 FOR 5 IN 2025",
+      "publishedAt": null,
+      "quote": "This way, we are optimally prepared to implement the new German Supply Chain Due Diligence Act when it came into effect on January 1, 2023."
+    },
+    {
+      "id": 10,
+      "url": "https://www.grammer.com/media/presse/migration/2021/09/20210929_pi_grammer_opening_shenyang_en.pdf",
+      "title": "Press information",
+      "publishedAt": null,
+      "quote": "At the same time, climate neutrality plays an important role for Grammer on its path towards becoming a green company: The plant in Shenyang is designed for sustainable production through targeted measures aimed at ensuring waste prevention, air purification and efficient energy use."
+    },
+    {
+      "id": 11,
+      "url": "https://www.grammer.com/media/presse/migration/2021/09/20210929_pi_grammer_opening_shenyang_en.pdf",
+      "title": "Press information",
+      "publishedAt": null,
+      "quote": "With a total area of around 8,000 square meters, including around 3,500 square meters of production space, the new plant in Shenyang consolidates Grammer’s footprint in northeast China and will employ around 80 people."
+    },
+    {
+      "id": 12,
+      "url": "https://reports.grammer.com/annual-report/2022/_assets/downloads/annual-report-grammer-ar22.pdf",
+      "title": "5 FOR 5 IN 2025",
+      "publishedAt": null,
+      "quote": "Geopolitical risks For GRAMMER Group, risks may arise from an intensification of geopolitical tensions, such as the escalation in the Russia-­ Ukraine conflict. Due to the very limited activities of GRAMMER Group in the Russian and Ukrainian markets, no significant direct effects on Group [...]"
+    },
+    {
+      "id": 13,
+      "url": "https://grammer.com/en/investor-relations/financial-news?tx_news_pi1%5Bcontroller%5D=News&tx_news_pi1%5BcurrentPage%5D=4&cHash=95c1e0d4661d857d17f646ae9b2292b3",
+      "title": "GRAMMER Financial News | GRAMMER AG",
+      "publishedAt": null,
+      "quote": "GRAMMER Group revenue increases by 6.4% to EUR 1,034.6 million, driven mainly by the Commercial Vehicles Division and positive currency effects"
+    },
+    {
+      "id": 14,
+      "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/quarterly_reports/quarterly_reports_english/grammer_q3_2014_en.pdf",
+      "title": "InterIm report - January to September 2014",
+      "publishedAt": null,
+      "quote": "At the end of trading on September 30, 2014, the GRAMMER share stood at EUR 30.66, down just under 12 % on the closing price on the final day of trading in 2013."
+    },
+    {
+      "id": 15,
+      "url": "https://www.marketbeat.com/stocks/ETR/GMM",
+      "title": "Grammer (GMM) Stock Price, News & Analysis",
+      "publishedAt": null,
+      "quote": "GMM stock has increased by 116.7% and is now trading at €13.00."
+    },
+    {
+      "id": 16,
+      "url": "https://www.investing.com/equities/grammer",
+      "title": "Grammer AG Stock Price Today | ETR: GMMG Live - Investing.com",
+      "publishedAt": null,
+      "quote": "Other Institutional Investors | 13.14M | 88.11% | 147.11M |"
+    },
+    {
+      "id": 17,
+      "url": "https://www.grammer.com/en/investor-relations/financial-news",
+      "title": "GRAMMER Financial News | GRAMMER AG",
+      "publishedAt": null,
+      "quote": "Persistently difficult market environment: revenue declines by 5.8% to EUR 1,386.9 million"
+    },
+    {
+      "id": 18,
+      "url": "https://www.grammer.com/en/investor-relations/financial-news",
+      "title": "GRAMMER Financial News | GRAMMER AG",
+      "publishedAt": null,
+      "quote": "Profitability improves: operating EBIT rises significantly"
+    },
+    {
+      "id": 19,
+      "url": "https://www.investing.com/equities/grammer",
+      "title": "Grammer AG Stock Price Today | ETR: GMMG Live - Investing.com",
+      "publishedAt": null,
+      "quote": "As of Oct 15, 2026, Grammer AG (GMMG) is trading at a price of 10.900 EUR, with a previous close of 10.900 EUR. The stock has fluctuated within a day range of 10.500 EUR to 11.200 EUR, while its 52-week range spans from 5.400 EUR to 16.400 EUR."
+    }
+  ],
+  "run": {
+    "seconds": 30.1,
+    "costUsd": 0.0119,
+    "tavilyCredits": 13,
+    "models": [
+      "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "nvidia/Nemotron-3_5-Lightning",
+      "nvidia/nemotron-3-super-120b-a12b"
+    ]
+  }
+}

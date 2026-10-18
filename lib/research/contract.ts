@@ -96,6 +96,14 @@ export const researchEventSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("error"), message: z.string() }),
 ]);
 
+/** A researched company as the seat view ranks it: scores in CRITERIA order, null where no evidence was found. */
+export const researchedRowSchema = z.strictObject({
+  id: researchedIdSchema,
+  name: z.string(),
+  scores: z.array(z.number().min(0).max(100).nullable()).length(CRITERIA.length),
+});
+
+export type ResearchedRow = z.infer<typeof researchedRowSchema>;
 export type ResearchInput = z.infer<typeof researchInputSchema>;
 export type ResearchSource = z.infer<typeof researchSourceSchema>;
 export type CriterionEstimate = z.infer<typeof criterionEstimateSchema>;

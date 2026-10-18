@@ -5,6 +5,8 @@ import { ChatWorkspace } from "@/components/chat/chat-dock";
 import { detailContext } from "@/components/leaderboard/detail-context";
 import { DetailShell } from "@/components/leaderboard/detail-shell";
 import { SupplierDetail } from "@/components/leaderboard/supplier-detail";
+import { ResearchedProfile } from "@/components/research/researched-profile";
+import { findResearched } from "@/lib/research/store";
 import { CRITERION_BY_KEY, type Weights } from "@/lib/suppliers/criteria";
 import { loadDatasetSuppliers } from "@/lib/suppliers/dataset";
 import { findAlternatives, rankSuppliers, topDriver, type Alternatives } from "@/lib/suppliers/scoring";
@@ -21,6 +23,21 @@ export default async function SupplierPage({ params, searchParams }: PageProps<"
   const { id } = await params;
   const { seat, w } = await searchParams;
   const context = detailContext(seat, w);
+  if (id.startsWith("EXT_")) {
+    const researched = await findResearched(id);
+    if (!researched) notFound();
+    return (
+      <ChatWorkspace>
+        <DetailShell backHref={context.backHref} section="Researched supplier / Seats" page={null}>
+          <section className="pt-7 pb-6 sm:pt-9" aria-labelledby="supplier-heading">
+            <p className="blueprint-label mb-2">03 / Researched supplier · public sources</p>
+            <h1 id="supplier-heading" className="text-3xl font-medium tracking-tight sm:text-4xl">{researched.name}</h1>
+          </section>
+          <ResearchedProfile researched={researched} weights={context.weights} query={context.query} />
+        </DetailShell>
+      </ChatWorkspace>
+    );
+  }
   const suppliers = await loadDatasetSuppliers();
   const ranked = rankSuppliers(suppliers, context.weights);
   const entry = ranked.find(({ supplier }) => supplier.id === id);

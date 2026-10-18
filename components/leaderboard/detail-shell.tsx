@@ -12,8 +12,8 @@ import { encodeWeights } from "@/lib/suppliers/profiles";
 interface DetailShellProps {
   backHref: string;
   section: string;
-  /** What the assistant answers about while this page is open. */
-  page: PageContext;
+  /** What the assistant answers about while this page is open; null where it has no context yet. */
+  page: PageContext | null;
   children: ReactNode;
 }
 
@@ -26,7 +26,7 @@ export function DetailShell({ backHref, section, page, children }: DetailShellPr
   const pageKey = JSON.stringify(page);
 
   useEffect(() => {
-    setPage(JSON.parse(pageKey) as PageContext);
+    setPage(JSON.parse(pageKey) as PageContext | null);
     return () => setPage(null);
   }, [pageKey, setPage]);
 

@@ -104,6 +104,18 @@ export function topByWeights(
   return best;
 }
 
+/** Where a weighted risk would land among the matrix rows: 1 + the number of rows with a lower risk. */
+export function rankAmong(scores: ArrayLike<number>, weights: readonly number[], risk: number): number {
+  const columns = weights.length;
+  let lower = 0;
+  for (let row = 0; row * columns < scores.length; row++) {
+    let rowRisk = 0;
+    for (let column = 0; column < columns; column++) rowRisk += weights[column] * scores[row * columns + column];
+    if (rowRisk < risk) lower++;
+  }
+  return lower + 1;
+}
+
 /** Lowest risk first. Ranks by the worst case, so missing data never helps a supplier. */
 export function rankSuppliers(suppliers: readonly Supplier[], weights: Weights): RankedSupplier[] {
   return suppliers

@@ -1,5 +1,6 @@
 "use client";
 
+import { PlusIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { CRITERION_BY_KEY, type CriterionKey } from "@/lib/suppliers/criteria";
 
@@ -11,18 +12,35 @@ export interface ColumnSupplier {
   activePoints: number | null;
 }
 
+/** A real company the agents researched: a range, because drivers without evidence count as unknown. */
+export interface ResearchedColumn {
+  id: string;
+  name: string;
+  /** Weighted risk from the drivers with evidence only. */
+  best: number;
+  /** As if every driver without evidence were at maximum risk. */
+  worst: number;
+  rankBest: number;
+  rankWorst: number;
+  unknownDrivers: number;
+  activePoints: number | null;
+}
+
 interface SupplierColumnsProps {
   suppliers: ColumnSupplier[];
+  researched: ResearchedColumn[];
   supplierCount: number;
   active: CriterionKey | null;
   onOpen: (id: string) => void;
+  onAdd: () => void;
 }
 
 const ROW = "grid grid-cols-[1.25rem_minmax(0,10rem)_minmax(0,1fr)_2.25rem] items-center gap-3";
 
-/** The top suppliers as ranked bars, re-sorted live as the weighting changes. Lower weighted risk is better. */
-export function SupplierColumns({ suppliers, supplierCount, active, onOpen }: SupplierColumnsProps) {
-  const axisMax = Math.ceil(Math.max(...suppliers.map(({ risk }) => risk), 1) / 5) * 5;
+/** The top suppliers as ranked bars, re-sorted live as the weighting changes, then researched companies. Lower is better. */
+export function SupplierColumns({ suppliers, researched, supplierCount, active, onOpen, onAdd }: SupplierColumnsProps) {
+  const axisMax = Math.ceil(Math.max(...suppliers.map(({ risk }) => risk), ...researched.map(({ best }) => best), 1) / 5) * 5;
+  const clip = (value: number) => `${(Math.min(value, axisMax) / axisMax) * 100}%`;
   const ticks = Array.from({ length: axisMax / 5 + 1 }, (_, index) => index * 5);
   const slot = 100 / Math.max(suppliers.length, 1);
 
@@ -36,6 +54,11 @@ export function SupplierColumns({ suppliers, supplierCount, active, onOpen }: Su
           <span className="flex items-center gap-1.5">
             <span aria-hidden="true" className="h-2 w-3 rounded-[2px] bg-[var(--series-1)]" /> Lower is better
           </span>
+          {researched.length > 0 && (
+            <span className="flex items-center gap-1.5">
+              <span aria-hidden="true" className="h-2 w-3 rounded-[2px] bg-[var(--series-3)]" /> Researched, estimated range
+            </span>
+          )}
           {active && (
             <span className="flex items-center gap-1.5">
               <span aria-hidden="true" className="h-2 w-3 rounded-[2px] bg-[var(--series-2)]" /> {CRITERION_BY_KEY[active].label}
@@ -97,6 +120,52 @@ export function SupplierColumns({ suppliers, supplierCount, active, onOpen }: Su
           );
         })}
       </ol>
+
+      <div className="flex flex-col">
+        {researched.length > 0 && <p className="blueprint-label border-b border-[var(--blueprint-rule)] pb-1.5">Researched companies · public sources</p>}
+        {researched.map((company) => (
+          <Tooltip key={company.id}>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={() => onOpen(company.id)}
+                aria-label={`${company.name}, researched: estimated weighted risk ${company.best.toFixed(1)} to ${company.worst.toFixed(1)}. Open the research.`}
+                className={`${ROW} h-8 w-full border-b border-[var(--blueprint-grid)] text-left text-xs outline-none hover:bg-[var(--blueprint-grid)] focus-visible:ring-2 focus-visible:ring-[var(--blueprint-ink)]`}
+              >
+                <span className="font-mono text-[10px] text-[var(--blueprint-muted)]">≈</span>
+                <span className="truncate font-medium">{company.name}</span>
+                <span className="relative h-2.5 rounded-[2px] bg-[var(--blueprint-grid)]">
+                  <span
+                    className="absolute inset-y-0 rounded-r-[2px] border border-l-0 border-dashed border-[var(--series-3)] bg-[color-mix(in_oklab,var(--series-3)_22%,transparent)]"
+                    style={{ left: clip(company.best), width: `calc(${clip(company.worst)} - ${clip(company.best)})` }}
+                  />
+                  <span className="absolute inset-y-0 left-0 rounded-l-[2px] bg-[var(--series-3)]" style={{ width: clip(company.best) }} />
+                </span>
+                <span className="text-right font-mono text-[10px] tabular-nums">
+                  {company.best.toFixed(0)}–{company.worst.toFixed(0)}
+                </span>
+              </button>
+            </TooltipTrigger>
+            <TooltipContent className="flex-col items-start gap-0.5">
+              <span>
+                <strong>{company.best.toFixed(1)}–{company.worst.toFixed(1)}</strong> estimated weighted risk
+              </span>
+              <span>{company.name} · researched from public sources</span>
+              <span>
+                Would rank #{company.rankBest.toLocaleString("en")}–#{company.rankWorst.toLocaleString("en")} of {supplierCount.toLocaleString("en")}
+              </span>
+              <span>{company.unknownDrivers} of 18 drivers without public evidence</span>
+            </TooltipContent>
+          </Tooltip>
+        ))}
+        <button
+          type="button"
+          onClick={onAdd}
+          className="mt-2 flex h-9 items-center justify-center gap-2 rounded-sm border border-dashed border-[var(--blueprint-muted)] text-xs text-[var(--blueprint-muted)] transition-colors hover:border-[var(--blueprint-ink)] hover:text-[var(--blueprint-ink)] focus-visible:ring-2 focus-visible:ring-[var(--blueprint-ink)] focus-visible:outline-none"
+        >
+          <PlusIcon className="size-3.5" strokeWidth={1.75} aria-hidden="true" /> Add a supplier: the agents research a real company
+        </button>
+      </div>
     </figure>
   );
 }

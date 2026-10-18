@@ -1,8 +1,19 @@
 import { researchSupplier } from "@/lib/research/agents";
-import { researchInputSchema } from "@/lib/research/contract";
+import { researchInputSchema, toSupplier, type ResearchedRow } from "@/lib/research/contract";
+import { listResearched } from "@/lib/research/store";
+import { CRITERIA } from "@/lib/suppliers/criteria";
 
 export const runtime = "nodejs";
 export const maxDuration = 200;
+
+/** Researched companies as ranking rows: scores in CRITERIA order, null where no evidence was found. */
+export async function GET() {
+  const rows: ResearchedRow[] = (await listResearched()).map((researched) => {
+    const supplier = toSupplier(researched);
+    return { id: supplier.id, name: supplier.name, scores: CRITERIA.map(({ key }) => supplier.scores[key]) };
+  });
+  return Response.json(rows, { headers: { "Cache-Control": "no-store" } });
+}
 
 /** Researches a real company and streams every agent's progress as Server-Sent Events. */
 export async function POST(request: Request) {
