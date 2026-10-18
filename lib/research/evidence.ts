@@ -67,6 +67,16 @@ export function excerptAround(quote: string, text: string, chars: number): { bef
   };
 }
 
+/** Keeps inline citations that name known sources, normalising "[2, 5]" to "[2][5]" and dropping the rest. */
+export function keepKnownCitations(text: string, known: ReadonlySet<number>): string {
+  return text
+    .replace(/\s*\[(\d+(?:\s*,\s*\d+)*)\]/g, (_, ids: string) => {
+      const kept = ids.split(/\s*,\s*/).filter((id) => known.has(Number(id)));
+      return kept.length > 0 ? ` ${kept.map((id) => `[${id}]`).join("")}` : "";
+    })
+    .trim();
+}
+
 /** Page text as extracted is Markdown; a reader wants the words, not link targets and table pipes. */
 function readable(markdown: string): string {
   return markdown.replace(/!?\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[#*_|>]+/g, " ").replace(/\s+/g, " ").trim();

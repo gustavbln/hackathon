@@ -5,53 +5,106 @@
   "website": "https://www.grammer.com",
   "country": "DE",
   "brief": "Railway passenger seats; evaluating them for a regional train order.",
-  "researchedAt": "2026-10-18T14:57:36.259Z",
-  "summary": "GRAMMER AG’s Americas business posted a €6.2 M operating EBIT loss in H1 2026, driven by higher logistics and tariff costs, and the company has flagged this as a key risk for the second half of the year.  At the same time, a 2024 loan renewal forces the firm to suspend dividend payments through 2027, signalling cash‑flow pressure.  Supply‑chain visibility is solid to Tier 3 via IMDS/RMI templates and a mandatory Supplier Code of Conduct, but Tier 4 mapping remains unconfirmed, leaving deeper sub‑tier blind spots.",
+  "researchedAt": "2026-10-18T15:18:08.225Z",
+  "summary": "GRAMMER AG maps material flows through Tier 3 using IMDS and RMI templates but has not confirmed comprehensive visibility into Tier 4 and beyond, relying on a global multi‑tier supply chain for raw materials. [4] [1] A mandatory Supplier Code of Conduct has been required in every digital RFQ since 2017, with 100 % of global suppliers confirming it, and formal VDA 6.3 process audits are conducted globally with annual internal supplier audits. [2] [3] Digital risk management via SPHERA‑SCM provides annual data updates for ongoing monitoring. [3] The company achieved a 25 % reduction in Scope 1 and 2 emissions by 2024, reports a group recycling rate of 85.73 % and targets over 75 % product recyclability, while aiming for net‑zero operational emissions by 2040 without disclosed Scope 3 interim targets. [8] [9] Financially, GRAMMER AG returned to profitability with EUR 17.2 M net income in FY 2025 after a EUR 115.2 M loss, but carries high debt (non‑current liabilities EUR 719.1 M, current liabilities EUR 623.9 M) and a low equity ratio of 18.1 %, with loan covenants suspending dividends until 2027. [6] [7]",
   "insights": [
     {
-      "headline": "Americas segment operating EBIT loss of €6.2 M in H1 2026 due to logistics and tariff expenses",
-      "criterion": "operationalResilience",
-      "sourceIds": [
-        1
-      ]
-    },
-    {
-      "headline": "Loss highlighted as a key investor risk for H2 2026",
-      "criterion": "operationalResilience",
-      "sourceIds": [
-        1
-      ]
-    },
-    {
-      "headline": "Dividend payments suspended until 2027 following 2024 loan renewal",
+      "headline": "Profitability restored but leverage remains high and dividends blocked until 2027.",
       "criterion": "financialHealth",
       "sourceIds": [
+        6,
+        7
+      ]
+    },
+    {
+      "headline": "Sub‑tier visibility stops at Tier 3; Tier 4 mapping not yet confirmed despite mandatory SCoC and annual VDA audits.",
+      "criterion": "subTierVisibility",
+      "sourceIds": [
+        4,
+        1,
         2
       ]
     },
     {
-      "headline": "Sub‑tier traceability confirmed only to Tier 3; Tier 4 coverage not yet comprehensive",
+      "headline": "Continuous digital risk monitoring (SPHERA‑SCM) and yearly VDA 6.3 audits give periodic oversight of supplier practices.",
       "criterion": "subTierVisibility",
       "sourceIds": [
-        6
+        3
       ]
     },
     {
-      "headline": "Supplier Code of Conduct mandatory in every digital RFQ since 2017; 100 % of global suppliers confirm enforceable human‑rights and environmental terms",
-      "criterion": "subTierVisibility",
+      "headline": "Climate progress: 25 % Scope 1&2 cut by 2024, 85.73 % recycling, 2040 net‑zero goal, but no public Scope 3 interim targets.",
+      "criterion": "esg",
       "sourceIds": [
-        4
+        8,
+        9
       ]
     },
     {
-      "headline": "Zero confirmed corruption or human‑rights violations in 2023, backed by strict SCoC and digital whistleblower system",
-      "criterion": "subTierVisibility",
+      "headline": "Equity ratio only 18.1 %, indicating a thin capital buffer despite recent profit.",
+      "criterion": "financialHealth",
       "sourceIds": [
         7
+      ]
+    },
+    {
+      "headline": "Supplier Code of Conduct mandatory since 2017 with 100 % global supplier sign‑off.",
+      "criterion": "compliance",
+      "sourceIds": [
+        2
       ]
     }
   ],
   "agents": {
+    "operationalResilience": {
+      "status": "no_evidence",
+      "estimate": null,
+      "report": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "3 searches: “\"GRAMMER AG\" plant closure production stop” · “\"GRAMMER AG\" supply disruption capacity 2025 2026” · “\"GRAMMER AG\" production sites manufacturing footprint”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "14 results, 14 about GRAMMER AG, from grammer.com, kalkinemedia.com, tiffinohio.net, linkedin.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read grammer.com: Interim Management Statements · 54,983 characters, 4 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kalkinemedia.com: GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast · 26,980 characters, 16 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read tiffinohio.net: Toledo Molding & Die Tiffin plant closing April 30, 407 jobs lost — TiffinOhio.net · 20,009 characters, 19 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read linkedin.com: Grammer AG · 3,357 characters",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about operational resilience found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
     "compliance": {
       "status": "no_evidence",
       "estimate": null,
@@ -65,7 +118,7 @@
         },
         {
           "kind": "search",
-          "text": "14 results, 5 about GRAMMER AG, from classaction.org, grammer.com, law360.com, ftc.gov",
+          "text": "14 results, 5 about GRAMMER AG, from classaction.org, grammer.com, law360.com, ftc.gov.",
           "sourceIds": [],
           "model": null
         },
@@ -101,223 +154,6 @@
         }
       ]
     },
-    "quality": {
-      "status": "no_evidence",
-      "estimate": null,
-      "report": null,
-      "thread": [
-        {
-          "kind": "plan",
-          "text": "3 searches: “\"GRAMMER AG\" recall defect quality problems” · “\"GRAMMER AG\" quality issues customers 2025 2026” · “\"GRAMMER AG\" quality certification IATF IRIS award”",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "search",
-          "text": "15 results, 8 about GRAMMER AG, from grammer.com, reports.grammer.com, railmarket.com, linkedin.com",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 8 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 6 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read railmarket.com: Component Producers companies in Europe | RAILMARKET.com · 80,000 characters, 29 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read linkedin.com: #annualreport #fy25 #financialresults2025 #corporatestrategy | Grammer AG · 62,190 characters, 13 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "note",
-          "text": "No verifiable public evidence about quality found.",
-          "sourceIds": [],
-          "model": null
-        }
-      ]
-    },
-    "operationalResilience": {
-      "status": "estimated",
-      "estimate": {
-        "value": 35,
-        "confidence": "low",
-        "rationale": "The evidence shows a documented financial impact (EBIT loss) directly linked to operational challenges in logistics and tariffs within a core business segment, indicating tangible risk to day-to-day production and logistics. However, the age of the evidence (H1 2026, ~4 months old as of 2026-10-18) limits confidence, and no broader geographic or systemic issues are shown. The score reflects moderate risk — elevated due to concrete losses but tempered by recency and lack of evidence of ongoing or",
-        "sourceIds": [
-          1
-        ]
-      },
-      "report": {
-        "headline": "Americas Segment Faces Operational Strain with Logistics and Tariff Pressures",
-        "findings": [
-          {
-            "text": "The Americas segment reported an operating EBIT loss of EUR 6.2 million in H1 2026 due to additional logistics and tariff-related expenses.",
-            "sourceIds": [
-              1
-            ]
-          },
-          {
-            "text": "This performance was described as 'a key risk for investors to watch in the second half' of 2026.",
-            "sourceIds": [
-              1
-            ]
-          }
-        ],
-        "openQuestions": [
-          "What specific logistics disruptions (e.g., port delays, inland transport) contributed to the increased costs?",
-          "Are the tariff-related expenses tied to U.S.-Mexico-Canada Agreement (USMCA) changes or other trade policy shifts affecting GRAMMER’s supply chain?",
-          "Has GRAMMER implemented mitigation measures such as nearshoring, inventory buffering, or carrier diversification since H1 2026?"
-        ]
-      },
-      "thread": [
-        {
-          "kind": "plan",
-          "text": "3 searches: “\"GRAMMER AG\" plant closure production stop” · “\"GRAMMER AG\" supply disruption capacity 2025 2026” · “\"GRAMMER AG\" production sites manufacturing footprint”",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "search",
-          "text": "14 results, 14 about GRAMMER AG, from grammer.com, kalkinemedia.com, tiffinohio.net, linkedin.com",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read grammer.com: Interim Management Statements · 54,983 characters, 4 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read kalkinemedia.com: GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast · 26,980 characters, 16 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read tiffinohio.net: Toledo Molding & Die Tiffin plant closing April 30, 407 jobs lost — TiffinOhio.net · 20,009 characters, 19 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read linkedin.com: Grammer AG · 3,357 characters",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "evidence",
-          "text": "The Americas segment posted an operating EBIT loss of EUR 6.2 million in H1 2026, affected by additional logistics and tariff-related expenses, representing a key risk for investors to watch in the second half.",
-          "sourceIds": [
-            1
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "verdict",
-          "text": "The evidence shows a documented financial impact (EBIT loss) directly linked to operational challenges in logistics and tariffs within a core business segment, indicating tangible risk to day-to-day production and logistics. However, the age of the evidence (H1 2026, ~4 months old as of 2026-10-18) limits confidence, and no broader geographic or systemic issues are shown. The score reflects moderate risk — elevated due to concrete losses but tempered by recency and lack of evidence of ongoing or",
-          "sourceIds": [
-            1
-          ],
-          "model": "nvidia/nemotron-3-super-120b-a12b"
-        }
-      ]
-    },
-    "financialHealth": {
-      "status": "estimated",
-      "estimate": {
-        "value": 35,
-        "confidence": "low",
-        "rationale": "The suspension of dividend payments until 2027 indicates financial prudence or potential stress, suggesting possible liquidity constraints despite the loan renewal. However, the absence of negative financial metrics (e.g., losses, debt ratios, credit downgrades) limits the risk assessment. The evidence is from an unspecified date in 2024 (no publishedAt), making it over 2 years old as of 2026-10-18, which reduces confidence.",
-        "sourceIds": [
-          2
-        ]
-      },
-      "report": {
-        "headline": "GRMAGER AG's financial health shows strain with suspended dividends through 2027 despite loan renewal",
-        "findings": [
-          {
-            "text": "The new loan agreement was renewed in 2024, and it was decided to suspend dividend payments during the term until 2027.",
-            "sourceIds": [
-              2
-            ]
-          }
-        ],
-        "openQuestions": [
-          "What are the specific terms and covenants of the 2024 loan agreement?",
-          "What is GRAMMER AG's current liquidity position and cash flow status?",
-          "Are there any signs of declining revenue or profitability in railway seating operations?"
-        ]
-      },
-      "thread": [
-        {
-          "kind": "plan",
-          "text": "3 searches: “\"GRAMMER AG\" annual report revenue net income results” · “\"GRAMMER AG\" profit warning loss restructuring 2025 2026” · “\"GRAMMER AG\" refinancing liquidity equity ratio”",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "search",
-          "text": "13 results, 8 about GRAMMER AG, from grammer.com, reports.grammer.com, eqs-news.com",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 7 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 2 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read eqs-news.com: GRAMMER AG publishes results for the first quarter of 2026 | Corporate - EQS News · 23,974 characters, 15 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read grammer.com: Press release · 10,318 characters, 1 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "evidence",
-          "text": "the new loan agreement was renewed in 2024, it was decided to suspend dividend payments during the term until 2027.",
-          "sourceIds": [
-            2
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "verdict",
-          "text": "The suspension of dividend payments until 2027 indicates financial prudence or potential stress, suggesting possible liquidity constraints despite the loan renewal. However, the absence of negative financial metrics (e.g., losses, debt ratios, credit downgrades) limits the risk assessment. The evidence is from an unspecified date in 2024 (no publishedAt), making it over 2 years old as of 2026-10-18, which reduces confidence.",
-          "sourceIds": [
-            2
-          ],
-          "model": "nvidia/nemotron-3-super-120b-a12b"
-        }
-      ]
-    },
     "laborStability": {
       "status": "no_evidence",
       "estimate": null,
@@ -331,7 +167,7 @@
         },
         {
           "kind": "search",
-          "text": "14 results, 5 about GRAMMER AG, from grammer.com, reports.grammer.com",
+          "text": "14 results, 5 about GRAMMER AG, from grammer.com, reports.grammer.com.",
           "sourceIds": [],
           "model": null
         },
@@ -367,50 +203,50 @@
         }
       ]
     },
-    "esg": {
+    "quality": {
       "status": "no_evidence",
       "estimate": null,
       "report": null,
       "thread": [
         {
           "kind": "plan",
-          "text": "3 searches: “\"GRAMMER AG\" sustainability report CO2 targets” · “\"GRAMMER AG\" ESG rating EcoVadis CDP 2025” · “\"GRAMMER AG\" emissions environmental controversy”",
+          "text": "3 searches: “\"GRAMMER AG\" recall defect quality problems” · “\"GRAMMER AG\" quality issues customers 2025 2026” · “\"GRAMMER AG\" quality certification IATF IRIS award”",
           "sourceIds": [],
           "model": null
         },
         {
           "kind": "search",
-          "text": "12 results, 8 about GRAMMER AG, from sustainabilityreports.com, reports.grammer.com, mashinii.com, grammer.com",
+          "text": "15 results, 5 about GRAMMER AG, from grammer.com, reports.grammer.com, linkedin.com, eqs-news.com.",
           "sourceIds": [],
           "model": null
         },
         {
           "kind": "read",
-          "text": "Read sustainabilityreports.com: Grammer AG 2024 Annual Report with Sustainability Disclosures - Free PDF · 1,628 characters",
+          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 8 relevant passages",
           "sourceIds": [],
           "model": null
         },
         {
           "kind": "read",
-          "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 3 relevant passages",
+          "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 6 relevant passages",
           "sourceIds": [],
           "model": null
         },
         {
           "kind": "read",
-          "text": "Read mashinii.com: GRAMMER Ethics Score & Company Evidence | Mashinii · 38,453 characters, 7 relevant passages",
+          "text": "Read linkedin.com: #annualreport #fy25 #financialresults2025 #corporatestrategy | Grammer AG · 62,190 characters, 13 relevant passages",
           "sourceIds": [],
           "model": null
         },
         {
           "kind": "read",
-          "text": "Read grammer.com: GRAMMER Sustainability & Social Responsibilty | GRAMMER AG · 10,916 characters, 43 relevant passages",
+          "text": "Read eqs-news.com: GRAMMER AG closes Financial Year 2021 with significantly higher revenue and earnings | Corporate - EQS News · 19,020 characters, 19 relevant passages",
           "sourceIds": [],
           "model": null
         },
         {
           "kind": "note",
-          "text": "No verifiable public evidence about esg found.",
+          "text": "No verifiable public evidence about quality found.",
           "sourceIds": [],
           "model": null
         }
@@ -419,55 +255,61 @@
     "subTierVisibility": {
       "status": "estimated",
       "estimate": {
-        "value": 35,
+        "value": 45,
         "confidence": "medium",
-        "rationale": "Evidence shows strong Tier 1–3 controls (IMDS, SPHERA-SCM, VDA 6.3, SCoC since 2017) but explicitly states Tier 4 mapping is 'not yet confirmed as comprehensive', indicating a visibility gap. No actual incidents reported, but lack of deep traceability introduces risk. Evidence is undated but appears current based on 2023 reference and LkSG context; age reduces confidence slightly. Score reflects medium risk due to structural limitation without evidence of harm.",
+        "rationale": "Evidence shows structured Tier 3 traceability (IMDS, RMI templates) and contractual cascade (SCoC since 2017, annual VDA 6.3 audits, SPHERA-SCM updates), which are strengths. However, the explicit statement that Tier 4 mapping is not yet confirmed as comprehensive leaves a material visibility gap for raw-material extraction — a known high-risk area for metals, textiles and foams. The evidence is undated (no publishedAt), so currency is uncertain; the 2023 zero-incident claim suggests recent data",
         "sourceIds": [
-          6,
-          5,
           4,
-          7,
+          1,
+          2,
           3
         ]
       },
       "report": {
-        "headline": "Limited sub-tier traceability beyond Tier 3 creates blind spots in GRAMMER AG’s supply chain",
+        "headline": "GRAMMER AG maps materials to Tier 3 but lacks confirmed comprehensive visibility into Tier 4 and beyond.",
         "findings": [
           {
-            "text": "Traceability coverage is tiered at -60, as the company utilizes the International Material Data System (IMDS) and RMI templates (CMRT/EMRT) to map material flows and conflict minerals through tier 3, though deeper tier 4 mapping is not yet confirmed as comprehensive.",
-            "sourceIds": [
-              6
-            ]
-          },
-          {
-            "text": "While it uses digital risk management (SPHERA-SCM) for annual data updates, formal process audits (VDA 6.3) are conducted globally, and suppliers are required to perform their own internal audits at least once a year.",
-            "sourceIds": [
-              5
-            ]
-          },
-          {
-            "text": "The company achieves a high tier (60) as its Supplier Code of Conduct (SCoC) has been a mandatory component of every digital RFQ since 2017, and 100% of global suppliers are required to confirm these policies, which include enforceable human rights and environmental terms.",
+            "text": "GRAMMER AG uses the International Material Data System (IMDS) and RMI templates (CMRT/EMRT) to map material flows and conflict minerals through Tier 3 of its supply chain.",
             "sourceIds": [
               4
             ]
           },
           {
-            "text": "Reporting zero confirmed incidents of corruption or human rights violations in the 2023 reporting year, supported by a strictly enforced SCoC and a digital whistleblower system.",
+            "text": "Deeper Tier 4 mapping is explicitly noted as not yet confirmed as comprehensive, leaving a gap in visibility for raw-material extraction and sub-supplier levels.",
             "sourceIds": [
-              7
+              4
             ]
           },
           {
-            "text": "Demonstrates a structured approach to ethical sourcing, primarily driven by compliance with the German Supply Chain Due Diligence Act (LkSG) and automotive industry standards.",
+            "text": "The company relies on a global, multi-tier supply chain for raw materials including metals, plastics, textiles, and foams, making sub-tier transparency a critical operational requirement.",
+            "sourceIds": [
+              1
+            ]
+          },
+          {
+            "text": "A Supplier Code of Conduct (SCoC) has been mandatory in every digital RFQ since 2017, and 100% of global suppliers are required to confirm it, extending contractual expectations down the chain.",
+            "sourceIds": [
+              2
+            ]
+          },
+          {
+            "text": "Formal process audits (VDA 6.3) are conducted globally and suppliers must perform internal audits at least annually, providing a periodic check on sub-tier practices.",
+            "sourceIds": [
+              3
+            ]
+          },
+          {
+            "text": "Digital risk management via SPHERA-SCM provides annual data updates, supporting ongoing monitoring rather than one-off assessments.",
             "sourceIds": [
               3
             ]
           }
         ],
         "openQuestions": [
-          "What specific mechanisms does GRAMMER AG use to verify or monitor conditions at Tier 4 and beyond in its supply chain?",
-          "Are there any known gaps or limitations in IMDS/RMI template coverage for materials used in railway passenger seat production?",
-          "How frequently are sub-tier assessments updated, and what triggers deeper investigations beyond Tier 3?"
+          "What percentage of Tier 3 suppliers have actually disclosed their own Tier 4 sources in IMDS/RMI templates?",
+          "Is there a target date or roadmap for achieving comprehensive Tier 4 mapping?",
+          "How are conflict-mineral risks (e.g., cobalt, mica) specifically traced beyond Tier 3?",
+          "What escalation process exists if a Tier 4 supplier refuses disclosure or fails an audit?"
         ]
       },
       "thread": [
@@ -479,7 +321,7 @@
         },
         {
           "kind": "search",
-          "text": "13 results, 12 about GRAMMER AG, from grammer.com, reports.grammer.com, mashinii.com, marketscreener.com",
+          "text": "13 results, 12 about GRAMMER AG, from grammer.com, reports.grammer.com, mashinii.com, marketscreener.com.",
           "sourceIds": [],
           "model": null
         },
@@ -511,7 +353,7 @@
           "kind": "evidence",
           "text": "GRAMMER AG demonstrates a structured approach to ethical sourcing, primarily driven by compliance with the German Supply Chain Due Diligence Act (LkSG) and automotive industry standards.",
           "sourceIds": [
-            3
+            1
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -519,7 +361,7 @@
           "kind": "evidence",
           "text": "Regarding ethical clauses, the company achieves a high tier (60) as its Supplier Code of Conduct (SCoC) has been a mandatory component of every digital RFQ since 2017, and 100% of global suppliers are required to confirm these policies, which include enforceable human rights and environmental terms.",
           "sourceIds": [
-            4
+            2
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -527,7 +369,7 @@
           "kind": "evidence",
           "text": "For audit frequency, the company is tiered at -60; while it uses digital risk management (SPHERA-SCM) for annual data updates, formal process audits (VDA 6.3) are conducted globally, and suppliers are required to perform their own internal audits at least once a year.",
           "sourceIds": [
-            5
+            3
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -535,7 +377,7 @@
           "kind": "evidence",
           "text": "Traceability coverage is tiered at -60, as the company utilizes the International Material Data System (IMDS) and RMI templates (CMRT/EMRT) to map material flows and conflict minerals through tier 3, though deeper tier 4 mapping is not yet confirmed as comprehensive.",
           "sourceIds": [
-            6
+            4
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -543,21 +385,235 @@
           "kind": "evidence",
           "text": "Finally, for forced and child labour incidents, the company is tiered at -10, reporting zero confirmed incidents of corruption or human rights violations in the 2023 reporting year, supported by a strictly enforced SCoC and a digital whistleblower system.",
           "sourceIds": [
+            5
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "Evidence shows structured Tier 3 traceability (IMDS, RMI templates) and contractual cascade (SCoC since 2017, annual VDA 6.3 audits, SPHERA-SCM updates), which are strengths. However, the explicit statement that Tier 4 mapping is not yet confirmed as comprehensive leaves a material visibility gap for raw-material extraction — a known high-risk area for metals, textiles and foams. The evidence is undated (no publishedAt), so currency is uncertain; the 2023 zero-incident claim suggests recent data",
+          "sourceIds": [
+            4,
+            1,
+            2,
+            3
+          ],
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        }
+      ]
+    },
+    "esg": {
+      "status": "estimated",
+      "estimate": {
+        "value": 30,
+        "confidence": "low",
+        "rationale": "The evidence shows concrete positive environmental performance: a verified 25% reduction in Scope 1&2 emissions by 2024 (ahead of target) and a high 85.73% group recycling rate with a design-for-recycling strategy. These are documented strengths that lower the risk score. However, the data comes solely from Mashinii, an ethics-scoring aggregator, with no publication date, no primary source citation, and no independent verification. The absence of Scope 3 targets and the age/uncertainty of the '2",
+        "sourceIds": [
+          8,
+          9
+        ]
+      },
+      "report": {
+        "headline": "Grammer AG shows measurable climate progress and high recycling rates, but evidence is from an unverified third-party aggregator with no publication date.",
+        "findings": [
+          {
+            "text": "Grammer AG achieved a 25% reduction in Scope 1 and 2 emissions by 2024, meeting its interim climate target one year ahead of schedule.",
+            "sourceIds": [
+              8
+            ]
+          },
+          {
+            "text": "The company reports a group recycling rate of 85.73% and uses a 'Design for Recycling' approach targeting over 75% recyclability for products at end-of-life.",
+            "sourceIds": [
+              9
+            ]
+          },
+          {
+            "text": "The company aims for a 100% reduction in operational emissions by 2040, though reports indicate specific quantitative interim targets for Scope 3 emissions are not publicly disclosed.",
+            "sourceIds": [
+              8,
+              9
+            ]
+          }
+        ],
+        "openQuestions": [
+          "What is the source and verification status of the emissions and recycling data cited by Mashinii?",
+          "When was the Mashinii assessment published, and does it reflect the latest reporting period?",
+          "What are the specific Scope 3 (value chain) emissions reduction targets and current progress?",
+          "Has Grammer AG published its own sustainability report or CDP disclosure to corroborate these figures?"
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "3 searches: “\"GRAMMER AG\" sustainability report CO2 targets” · “\"GRAMMER AG\" ESG rating EcoVadis CDP 2025” · “\"GRAMMER AG\" emissions environmental controversy”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "12 results, 8 about GRAMMER AG, from sustainabilityreports.com, reports.grammer.com, mashinii.com, grammer.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read sustainabilityreports.com: Grammer AG 2024 Annual Report with Sustainability Disclosures - Free PDF · 1,628 characters",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 3 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read mashinii.com: GRAMMER Ethics Score & Company Evidence | Mashinii · 38,453 characters, 7 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read grammer.com: GRAMMER Sustainability & Social Responsibilty | GRAMMER AG · 10,916 characters, 43 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Grammer AG achieved a 25% reduction in Scope 1 and 2 emissions by 2024, meeting its interim climate target a year ahead of schedule.",
+          "sourceIds": [
+            8
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "The company maintains a group recycling rate of 85.73% and utilizes a",
+          "sourceIds": [
+            9
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "The evidence shows concrete positive environmental performance: a verified 25% reduction in Scope 1&2 emissions by 2024 (ahead of target) and a high 85.73% group recycling rate with a design-for-recycling strategy. These are documented strengths that lower the risk score. However, the data comes solely from Mashinii, an ethics-scoring aggregator, with no publication date, no primary source citation, and no independent verification. The absence of Scope 3 targets and the age/uncertainty of the '2",
+          "sourceIds": [
+            8,
+            9
+          ],
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        }
+      ]
+    },
+    "financialHealth": {
+      "status": "estimated",
+      "estimate": {
+        "value": 55,
+        "confidence": "medium",
+        "rationale": "The score of 55 (high risk) reflects a company that has returned to profitability after a significant loss but remains highly leveraged with an equity ratio of only 18.1% and total liabilities exceeding EUR 1.3 billion. The contractual suspension of dividends until 2027 signals lender concern and restricts financial flexibility. Confidence is medium because the evidence covers key metrics but lacks full cash flow statements, covenant details, and maturity profiles, and the exact reporting dates—",
+        "sourceIds": [
+          6,
+          7
+        ]
+      },
+      "report": {
+        "headline": "GRAMMER AG shows improved profitability but carries high debt and low equity; loan covenants restrict dividends until 2027",
+        "findings": [
+          {
+            "text": "The company reported a net income of EUR 17.2 million for the 2025 financial year, reversing a net loss of EUR 115.2 million in the prior year, indicating a return to profitability.",
+            "sourceIds": [
+              6
+            ]
+          },
+          {
+            "text": "Accumulated losses from the previous financial year mean no dividend is currently proposed, and a renewed loan agreement in 2024 explicitly suspends dividend payments until 2027.",
+            "sourceIds": [
+              6
+            ]
+          },
+          {
+            "text": "As of the latest reporting date, the equity ratio stands at 18.1%, up 0.8 percentage points, but remains low, signaling a thin capital buffer.",
+            "sourceIds": [
+              7
+            ]
+          },
+          {
+            "text": "Non-current liabilities are high at EUR 719.1 million and current liabilities rose 2.8% to EUR 623.9 million, showing a heavy debt load with growing short-term obligations.",
+            "sourceIds": [
+              7
+            ]
+          }
+        ],
+        "openQuestions": [
+          "What are the specific financial covenants attached to the loan agreement renewed in 2024, and is the company currently in compliance?",
+          "What is the detailed maturity profile of the EUR 719 million in non-current liabilities and the EUR 624 million in current liabilities?",
+          "What are the projected free cash flows for 2026–2027 to assess the ability to service debt without dividend capacity?",
+          "Are there any off-balance-sheet obligations, guarantees, or contingent liabilities related to the regional train order or other major projects?"
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "3 searches: “\"GRAMMER AG\" annual report revenue net income results” · “\"GRAMMER AG\" profit warning loss restructuring 2025 2026” · “\"GRAMMER AG\" refinancing liquidity equity ratio”",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "13 results, 8 about GRAMMER AG, from grammer.com, reports.grammer.com, eqs-news.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 7 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 2 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read eqs-news.com: GRAMMER AG publishes results for the first quarter of 2026 | Corporate - EQS News · 23,974 characters, 15 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read grammer.com: Press release · 10,318 characters, 1 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "the new loan agreement was renewed in 2024, it was decided to suspend dividend payments during the term until 2027.",
+          "sourceIds": [
+            6
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "EUR 623.9 million (December 31, 2025: EUR 606.7 million).",
+          "sourceIds": [
             7
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
         {
           "kind": "verdict",
-          "text": "Evidence shows strong Tier 1–3 controls (IMDS, SPHERA-SCM, VDA 6.3, SCoC since 2017) but explicitly states Tier 4 mapping is 'not yet confirmed as comprehensive', indicating a visibility gap. No actual incidents reported, but lack of deep traceability introduces risk. Evidence is undated but appears current based on 2023 reference and LkSG context; age reduces confidence slightly. Score reflects medium risk due to structural limitation without evidence of harm.",
+          "text": "The score of 55 (high risk) reflects a company that has returned to profitability after a significant loss but remains highly leveraged with an equity ratio of only 18.1% and total liabilities exceeding EUR 1.3 billion. The contractual suspension of dividends until 2027 signals lender concern and restricts financial flexibility. Confidence is medium because the evidence covers key metrics but lacks full cash flow statements, covenant details, and maturity profiles, and the exact reporting dates—",
           "sourceIds": [
             6,
-            5,
-            4,
-            7,
-            3
+            7
           ],
-          "model": "nvidia/nemotron-3-super-120b-a12b"
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
         }
       ]
     }
@@ -565,28 +621,6 @@
   "sources": [
     {
       "id": 1,
-      "url": "https://kalkinemedia.com/uk/news/announcements/grammer-ag-0oqx-posts-eur-9614-million-h1-2026-revenue-with-171-operating-ebit-growth-affirms-full-year-forecast",
-      "title": "GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast",
-      "publishedAt": null,
-      "quote": "The Americas segment posted an operating EBIT loss of EUR 6.2 million in H1 2026, affected by additional logistics and tariff-related expenses, representing a key risk for investors to watch in the second half.",
-      "excerpt": {
-        "before": "the transaction completed, inflating current liabilities to EUR 878.5 million. Full-Year 2026 Guidance Maintained at EUR 1.9 Billion Revenue Amid Tariff and Economic Challenges GRAMMER confirmed its full-year 2026 guidance, projecting revenue around EUR 1.9 billion and operating EBIT near EUR 80 million, consistent with the forecast issued on 27 March 2026. The company warned of a challenging market environment due to macroeconomic uncertainty, elevated material and energy costs, geopolitical developments, and potential disruptions from US tariff measures impacting global supply chains.",
-        "after": "Kalkine Media To keep reading, please log in to your account, create a free account, or simply fill out the form below. Disclaimer The content, including but not limited to any articles, news, quotes, information, data, text, reports, ratings, opinions, images, photos, graphics, graphs, charts, animations and video (Content) is a service of Kalkine Media Limited, Company No. 12643132 (Kalkine Media, we or us) and is available for personal and non-commercial use only. Kalkine Media is an appointed representative of Kalkine Limited, who is authorized and regulated by the FCA (FRN: 579414). The"
-      }
-    },
-    {
-      "id": 2,
-      "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
-      "title": "ON POINT. AND BEYOND.",
-      "publishedAt": null,
-      "quote": "the new loan agreement was renewed in 2024, it was decided to suspend dividend payments during the term until 2027.",
-      "excerpt": {
-        "before": "of profit The appropriation of profits at GRAMMER AG is based on the accu-mulated profit/loss reported in the company’s annual financial statements prepared in accordance with commercial law. GRAMMER AG reported an accumulated loss of EUR –244.1 million as of December 31, 2025 (accumulated loss as of December 31, 2024: EUR –261.3 million). This figure included net income for the 2025 financial year of EUR 17.2 million (previous year: net loss of EUR –115.2 million). Due to GRAMMER AG’s accumulated loss in the previous financial year, no dividend is currently proposed. Furthermore, when",
-        "after": "2.5.5 Earnings performance in the regions EMEA Operating EBIT in EMEA, where the Group’s highest-revenue com-panies are located, was significantly higher than the previous year at EUR 62.8 million (previous year: EUR 25.2 million). The operating EBIT margin improved accordingly to 5.9% (previous year: 2.4%). Operating EBIT was adjusted for negative currency effects of EUR 4.7 million, income from the reversal of restructur-ing provisions of EUR 0.7 million, and a negative effect from re­ ceivables written off in connection with the deconsolidation of the US Group company GRAMMER Industries"
-      }
-    },
-    {
-      "id": 3,
       "url": "https://mashinii.com/score/GMM.XETRA",
       "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
       "publishedAt": null,
@@ -597,7 +631,7 @@
       }
     },
     {
-      "id": 4,
+      "id": 2,
       "url": "https://mashinii.com/score/GMM.XETRA",
       "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
       "publishedAt": null,
@@ -608,7 +642,7 @@
       }
     },
     {
-      "id": 5,
+      "id": 3,
       "url": "https://mashinii.com/score/GMM.XETRA",
       "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
       "publishedAt": null,
@@ -619,7 +653,7 @@
       }
     },
     {
-      "id": 6,
+      "id": 4,
       "url": "https://mashinii.com/score/GMM.XETRA",
       "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
       "publishedAt": null,
@@ -630,7 +664,7 @@
       }
     },
     {
-      "id": 7,
+      "id": 5,
       "url": "https://mashinii.com/score/GMM.XETRA",
       "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
       "publishedAt": null,
@@ -639,16 +673,59 @@
         "before": "and suppliers are required to perform their own internal audits at least once a year. 5 6 7 Traceability coverage is tiered at -60, as the company utilizes the International Material Data System (IMDS) and RMI templates (CMRT/EMRT) to map material flows and conflict minerals through tier 3, though deeper tier 4 mapping is not yet confirmed as comprehensive. 8 9 10 Remediation speed is scored at 40 based on specific quality and compliance response protocols: the company requires an initial reaction to complaints within 24 hours and a formal 8D remediation report within 5 working days. 11",
         "after": "12 13 14 No specific quantitative data was available for fair trade certification shares or supplier diversity spend. 15 16 17 Sources Honest & Fair Business As a manufacturer of automotive components, the company's core business does not inherently advance or harm honest and fair business practices, which are determined by corporate governance and regulatory compliance rather than the product itself. Grammer AG demonstrates a solid baseline for 'Honest & Fair Business' practices, supported by its status as a Prime Standard listed company on the German Stock Exchange, which mandates high"
       }
+    },
+    {
+      "id": 6,
+      "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
+      "title": "ON POINT. AND BEYOND.",
+      "publishedAt": null,
+      "quote": "the new loan agreement was renewed in 2024, it was decided to suspend dividend payments during the term until 2027.",
+      "excerpt": {
+        "before": "of profit The appropriation of profits at GRAMMER AG is based on the accu-mulated profit/loss reported in the company’s annual financial statements prepared in accordance with commercial law. GRAMMER AG reported an accumulated loss of EUR –244.1 million as of December 31, 2025 (accumulated loss as of December 31, 2024: EUR –261.3 million). This figure included net income for the 2025 financial year of EUR 17.2 million (previous year: net loss of EUR –115.2 million). Due to GRAMMER AG’s accumulated loss in the previous financial year, no dividend is currently proposed. Furthermore, when",
+        "after": "2.5.5 Earnings performance in the regions EMEA Operating EBIT in EMEA, where the Group’s highest-revenue com-panies are located, was significantly higher than the previous year at EUR 62.8 million (previous year: EUR 25.2 million). The operating EBIT margin improved accordingly to 5.9% (previous year: 2.4%). Operating EBIT was adjusted for negative currency effects of EUR 4.7 million, income from the reversal of restructur-ing provisions of EUR 0.7 million, and a negative effect from re­ ceivables written off in connection with the deconsolidation of the US Group company GRAMMER Industries"
+      }
+    },
+    {
+      "id": 7,
+      "url": "https://www.eqs-news.com/news/corporate/grammer-ag-publishes-results-for-the-first-quarter-of-2026/c34e3929-ad57-4e86-adbf-42424fdf14ed_en",
+      "title": "GRAMMER AG publishes results for the first quarter of 2026 | Corporate - EQS News",
+      "publishedAt": null,
+      "quote": "EUR 623.9 million (December 31, 2025: EUR 606.7 million).",
+      "excerpt": {
+        "before": "2025: EUR 679.9 million), mainly due to a 32.8% increase in current trade account receivables to EUR 295.3 million driven by seasonally higher sales in the first quarter of 2026 compared with Q4 2025. Equity rose by 6.9% to EUR 297.8 million as of March 31, 2026 (December 31, 2025: EUR 278.6 million) due to the positive net result. The equity ratio thus improved by 0.8 percentage points to 18.1% (December 31, 2025: 17.3%). Non-current liabilities remained overall stable with EUR 719.1 million (December 31, 2025: EUR 721.9 million). Current liabilities increased by EUR 17.2 million or 2.8% to",
+        "after": "Continuity on the Executive Board: Contract Extended The Supervisory Board of GRAMMER AG has extended the contract of Jens Öhlenschläger, Spokesman of the Executive Board, for a further term. The extended contract will take effect on January 1, 2027, and will run for five years. Commenting on the decision, Dr. Markus Lauer, Chairman of the Supervisory Board, stated: “By extending Jens Öhlenschläger’s contract as Spokesman of the Executive Board, we reaffirm our full confidence in him and in the Executive Board as a whole. Under his leadership, GRAMMER AG has developed positively. This"
+      }
+    },
+    {
+      "id": 8,
+      "url": "https://mashinii.com/score/GMM.XETRA",
+      "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
+      "publishedAt": null,
+      "quote": "Grammer AG achieved a 25% reduction in Scope 1 and 2 emissions by 2024, meeting its interim climate target a year ahead of schedule.",
+      "excerpt": {
+        "before": "finding, with the sources. No account. No card. Unsubscribe any time. One concise weekly email with new evidence-backed company research. Unsubscribe any time. Privacy policy. GRAMMER AG. GMM.XETRA Manufacture of parts and accessories for motor vehicles GRAMMER AG is a global supplier specializing in the development and manufacture of components and systems for passenger vehicle interiors as well as driver and operator seats for off-road vehicles (agricultural and construction machinery, forklifts), trucks, buses, and trains. Their automotive divis...Show More Ethics Score Mixed.",
+        "after": "The company maintains a group recycling rate of 85.73% and utilizes a \"Design for Recycling\" approach that targets over 75% recyclability for products at end-of-life. While it aims for a 100% reduction in operational emissions by 2040, reports indicate that specific quantitative data for Scope 3 emissions remains undisclosed. In 2024, the firm’s EcoVadis ESG rating improved from 58 to 71, placing it in the top 15% of its industry peers. Governance records show one financial restatement for the 2024 fiscal year due to discontinued operations, though regulators reported no environmental"
+      }
+    },
+    {
+      "id": 9,
+      "url": "https://mashinii.com/score/GMM.XETRA",
+      "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
+      "publishedAt": null,
+      "quote": "The company maintains a group recycling rate of 85.73% and utilizes a",
+      "excerpt": {
+        "before": "research. Unsubscribe any time. Privacy policy. GRAMMER AG. GMM.XETRA Manufacture of parts and accessories for motor vehicles GRAMMER AG is a global supplier specializing in the development and manufacture of components and systems for passenger vehicle interiors as well as driver and operator seats for off-road vehicles (agricultural and construction machinery, forklifts), trucks, buses, and trains. Their automotive divis...Show More Ethics Score Mixed. Grammer AG achieved a 25% reduction in Scope 1 and 2 emissions by 2024, meeting its interim climate target a year ahead of schedule.",
+        "after": "\"Design for Recycling\" approach that targets over 75% recyclability for products at end-of-life. While it aims for a 100% reduction in operational emissions by 2040, reports indicate that specific quantitative data for Scope 3 emissions remains undisclosed. In 2024, the firm’s EcoVadis ESG rating improved from 58 to 71, placing it in the top 15% of its industry peers. Governance records show one financial restatement for the 2024 fiscal year due to discontinued operations, though regulators reported no environmental compliance violations or fines during the same period. Last investigated"
+      }
     }
   ],
   "run": {
-    "seconds": 19.1,
-    "costUsd": 0.0083,
-    "tavilyCredits": 28,
+    "seconds": 32.6,
+    "costUsd": 0.0184,
+    "tavilyCredits": 29,
     "models": [
       "nvidia/Nemotron-3-Ultra-550b-a55b",
-      "nvidia/Nemotron-3_5-Lightning",
-      "nvidia/nemotron-3-super-120b-a12b"
+      "nvidia/Nemotron-3_5-Lightning"
     ]
   }
 }

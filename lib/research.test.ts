@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { allowsFraming } from "./research/embeddable.ts";
 import { researchedIdFor, researchedSupplierSchema, toSupplier, type ResearchedSupplier } from "./research/contract.ts";
-import { excerptAround, extractJson, isVerbatim, mentionsCompany, relevantPassages } from "./research/evidence.ts";
+import { excerptAround, extractJson, isVerbatim, keepKnownCitations, mentionsCompany, relevantPassages } from "./research/evidence.ts";
 
 test("quotes count only when they appear verbatim in the fetched text", () => {
   const page = "In 2025 the group reported   a net loss of EUR 12 million.\nRevenue grew 4%.";
@@ -52,6 +52,11 @@ test("estimates must cite sources that exist", () => {
   const quality = researched().agents.quality;
   const unbackedReport = researched({ agents: { quality: quality && { ...quality, report: { headline: "Recall", findings: [{ text: "Unbacked", sourceIds: [9] }], openQuestions: [] } } } });
   assert.equal(researchedSupplierSchema.safeParse(unbackedReport).success, false);
+  assert.equal(researchedSupplierSchema.safeParse(researched({ summary: "A recall in 2025 [9]." })).success, false);
+});
+
+test("briefing citations keep only sources that exist", () => {
+  assert.equal(keepKnownCitations("Dividends are suspended until 2027 [2, 9]. Revenue fell [7].", new Set([2])), "Dividends are suspended until 2027 [2]. Revenue fell.");
 });
 
 test("evidence must name the company, not just share its industry", () => {

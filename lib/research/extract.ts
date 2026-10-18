@@ -10,6 +10,8 @@ const responseSchema = z.object({
 const envSchema = z.object({ TAVILY_API_KEY: z.string().trim().min(1) });
 const RETRIES = [1_000, 2_000, 4_000];
 const MAX_PAGE_CHARS = 80_000;
+// Extract sometimes stalls on large documents; the agent then reads the search snippets instead.
+const ATTEMPT_TIMEOUT_MS = 25_000;
 
 export interface Page {
   url: string;
@@ -23,7 +25,7 @@ export async function readPages(urls: string[], signal: AbortSignal): Promise<{ 
   if (!config.success) throw new Error("TAVILY_API_KEY is not set");
   for (let attempt = 0; ; attempt++) {
     const response = await fetch("https://api.tavily.com/extract", {
-      method: "POST", signal, cache: "no-store",
+      method: "POST", signal: AbortSignal.any([signal, AbortSignal.timeout(ATTEMPT_TIMEOUT_MS)]), cache: "no-store",
       headers: { Authorization: `Bearer ${config.data.TAVILY_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ urls: urls.slice(0, 5), extract_depth: "basic", include_usage: true }),
     });

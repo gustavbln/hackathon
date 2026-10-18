@@ -89,7 +89,7 @@ export const researchedSupplierSchema = z
       models: z.array(z.string()),
     }),
   })
-  .superRefine(({ sources, agents, insights }, context) => {
+  .superRefine(({ sources, agents, insights, summary }, context) => {
     const known = new Set(sources.map(({ id }) => id));
     if (known.size !== sources.length) context.addIssue({ code: "custom", message: "Source ids must be unique" });
     const cited = [
@@ -99,11 +99,17 @@ export const researchedSupplierSchema = z
         ...(agent?.report?.findings.flatMap(({ sourceIds }) => sourceIds) ?? []),
       ]),
       ...insights.flatMap(({ sourceIds }) => sourceIds),
+      ...citedIds(summary),
     ];
     for (const id of new Set(cited)) {
       if (!known.has(id)) context.addIssue({ code: "custom", message: `Source ${id} is cited but missing` });
     }
   });
+
+/** Generated prose cites inline, like "…suspended until 2027 [2][5]."; each id names a saved source. */
+export function citedIds(text: string): number[] {
+  return [...text.matchAll(/\[(\d+)\]/g)].map((match) => Number(match[1]));
+}
 
 /** What the research stream sends, one per Server-Sent Event, so every agent's progress is visible live. */
 export const researchEventSchema = z.discriminatedUnion("type", [
