@@ -81,7 +81,7 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
   return (
     <figure
       ref={figure}
-      className={`blueprint-scene relative my-3 ${cabinHref ? "h-[160svh] shrink-0" : "min-h-[680px] flex-1 sm:min-h-[620px]"}`}
+      className={`blueprint-scene relative my-3 ${cabinHref ? "h-[200svh] shrink-0" : "min-h-[680px] flex-1 sm:min-h-[620px]"}`}
       aria-label="Explore the high-speed train. Scroll down to zoom into its passenger cabin."
     >
       <div className={`${cabinHref ? "sticky top-0 h-svh" : "absolute inset-0 min-h-[620px]"} overflow-hidden`}

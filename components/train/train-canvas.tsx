@@ -1,9 +1,9 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrthographicCamera } from "@react-three/drei";
+import { ContactShadows, Environment, Lightformer, PerspectiveCamera } from "@react-three/drei";
 import { Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { MathUtils, Mesh, Vector3, type OrthographicCamera as Camera } from "three";
+import { MathUtils, type PerspectiveCamera as Camera } from "three";
 import { TrainModel } from "./train-model";
 import { TrainFallback } from "./train-fallback";
 import { CabinTarget } from "@/components/cabin/cabin-target";
@@ -34,51 +34,34 @@ function TrainArrangement({ onReady, onCabinSelect }: { onReady: () => void; onC
 
 function SceneCamera({ progress, reducedMotion }: { progress: number; reducedMotion: boolean }) {
   const camera = useRef<Camera>(null);
-  const carriageCenter = useRef(new Vector3());
   const { width, height } = useThree((state) => state.size);
   const invalidate = useThree((state) => state.invalidate);
-  // A fixed three-quarter view can fill the width without reserving a full turning circle.
-  const zoom = Math.min(width / 27, height / 11);
-  useEffect(() => { invalidate(); }, [progress, reducedMotion, zoom, invalidate]);
+  const portrait = width < height;
+  const distance = portrait ? 128 : 86;
+  const startX = (portrait ? 0.96 : 0.52) * distance;
+  const startY = (portrait ? 0.3 : 0.27) * distance;
+  const startZ = (portrait ? 0.28 : 0.81) * distance;
+  useEffect(() => { invalidate(); }, [progress, reducedMotion, width, height, invalidate]);
   useFrame((state, delta) => {
     if (!camera.current) return;
     const travel = reducedMotion ? 0 : ease(progress);
     const smooth = reducedMotion ? 1 : 1 - Math.exp(-8 * Math.min(delta, 0.1));
-    const carriage = state.scene.getObjectByName("Passenger_carriage") ?? state.scene.getObjectByName("Passenger carriage");
-    if (carriage instanceof Mesh) {
-      if (!carriage.geometry.boundingBox) carriage.geometry.computeBoundingBox();
-      carriage.geometry.boundingBox?.getCenter(carriageCenter.current);
-      carriage.localToWorld(carriageCenter.current);
-    }
-    const x = carriageCenter.current.x * travel;
-    const z = carriageCenter.current.z * travel;
-    const targetX = 13 * (1 - travel) + x;
-    const targetY = 13 - 10.2 * travel;
-    const targetZ = 32 - 26 * travel + z;
-    const targetZoom = zoom * Math.pow(15, travel);
+    // Exponential distance gives an even approach, then levels with the passenger windows.
+    const remaining = Math.pow(0.005, travel);
+    const targetX = startX * remaining;
+    const targetY = 2.65 + (startY - 2.65) * remaining;
+    const targetZ = 1.4 + (startZ - 1.4) * remaining;
     camera.current.position.x = MathUtils.lerp(camera.current.position.x, targetX, smooth);
     camera.current.position.y = MathUtils.lerp(camera.current.position.y, targetY, smooth);
     camera.current.position.z = MathUtils.lerp(camera.current.position.z, targetZ, smooth);
-    // Exponential zoom reads as constant speed; a polynomial one crawls, then lurches.
-    camera.current.zoom = MathUtils.lerp(camera.current.zoom, targetZoom, smooth);
-    camera.current.lookAt(x, 1.8 + travel, z);
+    camera.current.lookAt(0, 2.2 + travel * 0.45, 0);
     camera.current.updateProjectionMatrix();
     if (Math.abs(camera.current.position.x - targetX) + Math.abs(camera.current.position.y - targetY)
-      + Math.abs(camera.current.position.z - targetZ) + Math.abs(camera.current.zoom - targetZoom) > 0.001) state.invalidate();
+      + Math.abs(camera.current.position.z - targetZ) > 0.001) state.invalidate();
   });
   return (
-    <OrthographicCamera
-      makeDefault
-      ref={camera}
-      position={[13, 13, 32]}
-      near={0.1}
-      far={200}
-      zoom={zoom}
-      onUpdate={(camera) => {
-        camera.lookAt(0, 1.8, 0);
-        camera.updateProjectionMatrix();
-      }}
-    />
+    <PerspectiveCamera makeDefault ref={camera} position={[startX, startY, startZ]} near={0.05} far={500} fov={36}
+      onUpdate={(camera) => { camera.lookAt(0, 2.2, 0); camera.updateProjectionMatrix(); }} />
   );
 }
 
@@ -89,8 +72,8 @@ export default function TrainCanvas({ onCabinSelect, progress = 0 }: { onCabinSe
 
   return (
     <>
+      {!loaded && <TrainFallback loading />}
       <Canvas
-        orthographic
         dpr={[1, 1.5]}
         frameloop="demand"
         gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
@@ -100,8 +83,15 @@ export default function TrainCanvas({ onCabinSelect, progress = 0 }: { onCabinSe
         style={{ touchAction: "pan-y" }}
       >
         <SceneCamera progress={progress} reducedMotion={reducedMotion} />
-        <ambientLight intensity={1.8} />
-        <directionalLight position={[12, 25, 18]} intensity={2} />
+        <ambientLight intensity={0.7} />
+        <directionalLight position={[15, 30, 20]} intensity={3} />
+        <directionalLight position={[-20, 10, -15]} intensity={1.5} />
+        <Environment resolution={128} frames={1}>
+          <Lightformer form="rect" intensity={3} position={[0, 18, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[100, 18, 1]} />
+          <Lightformer form="rect" intensity={2} position={[0, 8, 18]} rotation={[0, Math.PI, 0]} scale={[100, 6, 1]} />
+          <Lightformer form="rect" intensity={4} position={[0, 12, -15]} scale={[90, 3, 1]} />
+        </Environment>
+        <ContactShadows position={[0, -0.32, 0]} opacity={0.3} scale={100} blur={2.5} far={9} resolution={512} frames={1} />
         <Suspense fallback={null}>
           <TrainArrangement onReady={handleReady} onCabinSelect={onCabinSelect} />
         </Suspense>

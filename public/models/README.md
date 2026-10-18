@@ -1,26 +1,20 @@
 # Landing-page train
 
-`high-speed-train.glb` is an original procedural, stylised high-speed train created for this project.
-It uses no third-party model, logos, textures, or manufacturer-specific geometry.
+`high-speed-train.glb` is an original procedural high-speed electric multiple unit, built for this project. Its visual reference is the [Siemens Velaro](https://www.mobility.siemens.com/global/en/portfolio/rolling-stock/high-speed-and-intercity-trains/velaro.html). No third-party geometry, textures or logos are included.
 
-![Geometry preview in the original light palette](high-speed-train-preview.png)
+- Three carriages, approximately 77 metres overall, with six-metre sculpted cab noses.
+- Physically lit white paint, red waist stripes, dark glazing and rubber window seals.
+- Doors, LED headlights, windscreen wipers, gangway bellows, wheelsets, brake discs, suspension, roof ventilation and a pantograph.
+- Rails and sleepers are included. X runs along the train, Y is up; wheel contact is Y = 0.
+- Proportions and details are illustrative, not engineering measurements or a manufacturer CAD model.
+- Approximately 8 MB; no external textures, decoder or remote model service required.
 
-- Three cars: two streamlined power cars and a central passenger carriage.
-- Warm ivory paper surfaces, graphite contour lines, muted windows, windscreens, doors, gangways, bogies and wheels.
-- Unlit materials preserve the paper palette through rotation, with no metallic highlights.
-- X runs along the train, Y is up; the ground is Y = 0 and the train is centred along X and Z.
-- Approximately 35 metres long. Proportions are illustrative, not engineering measurements.
-- Named meshes allow later material overrides. No camera, lighting, track or animation is baked in.
-- GLB includes line primitives; keep them when importing to preserve the blueprint style.
-
-Edit `components/train/create-train.ts` for geometry and the `--train-*` hex tokens in
-`app/globals.css` for materials, then regenerate inside Docker:
+Edit `components/train/create-train.ts` and the `--train-*` tokens in `app/globals.css`, then regenerate inside Docker:
 
 ```sh
 docker compose exec web node --experimental-strip-types scripts/export-train.mjs
 ```
 
-`components/train/train-model.tsx` provides `<TrainModel />` for use inside a client-only
-React Three Fiber `<Canvas>` with a Suspense boundary. Add camera, lighting, loading/error
-fallbacks and rotation in the containing scene. Each instance clones the hierarchy while
-sharing cached geometry and materials.
+`components/train/train-model.tsx` loads the asset inside a client-only React Three Fiber canvas. `train-canvas.tsx` supplies studio lighting and a perspective camera that approaches the central passenger window as the visitor scrolls. `train-scene.tsx` then opens the existing interactive cabin. Reduced-motion users retain a stationary exterior and can enter with the button or by scrolling.
+
+`high-speed-train-preview.png` is the older blueprint illustration, retained as a lightweight loading and no-WebGL fallback.
