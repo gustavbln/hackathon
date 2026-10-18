@@ -149,6 +149,9 @@ function ShortlistResult({ shortlist }: { shortlist: SeatShortlist }) {
               <div className="mt-1.5 h-px bg-[var(--blueprint-rule)]">
                 <div className="h-px bg-[var(--blueprint-ink)]" style={{ width: `${(criterion.weightPercent / maxWeight) * 100}%` }} />
               </div>
+              <p className="mt-1.5 text-xs leading-relaxed text-[var(--blueprint-muted)]">
+                {criterion.reason ?? "Priority inherited from the dataset’s baseline weights."}
+              </p>
             </li>
           ))}
         </ol>

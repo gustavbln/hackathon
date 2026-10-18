@@ -27,7 +27,8 @@ const messages: ModelMessage[] = [
 This is a proposed buyer preference profile, not a supplier assessment or engineering approval.
 Score EACH listed criterion from 0 (irrelevant) to 10 (critical); 5 means moderate importance.
 Use only these existing dataset criteria (key, CSV column, label): ${JSON.stringify(CRITERIA.map(({ key, column, label }) => ({ key, column, label })))}.
-Give each column a short seat-specific reason (one sentence, at most 240 characters).
+Give each column a seat-specific reason in one short sentence, at most 12 words and 100 characters.
+State the procurement impact directly; omit introductions and repeated criterion names.
 Consider product quality, continuity of production, delivery and supplier reliability. Do not
 invent technical specifications, certifications, prices, countries, or supplier capabilities.
 Explain why a risk could matter; do not name laws/standards or assert specific seat requirements.
