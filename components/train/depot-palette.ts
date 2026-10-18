@@ -7,6 +7,6 @@ export function readDepotPalette(): DepotPalette {
     wall: token("wall"), brick: token("brick"), mortar: token("mortar"),
     roof: token("roof"), steel: token("steel"), glass: token("glass"),
     ground: token("ground"), ballast: token("ballast"), brand: token("brand"),
-    shutter: token("shutter"), shadow: token("shadow"), marking: token("marking"), sky: token("sky"),
+    shutter: token("shutter"), shadow: token("shadow"), marking: token("marking"), sky: token("sky"), trees: token("trees"),
   };
 }

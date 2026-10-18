@@ -118,25 +118,15 @@ function createDepot(palette: DepotPalette) {
     part(new THREE.CircleGeometry(0.31, 16), "shadow", [43.13, 10.08, z], [0, Math.PI / 2, 0]);
   }
 
-  // Taller glazed hall on the left reproduces the photograph's distinctive roofline.
-  const annex = 22;
-  roof(17, 9.8, 5.2, annex);
-  arch(16.4, 9.8, 5.2, annex, "glass");
-  box([0.8, 2.9, 17.2], [42, 8.35, annex], "wall");
-  box([110, 9.9, 0.5], [-13, 4.6, 30.5], "wall");
-  box([0.9, 0.35, 17.9], [42.1, 9.85, annex], "steel");
-  box([0.15, 1.55, 14.8], [42.46, 8.25, annex], "glass");
-  for (let z = -7.2; z <= 7.21; z += 0.8) {
-    box([0.2, 1.6, 0.055], [42.55, 8.25, annex + z], "shutter");
-    const height = 5.2 * (1 - (z / 8.2) ** 2);
-    box([0.12, height, 0.045], [42.16, 9.8 + height / 2, annex + z], "shutter");
+  // A hazy skyline behind a belt of trees fills the horizon below the landing headline.
+  for (let i = 0; i < 16; i++) {
+    const height = 6 + i * 37 % 9 * 2;
+    box([8 + i % 2 * 4, height, 4 + i % 3], [-262 - i % 3 * 7, height / 2 - 0.4, -40 + i * 5], "shutter");
   }
-  box([0.2, 0.06, 15.9], [42.26, 11.4, annex], "shutter");
-  box([0.85, 6.8, 2.5], [42, 3.1, annex - 7.2], "wall");
-  box([0.85, 6.8, 2.5], [42, 3.1, annex + 7.2], "wall");
-  box([0.25, 6.8, 12], [41.9, 3.1, annex], "shadow");
-  for (let z = -5.5; z <= 5.5; z += 1.1) box([0.12, 6.6, 0.045], [42.09, 3, annex + z], "steel");
-  box([0.2, 0.1, 16.5], [42.6, 5.9, annex], "marking");
+  for (let i = 0; i < 70; i++) {
+    const height = 7 + i * 17 % 5 * 1.6;
+    part(new THREE.ConeGeometry(height * 0.3, height, 7), "trees", [-150 - i * 53 % 95, height / 2 - 0.4, -45 + i * 29 % 85]);
+  }
 
   for (let x = -60; x <= 38; x += 14) {
     for (const z of [-12.6, -4, 4, 12.6]) box([0.22, 7.8, 0.22], [x, 3.55, z], "steel");

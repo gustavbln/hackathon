@@ -12,18 +12,18 @@ export default function Home() {
     <ChatWorkspace>
       <div className="blueprint-page flex min-h-svh min-w-0 flex-1 flex-col">
         <TrainScene>
-          <div className="flex items-center justify-between gap-4">
-            <p className="blueprint-label text-[var(--blueprint-ink)]">ComplyDo Solutions</p>
+          <div className="flex items-center justify-end gap-4">
             <p className="blueprint-label rounded-full border border-[var(--blueprint-ink)] bg-[var(--blueprint-paper)]/70 px-3 py-1.5 text-[var(--blueprint-ink)]">
               Runs on NVIDIA Nemotron
             </p>
           </div>
-          <section className="mt-[min(7svh,4rem)] max-w-3xl space-y-4" aria-labelledby="landing-heading">
+          <section className="mt-[min(3svh,1.5rem)] max-w-3xl space-y-4" aria-labelledby="landing-heading">
             <p className="blueprint-label text-[var(--blueprint-ink)]">Financial Risk Assessment / Supplier intelligence for rail</p>
             <h1 id="landing-heading" className="text-[clamp(2rem,4.5vw,3.75rem)] leading-none font-medium tracking-[-0.035em]">
-              Know your suppliers. Keep production moving.
+              Know your suppliers.<br />
+              Keep production moving.
             </h1>
-            <p className="w-fit max-w-sm rounded-sm bg-[var(--blueprint-paper)]/80 px-2 py-1 text-base text-[var(--blueprint-ink)] backdrop-blur-sm sm:text-lg">
+            <p className="max-w-md text-base text-[var(--blueprint-ink)] sm:text-lg">
               Weighted risk for 10,000 suppliers, part by part, from the train down to the seat.
             </p>
           </section>
