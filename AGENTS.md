@@ -21,7 +21,8 @@ Before each task, ask which of these it moves. None? Skip it.
 Deadline: TBD
 
 Video focus: one component, done really well end to end, including real suppliers outside the
-dataset. Component: TBD (proposal: brakes for a high-speed ICE).
+dataset. Component: seats on a high-speed train, with the real seat suppliers and how their
+company groups connect (parents, subsidiaries).
 
 ## Project
 
@@ -132,10 +133,14 @@ Split by folder so we rarely touch the same files.
 - Frontend owner: all pages and components, including chat, app shell, 3D train, explore and compare.
 - Dennis, chatbot functionality: `app/api/chat/` and shared server-side data, tools and Nemotron calls
   in `lib/`. Return typed data for supplier cards, comparisons and charts; leave frontend work to its owner.
-- Gustav: TBD
+- Gustav, supplier benchmark and real suppliers: `app/suppliers/`, `components/leaderboard/`,
+  `lib/market/`. A leaderboard like AI model benchmarks: the overall ranking for the chosen profile,
+  plus one chart per criterion comparing the top 20.
 
 `lib/` holds data access, scoring and tool functions: one source of truth that the UI, the chatbot
-and the agents all call. Shared files (`lib/`, `app/layout.tsx`, `app/globals.css`, `components/ui/`,
+and the agents all call. `lib/suppliers/` is the dataset foundation: `criteria.ts` (the 18 criteria
+with their exact weights), `dataset.ts` (server-only CSV loader), `profiles.ts` (weights per
+component and train type, each boost with its reason) and `scoring.ts` (profile risk and ranking). Shared files (`lib/`, `app/layout.tsx`, `app/globals.css`, `components/ui/`,
 `package.json`): small changes only, tell the team.
 
 Chat backend: `POST /api/chat`; request/response types and schemas in `lib/chat-contract.ts`.
