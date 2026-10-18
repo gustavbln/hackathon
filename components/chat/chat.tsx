@@ -16,7 +16,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Trace, TraceLine, TraceTitle } from "@/components/ui/trace"
 
 import { AssistantAvatar, assistantName } from "./assistant-avatar"
+import { useChatFocus } from "./chat-focus"
 import { ChatMessage } from "./chat-message"
+import { SeatBriefing } from "./seat-briefing"
 import type { ChatMessage as ChatMessageData, ChatStatus } from "./types"
 
 type ChatThreadProps = {
@@ -26,6 +28,8 @@ type ChatThreadProps = {
 }
 
 export function ChatThread({ messages, status, error }: ChatThreadProps) {
+  const { page } = useChatFocus()
+  if (messages.length === 0 && page?.page === "seat") return <SeatBriefing focus={page} />
   if (messages.length === 0) {
     return (
       <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-y-auto px-8 py-10 text-center">
