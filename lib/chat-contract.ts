@@ -86,6 +86,12 @@ export const nextSeatSuppliersSchema = z.strictObject({
   limit: z.number().int().min(1).max(20).default(10),
 });
 export const rerankSeatSchema = z.strictObject({ instruction: shortlistInstructionSchema });
+export const explainSupplierSchema = z.strictObject({
+  supplierId: supplierIdSchema,
+  /** The page opens the first alternative; only when the buyer asked to see one. */
+  openAlternative: z.boolean().default(false),
+});
+export const explainDriverSchema = z.strictObject({ driverKey: criterionKeySchema });
 export const chatRequestSchema = z.strictObject({
   message: z.string().trim().min(1).max(4_000),
   history: z.array(z.strictObject({ role: z.enum(["user", "assistant"]), content: z.string().max(2_000) })).max(12).default([]),

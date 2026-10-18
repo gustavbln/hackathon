@@ -80,6 +80,33 @@ export function ChatThread({ messages, status, error }: ChatThreadProps) {
   )
 }
 
+type PromptChipsProps = {
+  prompts: string[]
+  disabled: boolean
+  onPick: (prompt: string) => void
+}
+
+export function PromptChips({ prompts, disabled, onPick }: PromptChipsProps) {
+  if (prompts.length === 0) return null
+  return (
+    <div className="flex flex-wrap gap-2 px-4 pt-3" aria-label="Suggested questions">
+      {prompts.map((prompt) => (
+        <Button
+          key={prompt}
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={disabled}
+          onClick={() => onPick(prompt)}
+          className="h-auto rounded-full border-[var(--blueprint-rule)] bg-transparent px-3 py-1 text-xs font-normal text-[var(--blueprint-ink)] hover:border-[var(--blueprint-muted)] hover:bg-[var(--blueprint-grid)] hover:text-[var(--blueprint-ink)] dark:bg-transparent"
+        >
+          {prompt}
+        </Button>
+      ))}
+    </div>
+  )
+}
+
 type ChatComposerProps = {
   disabled: boolean
   onSend: (text: string) => void

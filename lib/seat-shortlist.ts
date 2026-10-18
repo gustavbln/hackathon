@@ -34,7 +34,7 @@ export async function nextSeatSupplierIds(weights: Weights, offset: number, limi
   return rankSuppliers(suppliers, weights).slice(offset, offset + limit).map(({ supplier }) => supplier.id);
 }
 
-async function seatWeights(source: ShortlistSource, instruction: string | null, signal: AbortSignal) {
+async function seatWeights(source: ShortlistSource, instruction: string | null, signal: AbortSignal, current: Weights | null) {
   if (source === "rules") {
     const { weights, boosts } = buildProfile("seats");
     return {
@@ -47,7 +47,7 @@ async function seatWeights(source: ShortlistSource, instruction: string | null, 
       })),
     };
   }
-  const evaluation = await evaluateSeatCriteria(signal, instruction);
+  const evaluation = await evaluateSeatCriteria(signal, instruction, current);
   return {
     weights: evaluation.weights,
     models: evaluation.models,
@@ -55,10 +55,11 @@ async function seatWeights(source: ShortlistSource, instruction: string | null, 
   };
 }
 
-export async function seatShortlist(source: ShortlistSource, instruction: string | null, signal: AbortSignal): Promise<SeatShortlist> {
+/** `current` is the weighting on screen: a Nemotron re-rank starts from it instead of from scratch. */
+export async function seatShortlist(source: ShortlistSource, instruction: string | null, signal: AbortSignal, current: Weights | null = null): Promise<SeatShortlist> {
   // Re-ranking is a Nemotron feature; the EN-standard profile is fixed.
   const steer = source === "nemotron" ? instruction : null;
-  const [suppliers, { weights, models, criteria }] = await Promise.all([loadDatasetSuppliers(), seatWeights(source, steer, signal)]);
+  const [suppliers, { weights, models, criteria }] = await Promise.all([loadDatasetSuppliers(), seatWeights(source, steer, signal, current)]);
   return seatShortlistSchema.parse({
     source,
     instruction: steer,

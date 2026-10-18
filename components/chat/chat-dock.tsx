@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type CSSProperties, type ReactNode } from "react"
+import { useEffect, useEffectEvent, useState, type CSSProperties, type ReactNode } from "react"
 import { ArrowLeftIcon, XIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -13,7 +13,7 @@ import { CRITERION_BY_KEY } from "@/lib/suppliers/criteria"
 import { encodeWeights } from "@/lib/suppliers/profiles"
 
 import { AssistantAvatar, assistantName } from "./assistant-avatar"
-import { ChatComposer, ChatThread } from "./chat"
+import { ChatComposer, ChatThread, PromptChips } from "./chat"
 import { ChatFocusProvider, useChatFocus } from "./chat-focus"
 import type { ChatMessage, ChatStatus } from "./types"
 
@@ -82,8 +82,16 @@ function ChatPanel() {
   const [status, setStatus] = useState<ChatStatus>("ready")
   const [error, setError] = useState<string | null>(null)
   const { isMobile, open, setOpen, openMobile, setOpenMobile } = useSidebar()
-  const { page, applyActions } = useChatFocus()
+  const { page, applyActions, onAsk } = useChatFocus()
   const router = useRouter()
+
+  // A page asks for the buyer (e.g. "Why is there this risk?"): open the panel, then send.
+  const askFromPage = useEffectEvent((question: string) => {
+    if (isMobile) setOpenMobile(true)
+    else setOpen(true)
+    if (status !== "pending") void send(question)
+  })
+  useEffect(() => onAsk((question) => askFromPage(question)), [onAsk])
 
   // Opening a supplier is navigation, so the dock handles it; everything else belongs to the page on screen.
   function apply(actions: PageAction[]) {
@@ -143,6 +151,7 @@ function ChatPanel() {
       </header>
       <ChatThread messages={messages} status={status} error={error} />
       <div className="shrink-0 border-t border-[var(--blueprint-rule)] pb-[env(safe-area-inset-bottom)] focus-within:border-[var(--blueprint-muted)]">
+        <PromptChips prompts={promptsFor(page)} disabled={status === "pending"} onPick={send} />
         <ChatComposer disabled={status === "pending"} onSend={send} />
       </div>
     </section>
@@ -167,6 +176,17 @@ function ChatPanel() {
       {open && panel}
     </Sidebar>
   )
+}
+
+/** One-click questions that fit the page; each one maps to a tool that answers it from the page's own data. */
+function promptsFor(page: PageContext | null): string[] {
+  if (!page) return []
+  if (page.page === "seat") return ["Why is #1 on top?", "Make quality matter more"]
+  if (page.page === "driver") {
+    const driver = CRITERION_BY_KEY[page.driverKey].label.toLowerCase()
+    return [`What does ${driver} mean for seats?`, `Worst of my top 20 on ${driver}`]
+  }
+  return ["Why is there this risk?", "Show a safer alternative"]
 }
 
 function describePage(page: PageContext): string {
