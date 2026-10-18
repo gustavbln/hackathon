@@ -164,9 +164,10 @@ Each person connects the Mobbin MCP in their own agent. It does not go into this
 - Look: "Tony Stark" blueprint. Edge lines and a soft glow, each part coloured by its supplier risk,
   smooth fly-to on click, hover callouts. Mobbin refs: Zillow 3D Home (hotspots plus side panel),
   Magnific 3D viewer.
-- Stack, installed in the container when you start: `three`, `@react-three/fiber@9`,
+- Installed 3D dependencies: `three`, `@react-three/fiber@9`,
   `@react-three/drei` (`CameraControls`, `Html`, `Edges`), `@react-three/postprocessing` (glow, off
-  on phones). Load the canvas client-side only (`next/dynamic` with `ssr: false`).
+  on phones), plus `@types/three` for TypeScript. Load the canvas client-side only
+  (`next/dynamic` with `ssr: false`).
 - Fallbacks: the [CC-BY ICE by gritsayilia](https://sketchfab.com/3d-models/ice-train-5718ef1a24f34e709bd6e35b7ada27b4)
   with hotspots, or a stylised ICE built from three.js shapes. Detail zoom:
   [Passenger Coach Bogie](https://sketchfab.com/3d-models/passenger-coach-bogie-99d906d4ec8e4b7293e560e08a4c84d8) (CC-BY-SA).
