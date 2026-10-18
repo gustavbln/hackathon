@@ -3,7 +3,6 @@
 import { useRef, useState, useSyncExternalStore } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrthographicCamera } from "@react-three/drei";
-import { PauseIcon, PlayIcon } from "lucide-react";
 import type { Group } from "three";
 
 import { Button } from "@/components/ui/button";
@@ -56,19 +55,17 @@ export default function SeatFocusCanvas({ seatId }: { seatId: string }) {
         <p className="blueprint-label">Selected component / {seatId}</p>
         <h2 className="mt-2 text-xl font-medium tracking-tight">Passenger seat</h2>
       </figcaption>
-      <div className="pointer-events-none min-h-0 flex-1" aria-label="3D seat model">
-        <Canvas dpr={[1, 1.5]} frameloop={rotating ? "always" : "demand"} gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-          fallback={<p className="p-5 text-sm text-[var(--blueprint-muted)]">The 3D preview is unavailable. Supplier analysis is still available.</p>}>
-          <SeatPreview seatId={seatId} rotating={rotating} palette={palette} />
-        </Canvas>
-      </div>
-      <div className="flex justify-center px-4 pb-5">
-        <Button variant="ghost" size="sm" disabled={prefersReducedMotion} aria-pressed={paused}
-          onClick={() => setPaused((current) => !current)} className="text-xs text-[var(--blueprint-muted)]">
-          {rotating ? <PauseIcon /> : <PlayIcon />}
-          {prefersReducedMotion ? "Motion reduced" : paused ? "Resume rotation" : "Pause rotation"}
-        </Button>
-      </div>
+      <Button variant="ghost" disabled={prefersReducedMotion} aria-pressed={paused}
+        aria-label={prefersReducedMotion ? "Seat model; reduced motion enabled" : rotating ? "Pause seat rotation" : "Resume seat rotation"}
+        onClick={() => setPaused((current) => !current)}
+        className="relative h-auto min-h-0 w-full flex-1 rounded-none p-0 hover:bg-transparent disabled:opacity-100">
+        <span className="pointer-events-none absolute inset-0 block" aria-label="3D seat model">
+          <Canvas dpr={[1, 1.5]} frameloop={rotating ? "always" : "demand"} gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
+            fallback={<span className="p-5 text-sm text-[var(--blueprint-muted)]">The 3D preview is unavailable. Supplier analysis is still available.</span>}>
+            <SeatPreview seatId={seatId} rotating={rotating} palette={palette} />
+          </Canvas>
+        </span>
+      </Button>
     </figure>
   );
 }

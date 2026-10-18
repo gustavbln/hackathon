@@ -3,6 +3,10 @@
 `cp .env.example .env`, add your Nebius key and Nemotron model ID, `docker compose up`, then open http://localhost:3000.
 Team rules: [AGENTS.md](AGENTS.md).
 
+If another checkout already uses port 3000, run
+`docker compose -f compose.yaml -f compose.preview.yaml up --build -d` and open http://localhost:3001.
+This preview has separate dependency and Next.js cache volumes so the checkouts cannot overwrite each other's installs.
+
 From the landing scene, choose **Enter cabin** to open `/cabin`: a blueprint interior with
 16 clickable seats, overhead luggage racks and ICE-inspired seat detailing. Drag to look around
 from a fixed position; scroll, pinch or use the zoom buttons to zoom. Reset view returns to the aisle.
@@ -12,7 +16,8 @@ The interior is a stylised original, informed by [DB’s ICE 4 overview](https:/
 Selecting a seat opens its top-20 supplier shortlist. Switch between the shared seat profile and
 three averaged Nemotron evaluations. Windows, the door and flooring open clearly labelled previews.
 The selected seat floats and rotates on the left while sourcing criteria and suppliers take the
-main panel on the right. Pause rotation or return to the cabin; reduced-motion preferences are respected.
+main panel on the right. Click the model or use Enter to pause rotation; reduced-motion preferences are respected.
+The selected view has one **Back to cabin** action in the page header, with no seat dropdown or extra rotation toolbar.
 Open Gauge in the cabin header: on desktop it docks beside the resized workspace; on phones it
 fills the screen. Closing and reopening keeps the conversation for the current page session.
 

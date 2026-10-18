@@ -1,19 +1,21 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { Component, useState, type ReactNode } from "react";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Minus, Plus, RotateCcw } from "lucide-react";
 import { ComponentPreviewPanel } from "@/components/cabin/component-preview-panel";
 import { SeatShortlistPanel } from "@/components/cabin/seat-shortlist-panel";
+import { ChatDock } from "@/components/chat/chat-dock";
 import { CABIN_COMPONENTS, CABIN_SEATS, type CabinComponentId } from "./cabin-layout";
 
 function CabinFallback({ loading = false }: { loading?: boolean }) {
   return (
     <div className="absolute inset-0 flex items-center justify-center p-8 text-center" role="status">
       <p className="text-sm text-[var(--blueprint-muted)]">
-        {loading ? "Preparing the preview…" : "The 3D preview is unavailable. You can still use the seat selector and supplier analysis."}
+        {loading ? "Preparing the preview…" : "The 3D preview is unavailable. You can still use the sourcing controls."}
       </p>
     </div>
   );
@@ -45,20 +47,8 @@ export function CabinScene() {
   const selectComponent = (id: CabinComponentId | null) => { setSelectedComponentId(id); setSelectedSeatId(null); };
   const componentLabel = CABIN_COMPONENTS.find(({ id }) => id === selectedComponentId)?.label;
 
-  if (selectedSeatId) {
-    return (
+  const scene = selectedSeatId ? (
       <section aria-label="Seat sourcing workspace" className="@container mt-6 flex min-h-0 flex-1 flex-col pb-6">
-        <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <Button variant="ghost" size="sm" onClick={() => selectSeat(null)} className="gap-2 px-0">
-            <ArrowLeft className="size-4" /> Back to cabin
-          </Button>
-          <div className="flex items-center gap-3">
-            <label htmlFor="cabin-seat" className="blueprint-label">Seat</label>
-            <NativeSelect id="cabin-seat" value={selectedSeatId} onChange={(event) => selectSeat(event.target.value)}>
-              {CABIN_SEATS.map((seat) => <NativeSelectOption key={seat.id} value={seat.id}>Seat {seat.id}</NativeSelectOption>)}
-            </NativeSelect>
-          </div>
-        </header>
         <div className="grid min-w-0 gap-5 @min-[720px]:grid-cols-[minmax(0,0.8fr)_minmax(0,1.8fr)]">
           <div className="relative h-72 overflow-hidden rounded-sm border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] animate-in fade-in-0 slide-in-from-right-8 duration-500 motion-reduce:animate-none @min-[720px]:h-auto">
             <CabinBoundary><SeatFocusCanvas seatId={selectedSeatId} /></CabinBoundary>
@@ -66,10 +56,7 @@ export function CabinScene() {
           <SeatShortlistPanel onClose={() => selectSeat(null)} />
         </div>
       </section>
-    );
-  }
-
-  return (
+  ) : (
     <section className="mt-6 flex flex-1 flex-col" aria-label="Interactive blueprint cabin">
       <div className="relative min-h-[420px] flex-1 overflow-hidden rounded-sm border border-[var(--blueprint-rule)] sm:min-h-[480px]">
         <div className="absolute inset-0">
@@ -102,5 +89,35 @@ export function CabinScene() {
       </footer>
       {selectedComponentId && <ComponentPreviewPanel componentId={selectedComponentId} onClose={() => selectComponent(null)} />}
     </section>
+  );
+
+  return (
+    <main className="blueprint-page relative flex min-h-svh min-w-0 flex-1 flex-col px-5 sm:px-10 lg:px-16">
+      <header className="flex items-center justify-between gap-4 border-b border-[var(--blueprint-rule)] py-6">
+        {selectedSeatId ? (
+          <Button variant="ghost" onClick={() => selectSeat(null)} className="min-h-9 gap-2 px-0 text-sm">
+            <ArrowLeft className="size-4" aria-hidden="true" /> Back to cabin
+          </Button>
+        ) : (
+          <Link href="/" className="flex min-h-9 items-center gap-2 text-sm hover:underline focus-visible:outline-2 focus-visible:outline-offset-4">
+            <ArrowLeft className="size-4" aria-hidden="true" /> Back to train
+          </Link>
+        )}
+        <div className="flex items-center gap-6">
+          <span className="blueprint-label hidden sm:block">HS—03 / Interior</span>
+          <ChatDock />
+        </div>
+      </header>
+      <section className="pt-7 sm:pt-9" aria-labelledby="cabin-heading">
+        <p className="blueprint-label mb-2">02 / Passenger compartment</p>
+        <h1 id="cabin-heading" className="text-3xl font-medium tracking-tight sm:text-4xl">
+          {selectedSeatId ? "Seat sourcing" : "Inside the cabin"}
+        </h1>
+        <p className="mt-2 text-sm text-[var(--blueprint-muted)]">
+          {selectedSeatId ? "Compare priorities and supplier risk for this component." : "Choose a seat to explore the train’s components."}
+        </p>
+      </section>
+      {scene}
+    </main>
   );
 }

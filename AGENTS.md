@@ -112,6 +112,9 @@ Data:
 
 ## Docker only
 
+Second checkout: add `-f compose.yaml -f compose.preview.yaml` to Docker Compose commands.
+It uses port 3001 and its own dependency/cache volumes; never share these volumes between checkouts.
+
 Nobody installs dependencies or runs `npm`, `npx` or `node` on their machine. Everything runs in the
 `web` container. The repo is mounted into it, so edits on your machine hot-reload instantly.
 `node_modules` and `.next` live in Docker volumes.

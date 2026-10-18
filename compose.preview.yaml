@@ -1,0 +1,6 @@
+name: hackathon-preview
+
+services:
+  web:
+    ports: !override
+      - "3001:3000"
