@@ -13,7 +13,8 @@ interface ResearchedProfileProps {
 /** A real company the agents researched: the briefing, the risk picture from evidence, every agent and source. */
 export function ResearchedProfile({ researched, weights, query }: ResearchedProfileProps) {
   const supplier = toSupplier(researched);
-  const scored = Object.values(researched.agents).filter((agent) => agent?.status === "estimated").length;
+  const agents = Object.values(researched.agents);
+  const scored = agents.filter((agent) => agent?.status === "estimated").length;
   const date = new Date(researched.researchedAt).toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric" });
 
   return (
@@ -33,15 +34,15 @@ export function ResearchedProfile({ researched, weights, query }: ResearchedProf
         </p>
         <p className="mt-3 leading-relaxed">{researched.summary}</p>
         <p className="mt-2 text-xs text-[var(--blueprint-muted)]">
-          Estimated from public sources by Nemotron agents, on the dataset&apos;s 0–100 scale. {scored} of 18 drivers have
-          evidence; the others stay unscored instead of guessed. Not comparable one to one with Siemens&apos; data.
+          Estimated from public sources by Nemotron agents, on the dataset&apos;s 0–100 scale. {scored} of {agents.length} researched
+          drivers have evidence; the others stay unscored instead of guessed. Not comparable one to one with Siemens&apos; data.
         </p>
       </section>
 
       <SupplierDetail scores={supplier.scores} weights={weights} query={query} />
 
       <section aria-labelledby="agents-heading" className="flex flex-col gap-3">
-        <h2 id="agents-heading" className="blueprint-label">18 agents, one per risk driver · open one to see why</h2>
+        <h2 id="agents-heading" className="blueprint-label">{agents.length} agents, one per seat risk driver · open one for its report</h2>
         <AgentGrid agents={researched.agents} sources={researched.sources} />
       </section>
 

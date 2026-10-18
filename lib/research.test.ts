@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { researchedIdFor, researchedSupplierSchema, toSupplier, type ResearchedSupplier } from "./research/contract.ts";
-import { extractJson, isVerbatim, mentionsCompany } from "./research/evidence.ts";
+import { extractJson, isVerbatim, mentionsCompany, relevantPassages } from "./research/evidence.ts";
 
 test("quotes count only when they appear verbatim in the fetched text", () => {
   const page = "In 2025 the group reported   a net loss of EUR 12 million.\nRevenue grew 4%.";
@@ -28,8 +28,8 @@ function researched(overrides: Partial<ResearchedSupplier> = {}): ResearchedSupp
     summary: "Fictional test company.",
     insights: [],
     agents: {
-      quality: { status: "estimated", estimate: { value: 30, confidence: "medium", rationale: "Recall in 2025.", sourceIds: [1] }, thread: [] },
-      compliance: { status: "no_evidence", estimate: null, thread: [] },
+      quality: { status: "estimated", estimate: { value: 30, confidence: "medium", rationale: "Recall in 2025.", sourceIds: [1] }, report: { headline: "One recall in 2025.", findings: [{ text: "A recall was announced in 2025.", sourceIds: [1] }], openQuestions: [] }, thread: [] },
+      compliance: { status: "no_evidence", estimate: null, report: null, thread: [] },
     },
     sources: [{ id: 1, url: "https://example.com/news", title: "News", publishedAt: null, quote: "A recall was announced in 2025." }],
     run: { seconds: 1, costUsd: 0, tavilyCredits: 0, models: [] },
@@ -48,6 +48,9 @@ test("estimates must cite sources that exist", () => {
   assert.equal(researchedSupplierSchema.safeParse(researched()).success, true);
   const broken = researched({ insights: [{ headline: "Unbacked claim", criterion: null, sourceIds: [9] }] });
   assert.equal(researchedSupplierSchema.safeParse(broken).success, false);
+  const quality = researched().agents.quality;
+  const unbackedReport = researched({ agents: { quality: quality && { ...quality, report: { headline: "Recall", findings: [{ text: "Unbacked", sourceIds: [9] }], openQuestions: [] } } } });
+  assert.equal(researchedSupplierSchema.safeParse(unbackedReport).success, false);
 });
 
 test("evidence must name the company, not just share its industry", () => {
@@ -59,4 +62,10 @@ test("evidence must name the company, not just share its industry", () => {
 test("model replies with reasoning around the JSON still parse, and prose alone does not", () => {
   assert.deepEqual(extractJson('We need to answer.\n```json\n{"value": 3}\n```'), { value: 3 });
   assert.equal(extractJson("We need to think about this first."), null);
+});
+
+test("long pages are read where they talk about the risk, not where their navigation is", () => {
+  const page = ["Home | Investors | Careers", ...Array.from({ length: 200 }, (_, index) => `Product line ${index} for seating.`), "Net income fell after a refinancing of the syndicated loan."].join("\n");
+  const passages = relevantPassages(page, ["refinancing liquidity equity ratio", "net income results"], 400);
+  assert.deepEqual(passages, ["Net income fell after a refinancing of the syndicated loan."]);
 });

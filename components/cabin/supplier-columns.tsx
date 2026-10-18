@@ -154,7 +154,7 @@ export function SupplierColumns({ suppliers, researched, supplierCount, active, 
               <span>
                 Would rank #{company.rankBest.toLocaleString("en")}–#{company.rankWorst.toLocaleString("en")} of {supplierCount.toLocaleString("en")}
               </span>
-              <span>{company.unknownDrivers} of 18 drivers without public evidence</span>
+              <span>{company.unknownDrivers} weighted drivers without public evidence</span>
             </TooltipContent>
           </Tooltip>
         ))}

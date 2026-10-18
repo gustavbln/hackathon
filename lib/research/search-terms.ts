@@ -1,23 +1,27 @@
 import type { CriterionKey } from "../suppliers/criteria.ts";
 
-export interface ResearchDesk {
-  id: string;
-  label: string;
-  /** The driver agents that read this desk's results. */
-  drivers: CriterionKey[];
-  /** Appended to the quoted company name. Fixed in code so every company gets the same, reviewable plan. */
-  searches: readonly [string, string];
-}
-
 /**
- * Six desks search for related drivers together: 12 searches per company instead of 36, which keeps a run within
- * Tavily's rate limit and a third of the credits. Every driver still gets its own agent that reads and judges.
+ * Three searches per driver agent, appended to the quoted company name: the core question, recent news, and an
+ * official or third-party angle. Fixed in code so every company gets the same reviewable plan (Lightning invented
+ * unusable queries when asked to plan).
  */
-export const RESEARCH_DESKS: ResearchDesk[] = [
-  { id: "finance", label: "Finance desk", drivers: ["financialHealth", "creditRating"], searches: ["annual report revenue net income results 2025", "profit warning loss restructuring refinancing credit rating"] },
-  { id: "legal", label: "Legal desk", drivers: ["compliance", "governance"], searches: ["lawsuit fine investigation court proceedings", "management board CEO change corporate governance"] },
-  { id: "operations", label: "Operations desk", drivers: ["quality", "operationalResilience", "subTierVisibility", "digitalSecurity"], searches: ["recall defect quality production problems", "plant closure supply chain disruption cyber attack"] },
-  { id: "people", label: "People & environment desk", drivers: ["workplaceSafety", "laborStability", "esg"], searches: ["sustainability report CO2 emissions EcoVadis", "workplace accident strike union layoffs"] },
-  { id: "location", label: "Location desk", drivers: ["geopolitical", "politicalStability", "environmentalExposure"], searches: ["plants countries production locations", "geopolitical risk sanctions tariffs natural disaster"] },
-  { id: "reputation", label: "Reputation desk", drivers: ["mediaSentiment", "marketSentiment", "externalIntelligence", "industryBenchmark"], searches: ["news controversy criticism reputation", "market share competitors analysts share price"] },
-];
+export const SEARCH_TERMS: Record<CriterionKey, readonly [string, string, string]> = {
+  financialHealth: ["annual report revenue net income results", "profit warning loss restructuring 2025 2026", "refinancing liquidity equity ratio"],
+  operationalResilience: ["plant closure production stop", "supply disruption capacity 2025 2026", "production sites manufacturing footprint"],
+  quality: ["recall defect quality problems", "quality issues customers 2025 2026", "quality certification IATF IRIS award"],
+  compliance: ["lawsuit fine investigation", "court proceedings regulator 2025 2026", "antitrust penalty compliance violation"],
+  subTierVisibility: ["supply chain due diligence suppliers", "supplier problems bottleneck 2025 2026", "supplier code of conduct human rights"],
+  workplaceSafety: ["workplace accident injury", "occupational safety incident 2025 2026", "lost time injury rate safety report"],
+  creditRating: ["credit rating outlook", "rating downgrade upgrade 2025 2026", "bond loan covenant financing"],
+  esg: ["sustainability report CO2 targets", "ESG rating EcoVadis CDP 2025", "emissions environmental controversy"],
+  governance: ["management board CEO change", "governance shareholder dispute 2025 2026", "major shareholder ownership takeover"],
+  geopolitical: ["production countries locations", "sanctions tariffs China exposure 2025 2026", "geopolitical risk supply chain"],
+  industryBenchmark: ["market share competitors", "compared with peers 2025", "industry ranking position"],
+  laborStability: ["strike union works council", "job cuts layoffs protest 2025 2026", "collective agreement workforce"],
+  environmentalExposure: ["plant flood earthquake extreme weather", "natural disaster factory site", "climate physical risk locations"],
+  digitalSecurity: ["cyber attack ransomware", "data breach IT outage 2025 2026", "information security certification TISAX"],
+  politicalStability: ["political risk countries operations", "government policy trade restrictions 2025 2026", "country risk exposure"],
+  mediaSentiment: ["news controversy criticism", "press coverage 2025 2026", "reputation scandal"],
+  externalIntelligence: ["analyst risk assessment", "rating agency report 2025", "research note outlook"],
+  marketSentiment: ["share price investors analysts", "stock outlook 2025 2026", "customer perception brand"],
+};

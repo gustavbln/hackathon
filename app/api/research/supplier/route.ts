@@ -4,7 +4,7 @@ import { listResearched } from "@/lib/research/store";
 import { CRITERIA } from "@/lib/suppliers/criteria";
 
 export const runtime = "nodejs";
-export const maxDuration = 200;
+export const maxDuration = 300;
 
 /** Researched companies as ranking rows: scores in CRITERIA order, null where no evidence was found. */
 export async function GET() {

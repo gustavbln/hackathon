@@ -7,11 +7,16 @@ export const criterionKeySchema = z.enum(CRITERIA.map(({ key }) => key));
 /** Researched companies get ids that can never collide with the anonymized `SUPP_00001` rows. */
 export const researchedIdSchema = z.string().regex(/^EXT_[a-z0-9-]{2,60}$/);
 
+/** The drivers a seat buyer weighs when the page sends none: the seat view's usual seven. */
+export const DEFAULT_DRIVERS = ["financialHealth", "operationalResilience", "quality", "compliance", "subTierVisibility", "laborStability", "esg"] as const;
+
 export const researchInputSchema = z.strictObject({
   name: z.string().trim().min(2).max(120),
   website: z.url().nullable().default(null),
   /** What the buyer already knows; context for the agents, never evidence. */
   brief: z.string().trim().max(600).default(""),
+  /** One agent per driver, e.g. the drivers the seat view weighs. */
+  drivers: z.array(criterionKeySchema).min(1).max(8).default([...DEFAULT_DRIVERS]),
 });
 
 export const researchSourceSchema = z.strictObject({
@@ -33,16 +38,24 @@ export const criterionEstimateSchema = z.strictObject({
 
 /** One line of a driver agent's visible thread: what it planned, searched, kept and concluded. */
 export const threadEntrySchema = z.strictObject({
-  kind: z.enum(["plan", "search", "evidence", "verdict", "note"]),
+  kind: z.enum(["plan", "search", "read", "evidence", "follow_up", "verdict", "note"]),
   text: z.string().trim().min(1).max(600),
   sourceIds: z.array(z.number().int().min(1)).max(10),
   model: z.string().nullable(),
 });
 
+/** The agent's written result, Perplexity-style: a headline, cited findings and what it could not settle. */
+export const driverReportSchema = z.strictObject({
+  headline: z.string().trim().min(1).max(200),
+  findings: z.array(z.strictObject({ text: z.string().trim().min(1).max(400), sourceIds: z.array(z.number().int().min(1)).min(1).max(6) })).max(6),
+  openQuestions: z.array(z.string().trim().min(1).max(200)).max(4),
+});
+
 export const driverAgentSchema = z.strictObject({
   status: z.enum(["estimated", "no_evidence", "failed"]),
   estimate: criterionEstimateSchema.nullable(),
-  thread: z.array(threadEntrySchema).max(40),
+  report: driverReportSchema.nullable().default(null),
+  thread: z.array(threadEntrySchema).max(60),
 });
 
 export const researchedSupplierSchema = z
@@ -78,7 +91,11 @@ export const researchedSupplierSchema = z
     const known = new Set(sources.map(({ id }) => id));
     if (known.size !== sources.length) context.addIssue({ code: "custom", message: "Source ids must be unique" });
     const cited = [
-      ...Object.values(agents).flatMap((agent) => [...(agent?.estimate?.sourceIds ?? []), ...(agent?.thread.flatMap(({ sourceIds }) => sourceIds) ?? [])]),
+      ...Object.values(agents).flatMap((agent) => [
+        ...(agent?.estimate?.sourceIds ?? []),
+        ...(agent?.thread.flatMap(({ sourceIds }) => sourceIds) ?? []),
+        ...(agent?.report?.findings.flatMap(({ sourceIds }) => sourceIds) ?? []),
+      ]),
       ...insights.flatMap(({ sourceIds }) => sourceIds),
     ];
     for (const id of new Set(cited)) {
@@ -109,6 +126,7 @@ export type ResearchSource = z.infer<typeof researchSourceSchema>;
 export type CriterionEstimate = z.infer<typeof criterionEstimateSchema>;
 export type ThreadEntry = z.infer<typeof threadEntrySchema>;
 export type DriverAgent = z.infer<typeof driverAgentSchema>;
+export type DriverReport = z.infer<typeof driverReportSchema>;
 export type ResearchedSupplier = z.infer<typeof researchedSupplierSchema>;
 export type ResearchEvent = z.infer<typeof researchEventSchema>;
 

@@ -30,3 +30,23 @@ export function extractJson(content: string): unknown {
     return null;
   }
 }
+
+/**
+ * The lines of a long page that matter for one risk: ranked by how many of the topic's words they contain, kept in
+ * page order up to the limit. Long reports put the relevant part far below their navigation.
+ */
+export function relevantPassages(text: string, topic: string[], limit: number): string[] {
+  const lines = text.split(/\n+/).map((line) => line.trim()).filter((line) => line.length > 0);
+  if (text.length <= limit) return lines;
+  const words = [...new Set(topic.flatMap((part) => part.toLowerCase().match(/[a-z0-9]{4,}/g) ?? []))];
+  const scored = lines.map((line, index) => ({ line, index, score: words.filter((word) => line.toLowerCase().includes(word)).length }));
+  const kept = new Set<number>();
+  let length = 0;
+  for (const { line, index, score } of [...scored].sort((a, b) => b.score - a.score)) {
+    if (score === 0) break;
+    if (length + line.length > limit) continue;
+    kept.add(index);
+    length += line.length;
+  }
+  return kept.size > 0 ? scored.filter(({ index }) => kept.has(index)).map(({ line }) => line) : [text.slice(0, limit)];
+}
