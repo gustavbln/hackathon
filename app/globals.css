@@ -59,6 +59,10 @@
   --blueprint-muted: #c3deef;
   --blueprint-rule: #ffffff30;
   --blueprint-grid: #ffffff0b;
+  --risk-low: #7fe0bd;
+  --risk-medium: #f2dc85;
+  --risk-high: #f6a15e;
+  --risk-critical: #ff7088;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

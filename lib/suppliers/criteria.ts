@@ -35,8 +35,13 @@ export const CRITERIA = [
   { key: "marketSentiment", column: "Market_Sentiment_Score", label: "Market sentiment", weight: 0.03, group: "company" },
 ] as const satisfies readonly Criterion[];
 
-export type CriterionKey = (typeof CRITERIA)[number]["key"];
+export type CriterionInfo = (typeof CRITERIA)[number];
+export type CriterionKey = CriterionInfo["key"];
 export type Weights = Record<CriterionKey, number>;
+
+export const CRITERION_BY_KEY = Object.fromEntries(
+  CRITERIA.map((criterion) => [criterion.key, criterion]),
+) as Record<CriterionKey, CriterionInfo>;
 
 export const TOTAL_RISK_WEIGHTS = Object.fromEntries(
   CRITERIA.map((criterion) => [criterion.key, criterion.weight]),

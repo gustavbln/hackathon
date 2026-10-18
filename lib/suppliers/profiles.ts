@@ -14,6 +14,13 @@ export const COMPONENTS = [
 export type TrainType = (typeof TRAIN_TYPES)[number]["id"];
 export type ComponentId = (typeof COMPONENTS)[number]["id"];
 
+export const TRAIN_TYPE_LABEL = Object.fromEntries(
+  TRAIN_TYPES.map((option) => [option.id, option.label]),
+) as Record<TrainType, string>;
+export const COMPONENT_LABEL = Object.fromEntries(
+  COMPONENTS.map((option) => [option.id, option.label]),
+) as Record<ComponentId, string>;
+
 /** Multiplies one criterion's weight, with the reason a buyer sees. */
 export interface Boost {
   criterion: CriterionKey;
