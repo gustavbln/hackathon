@@ -1,7 +1,6 @@
 import { ArmchairIcon } from "lucide-react"
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -16,9 +15,6 @@ export function SeatCriteriaView({ result }: { result: SeatCriteriaResponse }) {
             <ArmchairIcon className="size-3.5" aria-hidden="true" />
             Seat sourcing
           </span>
-          <Badge variant="outline" className="border-[var(--blueprint-rule)] text-[var(--blueprint-muted)]">
-            AI suggested
-          </Badge>
         </div>
         <CardTitle className="text-base font-medium tracking-tight">What matters most for seats?</CardTitle>
         <CardDescription className="text-xs leading-relaxed text-[var(--blueprint-muted)]">
