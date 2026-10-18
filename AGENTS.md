@@ -138,6 +138,9 @@ Split by folder so we rarely touch the same files.
 and the agents all call. Shared files (`lib/`, `app/layout.tsx`, `app/globals.css`, `components/ui/`,
 `package.json`): small changes only, tell the team.
 
+Chat backend: `POST /api/chat`; request/response types and schemas in `lib/chat-contract.ts`.
+Uses `zod`, `csv-parse`, `server-only`; focused backend checks run with `npm test` in Docker.
+
 ## Git on a shared main
 
 Once per clone:
