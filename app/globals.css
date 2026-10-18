@@ -49,15 +49,16 @@
 }
 
 :root {
-  --train-surface: #e7edf0;
-  --train-line: #245781;
-  --train-glass: #aec7d7;
-  --train-mechanical: #8199aa;
-  --blueprint-paper: #f5f3ed;
-  --blueprint-ink: #234d6b;
-  --blueprint-muted: #657d8d;
-  --blueprint-rule: #ccd5d8;
-  --blueprint-grid: #2457810a;
+  --train-surface: #17598a;
+  --train-line: #d7f2ff;
+  --train-glass: #2475a5;
+  --train-mechanical: #124b78;
+  --blueprint-paper: #236da2;
+  --blueprint-paper-deep: #15548c;
+  --blueprint-ink: #eff8ff;
+  --blueprint-muted: #c3deef;
+  --blueprint-rule: #ffffff30;
+  --blueprint-grid: #ffffff0b;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -139,7 +140,12 @@
 }
 
 .blueprint-page {
-  background: var(--blueprint-paper);
+  background-color: var(--blueprint-paper);
+  background-image:
+    linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px),
+    linear-gradient(145deg, var(--blueprint-paper-deep), var(--blueprint-paper));
+  background-size: 32px 32px, 32px 32px, 100% 100%;
   color: var(--blueprint-ink);
 }
 
@@ -149,16 +155,4 @@
   font-size: 10px;
   letter-spacing: 0.13em;
   text-transform: uppercase;
-}
-
-.blueprint-scene::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  pointer-events: none;
-  background-image:
-    linear-gradient(var(--blueprint-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--blueprint-grid) 1px, transparent 1px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at center, black 20%, transparent 72%);
 }

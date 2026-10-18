@@ -3,10 +3,10 @@
 `high-speed-train.glb` is an original procedural, stylised high-speed train created for this project.
 It uses no third-party model, logos, textures, or manufacturer-specific geometry.
 
-![Browser-rendered train preview](high-speed-train-preview.png)
+![Geometry preview in the original light palette](high-speed-train-preview.png)
 
 - Three cars: two streamlined power cars and a central passenger carriage.
-- Pale body surfaces, blue contour lines, windows, windscreens, doors, gangways, bogies and wheels.
+- Blue body surfaces, pale contour lines, windows, windscreens, doors, gangways, bogies and wheels.
 - X runs along the train, Y is up; the ground is Y = 0 and the train is centred along X and Z.
 - Approximately 35 metres long. Proportions are illustrative, not engineering measurements.
 - Named meshes allow later material overrides. No camera, lighting, track or animation is baked in.

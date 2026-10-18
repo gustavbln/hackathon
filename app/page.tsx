@@ -18,12 +18,12 @@ export default function Home() {
         <span className="blueprint-label hidden sm:block">Rail systems / Procurement</span>
       </header>
 
-      <section className="pt-12 text-center sm:pt-16" aria-labelledby="landing-heading">
+      <section className="pt-9 text-left sm:pt-12" aria-labelledby="landing-heading">
         <p className="blueprint-label mb-4">A clearer perspective</p>
-        <h1 id="landing-heading" className="mx-auto max-w-4xl text-4xl leading-[1.08] font-medium tracking-[-0.045em] sm:text-6xl lg:text-7xl">
+        <h1 id="landing-heading" className="max-w-xl text-3xl leading-[1.12] font-medium tracking-[-0.035em] sm:text-4xl lg:text-5xl">
           Supply Chain<br />Risk Assessment
         </h1>
-        <p className="mx-auto mt-5 max-w-lg text-sm leading-relaxed text-[var(--blueprint-muted)] sm:text-base">
+        <p className="mt-4 max-w-lg text-sm leading-relaxed text-[var(--blueprint-muted)]">
           Understand the suppliers behind every component.{" "}<br className="hidden sm:block" />
           Make confident decisions across your supply chain.
         </p>
