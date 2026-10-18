@@ -15,7 +15,7 @@ export function CabinFocus({ seatId, world, seats, zoom, rotating, reducedMotion
 }) {
   const { camera, size, invalidate } = useThree();
   const home = useRef<View | null>(null);
-  const motion = useRef<(View & { elapsed: number; mix: number }) | null>(null);
+  const motion = useRef<(View & { startedAt: number; mix: number }) | null>(null);
   const mix = useRef(0);
   const activeSeat = useRef<string | null>(null);
   const finishes = useRef<Finish[]>([]);
@@ -28,10 +28,10 @@ export function CabinFocus({ seatId, world, seats, zoom, rotating, reducedMotion
     const view = { position: camera.position.clone(), quaternion: camera.quaternion.clone(), fov: camera.fov };
     if (seatId && !home.current) home.current = view;
     if (seatId) activeSeat.current = seatId;
-    motion.current = { ...view, elapsed: 0, mix: mix.current };
+    motion.current = { ...view, startedAt: performance.now(), mix: mix.current };
 
     for (const finish of finishes.current) Object.assign(finish.material, {
-      opacity: finish.opacity, transparent: finish.transparent, depthWrite: finish.depthWrite,
+      opacity: finish.opacity, transparent: finish.transparent, depthWrite: finish.depthWrite, needsUpdate: true,
     });
     const materials = new Set<Material>();
     const collect = (object: Object3D) => {
@@ -46,6 +46,7 @@ export function CabinFocus({ seatId, world, seats, zoom, rotating, reducedMotion
       finish.material.transparent = true;
       finish.material.depthWrite = false;
       finish.material.opacity = finish.opacity * (1 - mix.current);
+      finish.material.needsUpdate = true;
     }
     Object.assign(world.current, { visible: true });
     for (const seat of seats.current.children) Object.assign(seat, { visible: true });
@@ -65,8 +66,8 @@ export function CabinFocus({ seatId, world, seats, zoom, rotating, reducedMotion
       return;
     }
 
-    animation.elapsed += Math.min(delta, 0.05);
-    const t = reducedMotion ? 1 : Math.min(animation.elapsed / 0.85, 1);
+    // Use the same wall clock as the CSS layout transition, including on slower GPUs.
+    const t = reducedMotion ? 1 : Math.min((performance.now() - animation.startedAt) / 850, 1);
     const eased = t * t * (3 - 2 * t);
     mix.current = MathUtils.lerp(animation.mix, seatId ? 1 : 0, eased);
     const target = new Vector3(...seat.position).add(new Vector3(2, 1.8, 3));
@@ -96,7 +97,7 @@ export function CabinFocus({ seatId, world, seats, zoom, rotating, reducedMotion
     if (t < 1 || (seatId && rotating && !reducedMotion)) invalidate();
     if (!seatId && t === 1) {
       for (const finish of finishes.current) Object.assign(finish.material, {
-        opacity: finish.opacity, transparent: finish.transparent, depthWrite: finish.depthWrite,
+        opacity: finish.opacity, transparent: finish.transparent, depthWrite: finish.depthWrite, needsUpdate: true,
       });
       finishes.current = [];
       motion.current = null;

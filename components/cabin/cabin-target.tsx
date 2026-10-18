@@ -24,7 +24,7 @@ export function CabinTarget({ onSelect, children }: { onSelect: () => void; chil
     >
       {children}
       {hovered && (
-        <Html position={[0, 4.8, 0]} center zIndexRange={[20, 0]} className="pointer-events-none">
+        <Html position={[-5.9, 4.8, 0]} center zIndexRange={[20, 0]} className="pointer-events-none">
           <span className="blueprint-label border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)]/90 px-2 py-1 whitespace-nowrap text-[var(--blueprint-ink)] backdrop-blur-sm">
             Passenger cabin / Seats
           </span>

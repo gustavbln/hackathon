@@ -76,7 +76,9 @@ export function CabinScene({ initialSeatId = null }: { initialSeatId?: string | 
         <div className={`grid min-w-0 transition-[grid-template-columns,gap] duration-[850ms] ease-in-out motion-reduce:transition-none ${focused ? "gap-5 @min-[720px]:grid-cols-[minmax(0,0.8fr)_minmax(0,1.8fr)]" : "gap-0 @min-[720px]:grid-cols-[minmax(0,1fr)_minmax(0,0fr)]"}`}>
           <figure aria-label={focused ? `Seat ${selectedSeatId} preview` : "Cabin panorama"}
             className={`relative min-w-0 overflow-hidden rounded-sm border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] transition-[height] duration-[850ms] motion-reduce:transition-none ${focused ? "h-80 @min-[720px]:h-[40rem]" : "h-[calc(100svh-10rem)] min-h-[420px]"}`}>
-            <div className="absolute inset-0">
+            {/* One fixed canvas size, centred and cropped by the frame: resizing WebGL during the
+                850 ms layout change painted blank grey frames. The seat stays centred, so the crop is safe. */}
+            <div className="absolute top-1/2 left-1/2 h-[max(calc(100svh-10rem),40rem)] w-[calc(100vw-2.5rem)] -translate-x-1/2 -translate-y-1/2">
               <CabinBoundary>
                 <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={selectSeat}
                   selectedComponentId={selectedComponentId} onComponentSelect={selectComponent}

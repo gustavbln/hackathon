@@ -162,17 +162,15 @@ export function createTrain(palette: TrainPalette) {
     }
   }
 
-  carriage(11.8, 1, true, "Front power car");
-  carriage(0, 1, false, "Passenger carriage");
-  carriage(-11.8, -1, true, "Rear power car");
-  for (const x of [-5.9, 5.9]) {
-    box("Flexible gangway", [0.6, 2.5, 2.35], [x, 2.4, 0], mechanical);
-    for (const dx of [-0.2, 0, 0.2]) {
-      line([[x + dx, 1.15, -1.19], [x + dx, 3.65, -1.19], [x + dx, 3.65, 1.19], [x + dx, 1.15, 1.19]]);
-    }
+  // Two cars, centred on the gangway between them.
+  carriage(5.9, 1, true, "Front power car");
+  carriage(-5.9, 1, false, "Passenger carriage");
+  box("Flexible gangway", [0.6, 2.5, 2.35], [0, 2.4, 0], mechanical);
+  for (const dx of [-0.2, 0, 0.2]) {
+    line([[dx, 1.15, -1.19], [dx, 3.65, -1.19], [dx, 3.65, 1.19], [dx, 1.15, 1.19]]);
   }
-  box("Roof ventilation unit", [2.0, 0.12, 1.1], [0, 3.99, 0]);
-  for (let x = -0.85; x <= 0.85; x += 0.17) line([[x, 4.055, -0.48], [x, 4.055, 0.48]]);
+  box("Roof ventilation unit", [2.0, 0.12, 1.1], [-5.9, 3.99, 0]);
+  for (let x = -6.75; x <= -5.05; x += 0.17) line([[x, 4.055, -0.48], [x, 4.055, 0.48]]);
   const lineGeometry = new THREE.BufferGeometry();
   lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(strokes, 3));
   const contours = new THREE.LineSegments(lineGeometry, ink);
