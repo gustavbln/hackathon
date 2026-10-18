@@ -298,7 +298,13 @@ async function readTop(results: WebResult[], topic: string[], context: Run, log:
     const full = read.pages.find(({ url }) => url === result.url);
     const content = full?.content ?? result.content;
     const passages = relevantPassages(content, topic, PASSAGE_CHARS);
-    log({ kind: "read", text: `${full ? "Read" : "Skimmed"} ${hostOf(result.url)}: ${result.title} · ${content.length.toLocaleString("en")} characters${content.length > PASSAGE_CHARS ? `, ${passages.length} relevant passages` : ""}`, sourceIds: [], model: null });
+    log({
+      kind: "read",
+      text: `${full ? "Read" : "Skimmed"} ${hostOf(result.url)}: ${result.title} · ${content.length.toLocaleString("en")} characters${content.length > PASSAGE_CHARS ? `, ${passages.length} relevant passages` : ""}`,
+      sourceIds: [],
+      model: null,
+      page: { url: result.url, title: result.title.slice(0, 300) || hostOf(result.url) },
+    });
     return { url: result.url, content, title: result.title, publishedAt: result.publishedDate, passages };
   });
 }

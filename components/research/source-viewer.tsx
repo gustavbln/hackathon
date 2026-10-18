@@ -9,20 +9,23 @@ import { Spinner } from "@/components/ui/spinner";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { ResearchSource } from "@/lib/research/contract";
 
-const OpenSource = createContext<((source: ResearchSource) => void) | null>(null);
+/** What the panel opens: a quote an agent cited, or a page it read. */
+export type ViewedSource = Pick<ResearchSource, "url" | "title"> & Partial<Pick<ResearchSource, "id" | "publishedAt" | "quote" | "excerpt">>;
+
+const OpenSource = createContext<((source: ViewedSource) => void) | null>(null);
 const embeddingSchema = z.object({ embeddable: z.boolean(), pdf: z.boolean() });
 
 type View = "page" | "context";
 
 /** Opens cited sources in a panel on the right: the live page where the site allows it, otherwise the passage the agent read. */
 export function SourceViewerProvider({ children }: { children: ReactNode }) {
-  const [source, setSource] = useState<ResearchSource | null>(null);
+  const [source, setSource] = useState<ViewedSource | null>(null);
   return (
     <OpenSource value={setSource}>
       {children}
       <Sheet open={source !== null} onOpenChange={(open) => !open && setSource(null)}>
         <SheetContent className="gap-0 bg-[var(--blueprint-paper)] text-[var(--blueprint-ink)] data-[side=right]:w-full data-[side=right]:sm:max-w-3xl">
-          {source && <SourcePanel key={`${source.id}-${source.url}`} source={source} />}
+          {source && <SourcePanel key={`${source.id ?? ""}-${source.url}`} source={source} />}
         </SheetContent>
       </Sheet>
     </OpenSource>
@@ -30,7 +33,7 @@ export function SourceViewerProvider({ children }: { children: ReactNode }) {
 }
 
 /** A link to a source: opens the panel on a plain click, a new tab on Cmd/Ctrl-click. */
-export function SourceLink({ source, className, children }: { source: ResearchSource; className?: string; children: ReactNode }) {
+export function SourceLink({ source, className, children }: { source: ViewedSource; className?: string; children: ReactNode }) {
   const open = use(OpenSource);
   const onClick = (event: MouseEvent) => {
     if (!open || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -38,13 +41,13 @@ export function SourceLink({ source, className, children }: { source: ResearchSo
     open(source);
   };
   return (
-    <a href={source.url} target="_blank" rel="noreferrer" title={source.quote} onClick={onClick} className={className}>
+    <a href={source.url} target="_blank" rel="noreferrer" title={source.quote ?? source.title} onClick={onClick} className={className}>
       {children}
     </a>
   );
 }
 
-function SourcePanel({ source }: { source: ResearchSource }) {
+function SourcePanel({ source }: { source: ViewedSource }) {
   const [embedding, setEmbedding] = useState<z.infer<typeof embeddingSchema> | null>(null);
   const [chosen, setChosen] = useState<View | null>(null);
   const host = new URL(source.url).hostname.replace(/^www\./, "");
@@ -66,11 +69,14 @@ function SourcePanel({ source }: { source: ResearchSource }) {
     <>
       <SheetHeader className="gap-2 border-b border-[var(--blueprint-rule)] pr-12">
         <p className="font-mono text-[11px] text-[var(--blueprint-muted)]">
-          [{source.id}] {host}
+          {source.id !== undefined && `[${source.id}] `}
+          {host}
           {source.publishedAt ? ` · ${source.publishedAt.slice(0, 10)}` : ""}
         </p>
         <SheetTitle className="leading-snug">{source.title}</SheetTitle>
-        <SheetDescription className="border-l-2 border-[var(--series-4)] pl-3 text-[var(--blueprint-ink)] italic">“{source.quote}”</SheetDescription>
+        <SheetDescription className={source.quote ? "border-l-2 border-[var(--series-4)] pl-3 text-[var(--blueprint-ink)] italic" : "sr-only"}>
+          {source.quote ? `“${source.quote}”` : `A page the agent read on ${host}`}
+        </SheetDescription>
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
           <ToggleGroup
             type="single"
@@ -83,10 +89,12 @@ function SourcePanel({ source }: { source: ResearchSource }) {
             <ToggleGroupItem value="page" disabled={!embedding?.embeddable}>
               Page
             </ToggleGroupItem>
-            <ToggleGroupItem value="context">Quote in context</ToggleGroupItem>
+            <ToggleGroupItem value="context" disabled={!source.quote}>
+              Quote in context
+            </ToggleGroupItem>
           </ToggleGroup>
           <Button asChild variant="ghost" size="sm">
-            <a href={withTextFragment(source.url, source.quote)} target="_blank" rel="noreferrer">
+            <a href={source.quote ? withTextFragment(source.url, source.quote) : source.url} target="_blank" rel="noreferrer">
               Open original <ExternalLinkIcon aria-hidden="true" />
             </a>
           </Button>
@@ -107,18 +115,28 @@ function SourcePanel({ source }: { source: ResearchSource }) {
             sandbox={embedding?.pdf ? undefined : "allow-scripts allow-same-origin allow-popups allow-forms"}
             className="size-full border-0 bg-white"
           />
-        ) : (
+        ) : source.quote ? (
           <QuoteInContext
             source={source}
+            quote={source.quote}
             note={embedding?.embeddable ? null : `${host} doesn't let other apps show its pages, so this is the passage the agent read. Open the original for the full page.`}
           />
+        ) : (
+          <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center text-sm text-[var(--blueprint-muted)]">
+            <p>{host} doesn&apos;t let other apps show its pages.</p>
+            <Button asChild variant="outline" size="sm">
+              <a href={source.url} target="_blank" rel="noreferrer">
+                Open on {host} <ExternalLinkIcon aria-hidden="true" />
+              </a>
+            </Button>
+          </div>
         )}
       </div>
     </>
   );
 }
 
-function QuoteInContext({ source, note }: { source: ResearchSource; note: string | null }) {
+function QuoteInContext({ source, quote, note }: { source: ViewedSource; quote: string; note: string | null }) {
   const mark = useRef<HTMLElement>(null);
   useEffect(() => {
     mark.current?.scrollIntoView({ block: "center" });
@@ -131,7 +149,7 @@ function QuoteInContext({ source, note }: { source: ResearchSource; note: string
         <p>
           {source.excerpt?.before && <>… {source.excerpt.before} </>}
           <mark ref={mark} className="rounded-[2px] bg-[color-mix(in_oklab,var(--series-4)_35%,transparent)] px-0.5 text-inherit">
-            {source.quote}
+            {quote}
           </mark>
           {source.excerpt?.after && <> {source.excerpt.after} …</>}
         </p>

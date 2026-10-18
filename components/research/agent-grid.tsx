@@ -261,7 +261,13 @@ function AgentReport({ criterion, agent, sources }: { criterion: CriterionKey; a
                   {KIND_LABEL[entry.kind]}
                   {entry.model ? ` · ${entry.model.replace("nvidia/", "")}` : ""}
                 </span>
-                <p className={cn("text-xs", entry.kind === "evidence" && "border-l-2 border-[var(--blueprint-rule)] pl-3 italic")}>{entry.text}</p>
+                {entry.page ? (
+                  <SourceLink source={entry.page} className="text-xs underline decoration-[var(--blueprint-rule)] underline-offset-2 hover:decoration-[var(--blueprint-ink)]">
+                    {entry.text}
+                  </SourceLink>
+                ) : (
+                  <p className={cn("text-xs", entry.kind === "evidence" && "border-l-2 border-[var(--blueprint-rule)] pl-3 italic")}>{entry.text}</p>
+                )}
                 {entry.sourceIds.length > 0 && <SourceChips ids={entry.sourceIds} sources={sources} />}
               </li>
             ))}
@@ -273,24 +279,20 @@ function AgentReport({ criterion, agent, sources }: { criterion: CriterionKey; a
   );
 }
 
-/** The sources a claim rests on, one pill per site with a numbered link per quote; each opens in the source panel. */
+/** The sources a claim rests on, one chip per quote; the whole chip opens it in the source panel. */
 export function SourceChips({ ids, sources }: { ids: number[]; sources: ResearchSource[] }) {
-  const bySite = new Map<string, ResearchSource[]>();
-  for (const id of new Set(ids)) {
-    const source = sources.find((candidate) => candidate.id === id);
-    if (source) bySite.set(hostOf(source.url), [...(bySite.get(hostOf(source.url)) ?? []), source]);
-  }
+  const cited = [...new Set(ids)].flatMap((id) => sources.find((source) => source.id === id) ?? []);
   return (
     <span className="inline-flex flex-wrap gap-1 align-middle">
-      {[...bySite].map(([site, cited]) => (
-        <span key={site} className="inline-flex items-center gap-1 rounded-sm border border-[var(--blueprint-rule)] px-1.5 py-0.5 font-mono text-[10px] leading-none text-[var(--blueprint-muted)]">
-          {site}
-          {cited.map((source) => (
-            <SourceLink key={source.id} source={source} className="text-[var(--blueprint-ink)] underline-offset-2 hover:underline">
-              {source.id}
-            </SourceLink>
-          ))}
-        </span>
+      {cited.map((source) => (
+        <SourceLink
+          key={source.id}
+          source={source}
+          className="inline-flex items-center gap-1 rounded-sm border border-[var(--blueprint-rule)] px-1.5 py-0.5 font-mono text-[10px] leading-none text-[var(--blueprint-muted)] transition-colors hover:border-[var(--blueprint-ink)] hover:text-[var(--blueprint-ink)]"
+        >
+          {hostOf(source.url)}
+          <span className="opacity-60">{source.id}</span>
+        </SourceLink>
       ))}
     </span>
   );

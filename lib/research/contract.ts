@@ -44,6 +44,8 @@ export const threadEntrySchema = z.strictObject({
   text: z.string().trim().min(1).max(600),
   sourceIds: z.array(z.number().int().min(1)).max(10),
   model: z.string().nullable(),
+  /** The page a "read" step opened, so the buyer can open it too. */
+  page: z.strictObject({ url: z.url(), title: z.string().trim().min(1).max(300) }).nullish(),
 });
 
 /** The agent's written result, Perplexity-style: a headline, cited findings and what it could not settle. */

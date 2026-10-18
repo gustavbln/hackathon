@@ -5,409 +5,80 @@
   "website": "https://www.grammer.com",
   "country": "DE",
   "brief": "",
-  "researchedAt": "2026-10-18T15:34:42.536Z",
-  "summary": "GRAMMER Aktiengesellschaft’s operating EBIT jumped to EUR 75.1 million in FY 2025 from EUR 41.6 million in FY 2024, yet an accumulated loss of EUR ‑244.1 million remains as of 31 Dec 2025 [6] [7] [8]. Net income swung to a EUR 17.2 million profit in FY 2025 from a EUR ‑115.2 million loss a year earlier, but no dividend is proposed because the loan agreement blocks payouts until 2027 [9] [10]. The Americas segment posted an EBIT loss of EUR 6.2 million and a 7.7 % revenue decline to EUR 153.0 million in H1 2026, driven by logistics and tariff costs and flagged as a key risk for H2 2026 [1] [4]. A U.S. class‑action alleges concealed defects in Active Head Restraints, and Grammer Inc. is suing APC Parent LLC for over $20 million withheld in a $40 million merger [11] [12]. The company holds a B+/stable rating from Scope Ratings (June 29 2026), unchanged for at least 12 months and improved from BB/stable in 2022, though all ratings come from German agencies [13] [14] [15].",
+  "researchedAt": "2026-10-18T15:45:12.839Z",
+  "summary": "GRAMMER Aktiengesellschaft’s Americas segment posted an operating EBIT loss of EUR 6.2 million in H1 2026 due to higher logistics and tariff costs [1]. Operating EBIT jumped to EUR 75.1 million in FY 2025 from EUR 41.6 million in FY 2024, driven by the “Top 10” restructuring programme and capacity adjustments [2] [3]. Yet the accumulated loss remained EUR –244.1 million at 31 Dec 2025, only slightly better than EUR –261.3 million a year earlier [4]. FY 2025 net income swung to EUR 17.2 million from a EUR –115.2 million loss in FY 2024, but no dividend is proposed because the 2024 loan agreement suspends payouts until 2027 [5] [6]. Scope Ratings GmbH rates the company B+/stable as of 29 Jun 2026, unchanged from the June 2025 rating and a two‑notch upgrade from BB/stable in 2022 [7] [8] [9].",
   "insights": [
     {
-      "headline": "Americas logistics and tariff drag creates a material EBIT loss and revenue contraction",
+      "headline": "Credit rating remains B+/stable (June 2026)",
+      "criterion": "creditRating",
+      "sourceIds": [
+        7,
+        8
+      ]
+    },
+    {
+      "headline": "Americas segment EBIT loss of EUR 6.2 m in H1 2026",
       "criterion": "operationalResilience",
       "sourceIds": [
-        1,
+        1
+      ]
+    },
+    {
+      "headline": "Operating EBIT recovery to EUR 75.1 m in FY 2025",
+      "criterion": "financialHealth",
+      "sourceIds": [
+        2,
+        3
+      ]
+    },
+    {
+      "headline": "Accumulated loss still EUR –244.1 m at end‑2025",
+      "criterion": "financialHealth",
+      "sourceIds": [
         4
       ]
     },
     {
-      "headline": "Group‑level EBIT still grew 17.1 % to EUR 41.7 million in H1 2026, backed by the Top 10 programme and EUR 762 million refinancing",
-      "criterion": "operationalResilience",
-      "sourceIds": [
-        2
-      ]
-    },
-    {
-      "headline": "Accumulated loss of EUR ‑244.1 million blocks dividend payments until 2027",
+      "headline": "Net income swing to EUR 17.2 m profit in FY 2025",
       "criterion": "financialHealth",
       "sourceIds": [
-        8,
-        10
+        5
       ]
     },
     {
-      "headline": "Class‑action over Active Head Restraints could trigger costly recalls and reputational harm",
-      "criterion": "compliance",
+      "headline": "Dividend suspended until 2027 per loan agreement",
+      "criterion": "financialHealth",
       "sourceIds": [
-        11
-      ]
-    },
-    {
-      "headline": "Credit rating B+/stable from Scope Ratings (German agency only) may limit access to international capital markets",
-      "criterion": "creditRating",
-      "sourceIds": [
-        13,
-        14,
-        15
-      ]
-    },
-    {
-      "headline": "Litigation with APC Parent LLC over $20 million in a $40 million merger adds legal‑cost risk",
-      "criterion": "compliance",
-      "sourceIds": [
-        12
+        6
       ]
     }
   ],
   "agents": {
-    "quality": {
-      "status": "no_evidence",
-      "estimate": null,
-      "report": null,
-      "thread": [
-        {
-          "kind": "plan",
-          "text": "4 searches: “\"GRAMMER AG\" recall defect quality problems” · “\"GRAMMER AG\" quality issues customers 2025 2026” · “\"GRAMMER AG\" quality certification IATF IRIS award” · “Quality recall defect quality problems” on grammer.com",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "search",
-          "text": "17 results, 7 about GRAMMER AG, from grammer.com, reports.grammer.com, linkedin.com, eqs-news.com.",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 8 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 6 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read linkedin.com: #annualreport #fy25 #financialresults2025 #corporatestrategy | Grammer AG · 62,190 characters, 10 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read eqs-news.com: GRAMMER AG closes Financial Year 2021 with significantly higher revenue and earnings | Corporate - EQS News · 19,020 characters, 19 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "note",
-          "text": "No verifiable public evidence about quality found.",
-          "sourceIds": [],
-          "model": null
-        }
-      ]
-    },
-    "financialHealth": {
-      "status": "estimated",
-      "estimate": {
-        "value": 55,
-        "confidence": "medium",
-        "rationale": "Evidence shows a clear operational turnaround in FY 2025 (EBIT up 80 %, return to net profit), but the balance sheet still bears a large accumulated loss (EUR –244 m) and dividend suspension until 2027 signals lender caution. This mixed picture — improved earnings offset by legacy balance-sheet weakness — places the risk in the high band (50–74). Confidence is medium because the quotes are undated but refer to FY 2025 (about 10 months old) and no cash-flow, debt or covenant details are provided.",
-        "sourceIds": [
-          6,
-          7,
-          8,
-          9,
-          10
-        ]
-      },
-      "report": {
-        "headline": "Profitability improved but accumulated loss persists",
-        "findings": [
-          {
-            "text": "Operating EBIT rose sharply to EUR 75.1 million in FY 2025 from EUR 41.6 million in FY 2024, driven by the “Top 10” program, restructuring and seasonal capacity adjustments.",
-            "sourceIds": [
-              6,
-              7
-            ]
-          },
-          {
-            "text": "The company still carries an accumulated loss of EUR –244.1 million as of 31 Dec 2025, only modestly improved from EUR –261.3 million a year earlier.",
-            "sourceIds": [
-              8
-            ]
-          },
-          {
-            "text": "FY 2025 net income was EUR 17.2 million, a swing from a net loss of EUR –115.2 million in FY 2024.",
-            "sourceIds": [
-              9
-            ]
-          },
-          {
-            "text": "No dividend is proposed for FY 2025 because of the accumulated loss; dividend payments are suspended under the loan agreement renewed in 2024 until 2027.",
-            "sourceIds": [
-              10
-            ]
-          }
-        ],
-        "openQuestions": [
-          "What is the current net debt / leverage ratio and debt maturity profile after the 2024 loan renewal?",
-          "How much of the EUR 75.1 million operating EBIT converts to free cash flow after capex, tax and working-capital changes?",
-          "Are there any covenant tests in the loan agreement that could be triggered if profitability slips again?",
-          "What is the realistic timeline and path to eliminate the EUR 244 million accumulated deficit?"
-        ]
-      },
-      "thread": [
-        {
-          "kind": "plan",
-          "text": "4 searches: “\"GRAMMER AG\" annual report revenue net income results” · “\"GRAMMER AG\" profit warning loss restructuring 2025 2026” · “\"GRAMMER AG\" refinancing liquidity equity ratio” · “Financial health annual report revenue net income results” on grammer.com",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "search",
-          "text": "19 results, 14 about GRAMMER AG, from grammer.com, eqs-news.com, live.deutsche-boerse.com, investegate.co.uk.",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 7 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read eqs-news.com: GRAMMER AG publishes results for the first half of 2026 | Corporate - EQS News · 22,291 characters, 37 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read live.deutsche-boerse.com: EQS-News: GRAMMER AG publishes results for the first half of 2026 · 18,548 characters, 3 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read investegate.co.uk: GRAMMER AG publishes results for the first half of 2026 · 21,149 characters, 5 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "evidence",
-          "text": "Despite declining revenue, GRAMMER achieved a significant increase in operating EBIT to EUR 75.1 million in the 2025 financial year (previous year: EUR 41.6 million).",
-          "sourceIds": [
-            6
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "evidence",
-          "text": "The main factors behind the significant increase in profitability were the “Top 10” program, the restructuring measures that were introduced, and the timely seasonal capacity adjustments, which led to increased efficiency at the plants.",
-          "sourceIds": [
-            7
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "evidence",
-          "text": "GRAMMER AG reported an accumulated loss of EUR –244.1 million as of December 31, 2025 (accumulated loss as of December 31, 2024: EUR –261.3 million).",
-          "sourceIds": [
-            8
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "evidence",
-          "text": "This figure included net income for the 2025 financial year of EUR 17.2 million (previous year: net loss of EUR –115.2 million).",
-          "sourceIds": [
-            9
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "evidence",
-          "text": "Due to GRAMMER AG’s accumulated loss in the previous financial year, no dividend is currently proposed. Furthermore, when the new loan agreement was renewed in 2024, it was decided to suspend dividend payments during the term until 2027.",
-          "sourceIds": [
-            10
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "verdict",
-          "text": "Evidence shows a clear operational turnaround in FY 2025 (EBIT up 80 %, return to net profit), but the balance sheet still bears a large accumulated loss (EUR –244 m) and dividend suspension until 2027 signals lender caution. This mixed picture — improved earnings offset by legacy balance-sheet weakness — places the risk in the high band (50–74). Confidence is medium because the quotes are undated but refer to FY 2025 (about 10 months old) and no cash-flow, debt or covenant details are provided.",
-          "sourceIds": [
-            6,
-            7,
-            8,
-            9,
-            10
-          ],
-          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
-        }
-      ]
-    },
-    "compliance": {
-      "status": "estimated",
-      "estimate": {
-        "value": 50,
-        "confidence": "low",
-        "rationale": "The evidence shows two active legal disputes: a consumer class action alleging fraudulent concealment of a safety defect affecting hundreds of thousands of vehicles, and a commercial litigation over $20M+ in a bankrupt merger. The class action carries potential for significant regulatory fines, recall costs, and reputational damage, but its stage and financial impact are unknown. The commercial suit shows Grammer as plaintiff, not defendant, though it signals counterparty risk. No regulatory rul",
-        "sourceIds": [
-          11,
-          12
-        ]
-      },
-      "report": {
-        "headline": "Grammer AG faces class action over defective head restraints",
-        "findings": [
-          {
-            "text": "A U.S. class-action lawsuit alleges that Grammer AG and Chrysler fraudulently concealed a defect in Active Head Restraints (AHR) that can spontaneously deploy, seeking to compel notification and repair for 'hundreds of thousands' of Dodge, Jeep and Chrysler vehicles.",
-            "sourceIds": [
-              11
-            ]
-          },
-          {
-            "text": "Grammer Inc. (related entity) filed suit in Delaware Chancery Court in September 2025 against APC Parent LLC and First Brands Group, alleging breach of multiple agreements and withholding of over $20 million tied to a $40 million merger, while the counterparties were in Chapter 11 bankruptcy.",
-            "sourceIds": [
-              12
-            ]
-          }
-        ],
-        "openQuestions": [
-          "What is the current status and potential financial exposure of the AHR class action (certification, settlement talks, trial date)?",
-          "Has Grammer AG set aside reserves or disclosed contingent liabilities for the AHR litigation in its financial statements?",
-          "Are any regulatory bodies (NHTSA, KBA, etc.) investigating the AHR defect or Grammer's disclosure practices?",
-          "What is the outcome of the Delaware Chancery suit against the bankrupt First Brands Group, and how much of the $20M+ is recoverable?"
-        ]
-      },
-      "thread": [
-        {
-          "kind": "plan",
-          "text": "4 searches: “\"GRAMMER AG\" lawsuit fine investigation” · “\"GRAMMER AG\" court proceedings regulator 2025 2026” · “\"GRAMMER AG\" antitrust penalty compliance violation” · “Compliance lawsuit fine investigation” on grammer.com",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "search",
-          "text": "19 results, 10 about GRAMMER AG, from classaction.org, grammer.com, law360.com, ftc.gov.",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read classaction.org: Class Action: ‘Hundreds of Thousands’ of Dodge, Jeep, Chrysler Vehicles Equipped with Defective Active Head Restraints · 7,245 characters, 18 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 6 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read law360.com: In Chancery, Bankrupt First Brands Accused Of Deal Breach - Law360 · 12,064 characters, 11 relevant passages",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "read",
-          "text": "Read ftc.gov: 20181436: Mrs. Wu Bifeng; Grammer AG | Federal Trade Commission · 943 characters",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "evidence",
-          "text": "the plaintiffs aim to compel Chrysler and Grammer AG to both notify owners of all affected vehicles as to the AHR defect and fix the problem.",
-          "sourceIds": [
-            11
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "evidence",
-          "text": "Automotive manufacturer Grammer Inc. filed a suit in the Delaware Chancery Court accusing APC Parent LLC and guarantor First Brands Group, which filed for Chapter 11 protection on Sunday, of breaching multiple agreements and withholding more than $20 million in payments involved with a $40 million merger.",
-          "sourceIds": [
-            12
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "note",
-          "text": "3 of 5 proposed quotes were dropped: not word for word on their page, or not about GRAMMER AG.",
-          "sourceIds": [],
-          "model": null
-        },
-        {
-          "kind": "verdict",
-          "text": "The evidence shows two active legal disputes: a consumer class action alleging fraudulent concealment of a safety defect affecting hundreds of thousands of vehicles, and a commercial litigation over $20M+ in a bankrupt merger. The class action carries potential for significant regulatory fines, recall costs, and reputational damage, but its stage and financial impact are unknown. The commercial suit shows Grammer as plaintiff, not defendant, though it signals counterparty risk. No regulatory rul",
-          "sourceIds": [
-            11,
-            12
-          ],
-          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
-        }
-      ]
-    },
     "operationalResilience": {
       "status": "estimated",
       "estimate": {
-        "value": 35,
+        "value": 50,
         "confidence": "medium",
-        "rationale": "The Americas segment posted a clear, quantified EBIT loss (EUR -6.2 m) in the most recent half-year (H1 2026) directly tied to logistics and tariff expenses, and management itself labels it a key risk for H2. This is a documented, current operational problem, not merely a policy or generic warning. However, the group remains profitable overall (EUR 41.7 m operating EBIT), has refinanced EUR 762 m for liquidity headroom, and maintains full-year guidance, which prevents the score from reaching the",
+        "rationale": "A single segment EBIT loss of EUR 6.2 million in the most recent half-year (H1 2026) shows a concrete, current operational disruption from logistics and tariffs. The evidence is recent (about 4 months old) but limited to one segment and one half-year; no full-year outcome, remediation detail, or cross-segment data is provided. This places the risk at the mixed-evidence level (50) with medium confidence.",
         "sourceIds": [
-          1,
-          3,
-          4,
-          2
+          1
         ]
       },
       "report": {
         "headline": "Americas logistics and tariff costs drive H1 2026 EBIT loss",
         "findings": [
           {
-            "text": "The Americas segment recorded an operating EBIT loss of EUR 6.2 million in H1 2026, explicitly attributed to additional logistics and tariff-related expenses, and flagged as a key risk for the second half of 2026.",
+            "text": "The Americas segment recorded an operating EBIT loss of EUR 6.2 million in H1 2026, attributed to additional logistics and tariff-related expenses.",
             "sourceIds": [
               1
-            ]
-          },
-          {
-            "text": "Group management warned of a challenging market environment citing macroeconomic uncertainty, elevated material and energy costs, geopolitical developments, and potential disruptions from US tariff measures impacting global supply chains.",
-            "sourceIds": [
-              3
-            ]
-          },
-          {
-            "text": "Americas revenue declined 7.7% to EUR 153.0 million in H1 2026 due to weaker demand and currency headwinds, indicating the region is shrinking while also losing money.",
-            "sourceIds": [
-              4
-            ]
-          },
-          {
-            "text": "Despite the Americas loss, group operating EBIT rose 17.1% to EUR 41.7 million in H1 2026, driven by strong Q2 performance, efficiency initiatives under the 'Top 10' programme, and group-wide capacity adjustments.",
-            "sourceIds": [
-              2
-            ]
-          },
-          {
-            "text": "The company completed long-term refinancing facilities of approximately EUR 762 million in H1 2026, enhancing financial clarity and providing liquidity headroom to absorb operational shocks.",
-            "sourceIds": [
-              2
-            ]
-          },
-          {
-            "text": "Full-year 2026 guidance is maintained at around EUR 1.9 billion revenue and operating EBIT near EUR 80 million, implying management expects the Americas logistics and tariff drag to be contained or offset in H2.",
-            "sourceIds": [
-              3
             ]
           }
         ],
         "openQuestions": [
-          "What specific logistics routes, ports or carriers are causing the cost overruns in the Americas, and are alternative routings or near-shoring options being implemented?",
-          "What is the quantified tariff exposure by product line and country of origin, and has GRAMMER secured any exclusions or duty-drawback arrangements?",
-          "Does the 'Top 10' efficiency programme include concrete Americas-specific actions (footprint consolidation, supplier dual-sourcing, inventory buffering) with measurable milestones for H2 2026?",
-          "How much of the EUR 762 million refinancing is earmarked for working-capital swings caused by logistics delays or tariff payments versus general corporate purposes?"
+          "What specific tariff measures and logistics disruptions caused the EUR 6.2 million loss?",
+          "Has the company quantified the expected impact for H2 2026 and full-year 2026?",
+          "What mitigation actions (e.g., supply chain rerouting, inventory buffering, tariff engineering) are being implemented?",
+          "Is the Americas segment loss indicative of broader supply chain fragility in other regions?"
         ]
       },
       "thread": [
@@ -427,25 +98,41 @@
           "kind": "read",
           "text": "Read wdam.com: Production starts at new Grammer plant in Mississippi · 4,361 characters",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.wdam.com/story/27954365/production-starts-at-new-grammer-plant-in-mississippi",
+            "title": "Production starts at new Grammer plant in Mississippi"
+          }
         },
         {
           "kind": "read",
           "text": "Read kalkinemedia.com: GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast · 26,980 characters, 9 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://kalkinemedia.com/uk/news/announcements/grammer-ag-0oqx-posts-eur-9614-million-h1-2026-revenue-with-171-operating-ebit-growth-affirms-full-year-forecast",
+            "title": "GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast"
+          }
         },
         {
           "kind": "read",
           "text": "Read grammer.com: GRAMMER Locations | GRAMMER AG · 13,208 characters, 8 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.grammer.com/en/company/locations",
+            "title": "GRAMMER Locations | GRAMMER AG"
+          }
         },
         {
           "kind": "read",
           "text": "Read linkedin.com: Grammer AG · 3,357 characters",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.linkedin.com/company/grammer-ag",
+            "title": "Grammer AG"
+          }
         },
         {
           "kind": "evidence",
@@ -456,90 +143,77 @@
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
         {
-          "kind": "evidence",
-          "text": "GRAMMER also reaffirmed its full-year 2026 outlook and announced the completion of long-term refinancing facilities totaling approximately EUR 762 million, enhancing financial clarity for investors.",
-          "sourceIds": [
-            2
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "evidence",
-          "text": "The company warned of a challenging market environment due to macroeconomic uncertainty, elevated material and energy costs, geopolitical developments, and potential disruptions from US tariff measures impacting global supply chains.",
-          "sourceIds": [
-            3
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "evidence",
-          "text": "Group revenue grew by EUR 7.7 million, or 0.8%, to EUR 961.4 million compared to EUR 953.7 million in H1 2025. Adjusted for currency effects, revenue growth reached 2.7%.",
-          "sourceIds": [
-            4
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
-        },
-        {
-          "kind": "evidence",
-          "text": "The APAC region led growth with a 7.6% increase to EUR 264.3 million, driven by a 30.7% rise in Commercial Vehicles revenue.",
-          "sourceIds": [
-            5
-          ],
-          "model": "nvidia/Nemotron-3_5-Lightning"
+          "kind": "note",
+          "text": "1 of 2 proposed quotes were dropped: not word for word on their page, or not about GRAMMER AG.",
+          "sourceIds": [],
+          "model": null
         },
         {
           "kind": "verdict",
-          "text": "The Americas segment posted a clear, quantified EBIT loss (EUR -6.2 m) in the most recent half-year (H1 2026) directly tied to logistics and tariff expenses, and management itself labels it a key risk for H2. This is a documented, current operational problem, not merely a policy or generic warning. However, the group remains profitable overall (EUR 41.7 m operating EBIT), has refinanced EUR 762 m for liquidity headroom, and maintains full-year guidance, which prevents the score from reaching the",
+          "text": "A single segment EBIT loss of EUR 6.2 million in the most recent half-year (H1 2026) shows a concrete, current operational disruption from logistics and tariffs. The evidence is recent (about 4 months old) but limited to one segment and one half-year; no full-year outcome, remediation detail, or cross-segment data is provided. This places the risk at the mixed-evidence level (50) with medium confidence.",
           "sourceIds": [
-            1,
-            3,
-            4,
-            2
+            1
           ],
           "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
         }
       ]
     },
-    "laborStability": {
+    "compliance": {
       "status": "no_evidence",
       "estimate": null,
       "report": null,
       "thread": [
         {
           "kind": "plan",
-          "text": "4 searches: “\"GRAMMER AG\" strike union works council” · “\"GRAMMER AG\" job cuts layoffs protest 2025 2026” · “\"GRAMMER AG\" collective agreement workforce” · “Labor stability strike union works council” on grammer.com",
+          "text": "4 searches: “\"GRAMMER AG\" lawsuit fine investigation” · “\"GRAMMER AG\" court proceedings regulator 2025 2026” · “\"GRAMMER AG\" antitrust penalty compliance violation” · “Compliance lawsuit fine investigation” on grammer.com",
           "sourceIds": [],
           "model": null
         },
         {
           "kind": "search",
-          "text": "14 results, 5 about GRAMMER AG, from grammer.com, plasticker.de, mashinii.com.",
+          "text": "19 results, 10 about GRAMMER AG, from classaction.org, grammer.com, law360.com, ftc.gov.",
           "sourceIds": [],
           "model": null
         },
         {
           "kind": "read",
-          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 8 relevant passages",
+          "text": "Read classaction.org: Class Action: ‘Hundreds of Thousands’ of Dodge, Jeep, Chrysler Vehicles Equipped with Defective Active Head Restraints · 7,245 characters, 18 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.classaction.org/news/class-action-hundreds-of-thousands-of-dodge-jeep-chrysler-vehicles-equipped-with-defective-active-head-restraints",
+            "title": "Class Action: ‘Hundreds of Thousands’ of Dodge, Jeep, Chrysler Vehicles Equipped with Defective Active Head Restraints"
+          }
         },
         {
           "kind": "read",
-          "text": "Read plasticker.de: Grammer reacts to substantial order decline with workforce reduction · 12,786 characters, 4 relevant passages",
+          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 6 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
+            "title": "ON POINT. AND BEYOND."
+          }
         },
         {
           "kind": "read",
-          "text": "Read mashinii.com: GRAMMER Ethics Score & Company Evidence | Mashinii · 38,453 characters, 6 relevant passages",
+          "text": "Read law360.com: In Chancery, Bankrupt First Brands Accused Of Deal Breach - Law360 · 12,064 characters, 11 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.law360.com/articles/2393563/in-chancery-bankrupt-first-brands-accused-of-deal-breach",
+            "title": "In Chancery, Bankrupt First Brands Accused Of Deal Breach - Law360"
+          }
         },
         {
           "kind": "read",
-          "text": "Read grammer.com: Investor Presentation November 2018 · 35,257 characters, 2 relevant passages",
+          "text": "Read ftc.gov: 20181436: Mrs. Wu Bifeng; Grammer AG | Federal Trade Commission · 943 characters",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.ftc.gov/legal-library/browse/early-termination-notices/20181436",
+            "title": "20181436: Mrs. Wu Bifeng; Grammer AG | Federal Trade Commission"
+          }
         },
         {
           "kind": "note",
@@ -549,7 +223,229 @@
         },
         {
           "kind": "note",
-          "text": "No verifiable public evidence about labor stability found.",
+          "text": "No verifiable public evidence about compliance found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "financialHealth": {
+      "status": "estimated",
+      "estimate": {
+        "value": 55,
+        "confidence": "medium",
+        "rationale": "Evidence shows a clear profit turnaround in FY 2025 (EBIT +80 %, net income positive) but a very large accumulated loss (EUR 244 m) remains, dividends are blocked until 2027, and the loan agreement renewal signals ongoing creditor oversight. This places the company in the high-risk band (50–74). Confidence is medium because the quotes are undated but refer to FY 2025 results (about 10 months old) and no balance-sheet liquidity or debt-service figures are provided.",
+        "sourceIds": [
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "report": {
+        "headline": "GRAMMER AG: Profit recovery but EUR 244m accumulated loss persists",
+        "findings": [
+          {
+            "text": "Operating EBIT rose sharply to EUR 75.1 million in FY 2025 from EUR 41.6 million in FY 2024, driven by a “Top 10” restructuring programme and capacity adjustments.",
+            "sourceIds": [
+              2,
+              3
+            ]
+          },
+          {
+            "text": "The company still carried an accumulated loss of EUR –244.1 million as of 31 December 2025, only slightly improved from EUR –261.3 million a year earlier.",
+            "sourceIds": [
+              4
+            ]
+          },
+          {
+            "text": "FY 2025 net income was EUR 17.2 million, a swing from a EUR –115.2 million net loss in FY 2024.",
+            "sourceIds": [
+              5
+            ]
+          },
+          {
+            "text": "No dividend is proposed for FY 2025 because of the accumulated loss; dividend payments are suspended under the loan agreement renewed in 2024 until 2027.",
+            "sourceIds": [
+              6
+            ]
+          }
+        ],
+        "openQuestions": [
+          "What is the current net debt / leverage ratio and debt maturity profile after the 2024 loan renewal?",
+          "How much of the EUR 244m accumulated loss is covered by equity versus shareholder loans or hybrid capital?",
+          "What are the cash-flow forecasts for FY 2026–2027 and are covenant tests expected to be met?",
+          "Are further restructuring costs or site closures planned that could reverse the EBIT improvement?"
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"GRAMMER AG\" annual report revenue net income results” · “\"GRAMMER AG\" profit warning loss restructuring 2025 2026” · “\"GRAMMER AG\" refinancing liquidity equity ratio” · “Financial health annual report revenue net income results” on grammer.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "19 results, 14 about GRAMMER AG, from grammer.com, eqs-news.com, live.deutsche-boerse.com, investegate.co.uk.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 7 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
+            "title": "ON POINT. AND BEYOND."
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read eqs-news.com: GRAMMER AG publishes results for the first half of 2026 | Corporate - EQS News · 22,291 characters, 37 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://www.eqs-news.com/news/corporate/grammer-ag-publishes-results-for-the-first-half-of-2026/caee69b8-1b40-4175-a5b3-f90c4fab9259_en",
+            "title": "GRAMMER AG publishes results for the first half of 2026 | Corporate - EQS News"
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read live.deutsche-boerse.com: EQS-News: GRAMMER AG publishes results for the first half of 2026 · 18,548 characters, 3 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://live.deutsche-boerse.com/news/EQS-News-GRAMMER-AG-publishes-results-for-the-first-half-of-2026-be075435-4ecc-4c2d-83a9-da06183782e1",
+            "title": "EQS-News: GRAMMER AG publishes results for the first half of 2026"
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read investegate.co.uk: GRAMMER AG publishes results for the first half of 2026 · 21,149 characters, 5 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://www.investegate.co.uk/announcement/eqs/grammer-ag--0oqx/eqs-news-grammer-ag-publishes-results-for-th-/9722242",
+            "title": "GRAMMER AG publishes results for the first half of 2026"
+          }
+        },
+        {
+          "kind": "evidence",
+          "text": "Despite declining revenue, GRAMMER achieved a significant increase in operating EBIT to EUR 75.1 million in the 2025 financial year (previous year: EUR 41.6 million).",
+          "sourceIds": [
+            2
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "The main factors behind the significant increase in profitability were the “Top 10” program, the restructuring measures that were introduced, and the timely seasonal capacity adjustments, which led to increased efficiency at the plants.",
+          "sourceIds": [
+            3
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "GRAMMER AG reported an accumulated loss of EUR –244.1 million as of December 31, 2025 (accumulated loss as of December 31, 2024: EUR –261.3 million).",
+          "sourceIds": [
+            4
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "This figure included net income for the 2025 financial year of EUR 17.2 million (previous year: net loss of EUR –115.2 million).",
+          "sourceIds": [
+            5
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "Due to GRAMMER AG’s accumulated loss in the previous financial year, no dividend is currently proposed. Furthermore, when the new loan agreement was renewed in 2024, it was decided to suspend dividend payments during the term until 2027.",
+          "sourceIds": [
+            6
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "Evidence shows a clear profit turnaround in FY 2025 (EBIT +80 %, net income positive) but a very large accumulated loss (EUR 244 m) remains, dividends are blocked until 2027, and the loan agreement renewal signals ongoing creditor oversight. This places the company in the high-risk band (50–74). Confidence is medium because the quotes are undated but refer to FY 2025 results (about 10 months old) and no balance-sheet liquidity or debt-service figures are provided.",
+          "sourceIds": [
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        }
+      ]
+    },
+    "quality": {
+      "status": "no_evidence",
+      "estimate": null,
+      "report": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"GRAMMER AG\" recall defect quality problems” · “\"GRAMMER AG\" quality issues customers 2025 2026” · “\"GRAMMER AG\" quality certification IATF IRIS award” · “Quality recall defect quality problems” on grammer.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "13 results, 8 about GRAMMER AG, from grammer.com, reports.grammer.com, linkedin.com, eqs-news.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 8 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
+            "title": "ON POINT. AND BEYOND."
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 6 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://reports.grammer.com/annual-report/2022/_assets/downloads/annual-report-grammer-ar22.pdf",
+            "title": "5 FOR 5 IN 2025"
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read linkedin.com: #annualreport #fy25 #financialresults2025 #corporatestrategy | Grammer AG · 62,190 characters, 10 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://www.linkedin.com/posts/grammer-ag_annualreport-fy25-financialresults2025-activity-7443207573388042240-5DiZ",
+            "title": "#annualreport #fy25 #financialresults2025 #corporatestrategy | Grammer AG"
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read eqs-news.com: GRAMMER AG closes Financial Year 2021 with significantly higher revenue and earnings | Corporate - EQS News · 19,020 characters, 19 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://www.eqs-news.com/news/corporate/grammer-ag-closes-financial-year-2021-with-significantly-higher-revenue-and-earnings/1e2b5a39-f7c1-419a-a673-3a4632de3711",
+            "title": "GRAMMER AG closes Financial Year 2021 with significantly higher revenue and earnings | Corporate - EQS News"
+          }
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about quality found.",
           "sourceIds": [],
           "model": null
         }
@@ -560,60 +456,57 @@
       "estimate": {
         "value": 50,
         "confidence": "medium",
-        "rationale": "The company holds a B+/stable rating from Scope Ratings GmbH as of June 2026, which is a sub-investment-grade (speculative) rating. The rating has been stable for over a year and represents an improvement from BB in 2022. However, B+ indicates material credit risk and the ratings come from smaller German agencies rather than major international ones. Historical volatility (BBB- to BB+/negative between 2018–2020) adds uncertainty. On the 0–100 scale, this places the risk in the high band (50–74),",
+        "rationale": "The B+/stable rating from Scope Ratings GmbH (June 2026) places GRAMMER AG in the sub-investment grade category, consistent with a score of 50 (mixed evidence). The two-notch improvement from BB (2022) to B+ (2025-2026) shows positive trajectory, but the rating remains well below investment grade. The rating agency (Scope Ratings) is not one of the major international agencies, limiting comparability. Evidence is current (latest June 2026) but from a single source type.",
         "sourceIds": [
-          13,
-          14,
-          15,
-          16,
-          17
+          7,
+          8,
+          9,
+          10,
+          11
         ]
       },
       "report": {
         "headline": "GRAMMER AG holds B+ rating with stable outlook",
         "findings": [
           {
-            "text": "Latest rating from Scope Ratings GmbH dated June 29, 2026 shows B+/stable (about 4 months old).",
+            "text": "Latest rating from June 29, 2026 by Scope Ratings GmbH is B+/stable, indicating sub-investment grade creditworthiness with stable outlook.",
             "sourceIds": [
-              13
+              7
             ]
           },
           {
-            "text": "Previous rating from Scope Ratings GmbH dated June 26, 2025 also B+/stable, indicating the rating has been held for at least 12 months.",
+            "text": "Previous rating from June 26, 2025 by Scope Ratings GmbH was also B+/stable, showing no change over the past year.",
             "sourceIds": [
-              14
+              8
             ]
           },
           {
-            "text": "Rating improved from BB/stable (Scope Hamburg GmbH, June 22, 2022) to B+/stable over the last four years.",
+            "text": "Rating improved from BB/stable (June 22, 2022) to B+/stable, a two-notch upgrade over approximately four years.",
             "sourceIds": [
-              13,
-              15
+              7,
+              9
             ]
           },
           {
-            "text": "Earlier ratings from Euler Hermes Rating GmbH ranged from BBB-/stable (September 2018) to BB+/negative (June 2020), showing volatility before 2021.",
+            "text": "Earlier ratings from Scope Hamburg GmbH (2021-2022) ranged from BB+ to BB, with one period under review for methodology changes.",
             "sourceIds": [
-              16,
-              17
+              9,
+              10
             ]
           },
           {
-            "text": "All ratings are from German agencies (Scope Ratings, Scope Hamburg, Euler Hermes) rather than major international agencies (S&P, Moody's, Fitch).",
+            "text": "Historical ratings from Euler Hermes Rating GmbH (2018-2020) ranged from BBB- to BB+, including negative outlooks.",
             "sourceIds": [
-              13,
-              14,
-              15,
-              16,
-              17
+              10,
+              11
             ]
           }
         ],
         "openQuestions": [
-          "Has GRAMMER AG sought a rating from a major international agency (S&P, Moody's, Fitch) for broader investor recognition?",
-          "What specific financial metrics (leverage, interest coverage, cash flow) underpin the B+ assessment by Scope Ratings?",
-          "Are there any covenant restrictions or financing events tied to maintaining this rating level?",
-          "What is the outlook for the next 12–18 months given the current economic environment in GRAMMER's end markets?"
+          "What specific financial metrics or business improvements drove the upgrade from BB to B+?",
+          "Has the company been rated by any major international rating agency (S&P, Moody's, Fitch)?",
+          "What is the current debt maturity profile and liquidity position?",
+          "Are there any covenant restrictions or financial triggers in existing debt agreements?"
         ]
       },
       "thread": [
@@ -633,31 +526,47 @@
           "kind": "read",
           "text": "Read grammer.com: GRAMMER Rating | GRAMMER AG · 1,175 characters",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.grammer.com/en/investor-relations/rating",
+            "title": "GRAMMER Rating | GRAMMER AG"
+          }
         },
         {
           "kind": "read",
           "text": "Read research.quirinprivatbank.de: Quirin Research Portal · 80,000 characters, 209 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://research.quirinprivatbank.de/search/product/equity-research",
+            "title": "Quirin Research Portal"
+          }
         },
         {
           "kind": "read",
           "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 3 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://reports.grammer.com/annual-report/2022/_assets/downloads/annual-report-grammer-ar22.pdf",
+            "title": "5 FOR 5 IN 2025"
+          }
         },
         {
           "kind": "read",
           "text": "Read sec.gov: lear-20251231 · 80,000 characters, 7 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.sec.gov/Archives/edgar/data/842162/000084216226000011/lear-20251231.htm",
+            "title": "lear-20251231"
+          }
         },
         {
           "kind": "evidence",
           "text": "June 29, 2026 Scope Ratings GmbH B+/stable",
           "sourceIds": [
-            13
+            7
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -665,7 +574,7 @@
           "kind": "evidence",
           "text": "June 26, 2025 Scope Ratings GmbH B+/stable",
           "sourceIds": [
-            14
+            8
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -673,7 +582,7 @@
           "kind": "evidence",
           "text": "June 22, 2022 Scope Hamburg GmbH BB/stable",
           "sourceIds": [
-            15
+            9
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -681,7 +590,7 @@
           "kind": "evidence",
           "text": "May, 2, 2022 Scope Hamburg GmbH BB+/under review for changes in methodologies",
           "sourceIds": [
-            16
+            10
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -689,19 +598,19 @@
           "kind": "evidence",
           "text": "June 22, 2021 Scope Hamburg GmbH BB+/stable",
           "sourceIds": [
-            17
+            11
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
         {
           "kind": "verdict",
-          "text": "The company holds a B+/stable rating from Scope Ratings GmbH as of June 2026, which is a sub-investment-grade (speculative) rating. The rating has been stable for over a year and represents an improvement from BB in 2022. However, B+ indicates material credit risk and the ratings come from smaller German agencies rather than major international ones. Historical volatility (BBB- to BB+/negative between 2018–2020) adds uncertainty. On the 0–100 scale, this places the risk in the high band (50–74),",
+          "text": "The B+/stable rating from Scope Ratings GmbH (June 2026) places GRAMMER AG in the sub-investment grade category, consistent with a score of 50 (mixed evidence). The two-notch improvement from BB (2022) to B+ (2025-2026) shows positive trajectory, but the rating remains well below investment grade. The rating agency (Scope Ratings) is not one of the major international agencies, limiting comparability. Evidence is current (latest June 2026) but from a single source type.",
           "sourceIds": [
-            13,
-            14,
-            15,
-            16,
-            17
+            7,
+            8,
+            9,
+            10,
+            11
           ],
           "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
         }
@@ -728,31 +637,47 @@
           "kind": "read",
           "text": "Read grammer.com: Purchasing | GRAMMER AG · 6,357 characters, 14 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.grammer.com/en/supplier-support-1/purchasing",
+            "title": "Purchasing | GRAMMER AG"
+          }
         },
         {
           "kind": "read",
           "text": "Read reports.grammer.com: 5 FOR 5 IN 2025 · 80,000 characters, 5 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://reports.grammer.com/annual-report/2022/_assets/downloads/annual-report-grammer-ar22.pdf",
+            "title": "5 FOR 5 IN 2025"
+          }
         },
         {
           "kind": "read",
           "text": "Read business-humanrights.org: Grammer's response to ETI Sweden report on human rights risks linked to tram production - Business and Human Rights Centre · 7,897 characters, 32 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://www.business-humanrights.org/en/latest-news/grammers-response-to-eti-sweden-report-on-human-rights-risks-linked-to-tram-production",
+            "title": "Grammer's response to ETI Sweden report on human rights risks linked to tram production - Business and Human Rights Centre"
+          }
         },
         {
           "kind": "read",
           "text": "Read mashinii.com: GRAMMER Ethics Score & Company Evidence | Mashinii · 38,453 characters, 4 relevant passages",
           "sourceIds": [],
-          "model": null
+          "model": null,
+          "page": {
+            "url": "https://mashinii.com/score/GMM.XETRA",
+            "title": "GRAMMER Ethics Score & Company Evidence | Mashinii"
+          }
         },
         {
           "kind": "evidence",
           "text": "Supplier-Support",
           "sourceIds": [
-            18
+            12
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -760,7 +685,7 @@
           "kind": "evidence",
           "text": "Supplier Support",
           "sourceIds": [
-            19
+            13
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -768,7 +693,7 @@
           "kind": "evidence",
           "text": "Download area for our suppliers",
           "sourceIds": [
-            20
+            14
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -776,7 +701,7 @@
           "kind": "evidence",
           "text": "2. Business Partner Check: The check will be done in our E-Procurement-tool ASTRAS; By registering you will have to fill in your company data and upload your certificates + once a year the system sends you a reminder to check and update your data. This system is our communication basis to you, here you will get for example your monthly supplier evaluation (serial suppliers) or have the possibility",
           "sourceIds": [
-            21
+            15
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -784,7 +709,7 @@
           "kind": "evidence",
           "text": "3. Whistleblower-Tool: Grammer is obligated (among others by the Supply Chain Due Diligence Act) to establish a reporting channel for violations of certain requirements (e.g. Human Rights, Health & Safety and Environmental Protection) and to make this reporting channel known. This also applies to third parties, i.e. our suppliers. We are also obligated to work towards ensuring that this is",
           "sourceIds": [
-            22
+            16
           ],
           "model": "nvidia/Nemotron-3_5-Lightning"
         },
@@ -798,13 +723,84 @@
           "kind": "note",
           "text": "The evidence found does not speak to sub-tier visibility, so it stays unscored.",
           "sourceIds": [
-            18,
-            19,
-            20,
-            21,
-            22
+            12,
+            13,
+            14,
+            15,
+            16
           ],
           "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        }
+      ]
+    },
+    "laborStability": {
+      "status": "no_evidence",
+      "estimate": null,
+      "report": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"GRAMMER AG\" strike union works council” · “\"GRAMMER AG\" job cuts layoffs protest 2025 2026” · “\"GRAMMER AG\" collective agreement workforce” · “Labor stability strike union works council” on grammer.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "14 results, 5 about GRAMMER AG, from grammer.com, plasticker.de, mashinii.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read grammer.com: ON POINT. AND BEYOND. · 80,000 characters, 8 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
+            "title": "ON POINT. AND BEYOND."
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read plasticker.de: Grammer reacts to substantial order decline with workforce reduction · 12,786 characters, 4 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://plasticker.de/Plastics_News_7639_Grammer_reacts_to_substantial_order_decline_with_workforce_reduction?seite=183",
+            "title": "Grammer reacts to substantial order decline with workforce reduction"
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read mashinii.com: GRAMMER Ethics Score & Company Evidence | Mashinii · 38,453 characters, 6 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://mashinii.com/score/GMM.XETRA",
+            "title": "GRAMMER Ethics Score & Company Evidence | Mashinii"
+          }
+        },
+        {
+          "kind": "read",
+          "text": "Read grammer.com: Investor Presentation November 2018 · 35,257 characters, 2 relevant passages",
+          "sourceIds": [],
+          "model": null,
+          "page": {
+            "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/presentations/2020_und_aelter/2018/2018_11_grammer_ag_investorenpraesentation.pdf",
+            "title": "Investor Presentation November 2018"
+          }
+        },
+        {
+          "kind": "note",
+          "text": "1 of 1 proposed quotes were dropped: not word for word on their page, or not about GRAMMER AG.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about labor stability found.",
+          "sourceIds": [],
+          "model": null
         }
       ]
     }
@@ -823,50 +819,6 @@
     },
     {
       "id": 2,
-      "url": "https://kalkinemedia.com/uk/news/announcements/grammer-ag-0oqx-posts-eur-9614-million-h1-2026-revenue-with-171-operating-ebit-growth-affirms-full-year-forecast",
-      "title": "GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast",
-      "publishedAt": null,
-      "quote": "GRAMMER also reaffirmed its full-year 2026 outlook and announced the completion of long-term refinancing facilities totaling approximately EUR 762 million, enhancing financial clarity for investors.",
-      "excerpt": {
-        "before": "(FCSS) Completes Repurchase of 2... thumbnail Fidelity Asian Values plc (FAS) Completes Treasury Share Buyback of 24... Make Kalkine Media My Trusted Source Google Source GRAMMER Aktiengesellschaft (0OQX), the German leader in automotive and commercial vehicle seating based in Ursensollen, released its H1 2026 financial results, reporting group revenue of EUR 961.4 million and a 17.1% rise in operating EBIT to EUR 41.7 million. The company credited the strong Q2 performance, ongoing efficiency initiatives under its \"Top 10\" programme, and group-wide capacity adjustments for the improvement.",
-        "after": "Key Points Strong Q2 and APAC Expansion Propel GRAMMER's H1 2026 Revenue to EUR 961.4 Million Group revenue grew by EUR 7.7 million, or 0.8%, to EUR 961.4 million compared to EUR 953.7 million in H1 2025. Adjusted for currency effects, revenue growth reached 2.7%. The APAC region led growth with a 7.6% increase to EUR 264.3 million, driven by a 30.7% rise in Commercial Vehicles revenue. EMEA remained stable at EUR 564.0 million, while AMERICAS declined 7.7% to EUR 153.0 million due to weaker demand and currency headwinds. Commercial Vehicles revenue expanded 5.2% to EUR 358.9 million,"
-      }
-    },
-    {
-      "id": 3,
-      "url": "https://kalkinemedia.com/uk/news/announcements/grammer-ag-0oqx-posts-eur-9614-million-h1-2026-revenue-with-171-operating-ebit-growth-affirms-full-year-forecast",
-      "title": "GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast",
-      "publishedAt": null,
-      "quote": "The company warned of a challenging market environment due to macroeconomic uncertainty, elevated material and energy costs, geopolitical developments, and potential disruptions from US tariff measures impacting global supply chains.",
-      "excerpt": {
-        "before": "rose 13.8% to EUR 317.0 million, boosting the equity ratio to 18.4%. The company noted that this refinancing is not yet reflected in period-end figures, as non-current financial liabilities were reclassified as current liabilities before the transaction completed, inflating current liabilities to EUR 878.5 million. Full-Year 2026 Guidance Maintained at EUR 1.9 Billion Revenue Amid Tariff and Economic Challenges GRAMMER confirmed its full-year 2026 guidance, projecting revenue around EUR 1.9 billion and operating EBIT near EUR 80 million, consistent with the forecast issued on 27 March 2026.",
-        "after": "The Americas segment posted an operating EBIT loss of EUR 6.2 million in H1 2026, affected by additional logistics and tariff-related expenses, representing a key risk for investors to watch in the second half. Kalkine Media To keep reading, please log in to your account, create a free account, or simply fill out the form below. Disclaimer The content, including but not limited to any articles, news, quotes, information, data, text, reports, ratings, opinions, images, photos, graphics, graphs, charts, animations and video (Content) is a service of Kalkine Media Limited, Company No. 12643132"
-      }
-    },
-    {
-      "id": 4,
-      "url": "https://kalkinemedia.com/uk/news/announcements/grammer-ag-0oqx-posts-eur-9614-million-h1-2026-revenue-with-171-operating-ebit-growth-affirms-full-year-forecast",
-      "title": "GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast",
-      "publishedAt": null,
-      "quote": "Group revenue grew by EUR 7.7 million, or 0.8%, to EUR 961.4 million compared to EUR 953.7 million in H1 2025. Adjusted for currency effects, revenue growth reached 2.7%.",
-      "excerpt": {
-        "before": "its H1 2026 financial results, reporting group revenue of EUR 961.4 million and a 17.1% rise in operating EBIT to EUR 41.7 million. The company credited the strong Q2 performance, ongoing efficiency initiatives under its \"Top 10\" programme, and group-wide capacity adjustments for the improvement. GRAMMER also reaffirmed its full-year 2026 outlook and announced the completion of long-term refinancing facilities totaling approximately EUR 762 million, enhancing financial clarity for investors. Key Points Strong Q2 and APAC Expansion Propel GRAMMER's H1 2026 Revenue to EUR 961.4 Million",
-        "after": "The APAC region led growth with a 7.6% increase to EUR 264.3 million, driven by a 30.7% rise in Commercial Vehicles revenue. EMEA remained stable at EUR 564.0 million, while AMERICAS declined 7.7% to EUR 153.0 million due to weaker demand and currency headwinds. Commercial Vehicles revenue expanded 5.2% to EUR 358.9 million, whereas Automotive revenue decreased 1.6% to EUR 602.5 million, reflecting ongoing pressure in the European automotive market. Operating EBIT Climbs to EUR 41.7 Million as \"Top 10\" Efficiency Program Yields Gains Operating EBIT increased 17.1% to EUR 41.7 million from"
-      }
-    },
-    {
-      "id": 5,
-      "url": "https://kalkinemedia.com/uk/news/announcements/grammer-ag-0oqx-posts-eur-9614-million-h1-2026-revenue-with-171-operating-ebit-growth-affirms-full-year-forecast",
-      "title": "GRAMMER AG (0OQX) Posts EUR 961.4 Million H1 2026 Revenue with 17.1% Operating EBIT Growth, Affirms Full-Year Forecast",
-      "publishedAt": null,
-      "quote": "The APAC region led growth with a 7.6% increase to EUR 264.3 million, driven by a 30.7% rise in Commercial Vehicles revenue.",
-      "excerpt": {
-        "before": "Q2 performance, ongoing efficiency initiatives under its \"Top 10\" programme, and group-wide capacity adjustments for the improvement. GRAMMER also reaffirmed its full-year 2026 outlook and announced the completion of long-term refinancing facilities totaling approximately EUR 762 million, enhancing financial clarity for investors. Key Points Strong Q2 and APAC Expansion Propel GRAMMER's H1 2026 Revenue to EUR 961.4 Million Group revenue grew by EUR 7.7 million, or 0.8%, to EUR 961.4 million compared to EUR 953.7 million in H1 2025. Adjusted for currency effects, revenue growth reached 2.7%.",
-        "after": "EMEA remained stable at EUR 564.0 million, while AMERICAS declined 7.7% to EUR 153.0 million due to weaker demand and currency headwinds. Commercial Vehicles revenue expanded 5.2% to EUR 358.9 million, whereas Automotive revenue decreased 1.6% to EUR 602.5 million, reflecting ongoing pressure in the European automotive market. Operating EBIT Climbs to EUR 41.7 Million as \"Top 10\" Efficiency Program Yields Gains Operating EBIT increased 17.1% to EUR 41.7 million from EUR 35.6 million in H1 2025, with the operating EBIT margin improving to 4.3% from 3.7%. Reported EBIT surged to EUR 48.6"
-      }
-    },
-    {
-      "id": 6,
       "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
       "title": "ON POINT. AND BEYOND.",
       "publishedAt": null,
@@ -877,7 +829,7 @@
       }
     },
     {
-      "id": 7,
+      "id": 3,
       "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
       "title": "ON POINT. AND BEYOND.",
       "publishedAt": null,
@@ -888,7 +840,7 @@
       }
     },
     {
-      "id": 8,
+      "id": 4,
       "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
       "title": "ON POINT. AND BEYOND.",
       "publishedAt": null,
@@ -899,7 +851,7 @@
       }
     },
     {
-      "id": 9,
+      "id": 5,
       "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
       "title": "ON POINT. AND BEYOND.",
       "publishedAt": null,
@@ -910,7 +862,7 @@
       }
     },
     {
-      "id": 10,
+      "id": 6,
       "url": "https://www.grammer.com/media/01_content/05_investor_relations/financial_publications/annual_reports/2026/260327_gb-grammer-2025_en_sec.pdf",
       "title": "ON POINT. AND BEYOND.",
       "publishedAt": null,
@@ -921,29 +873,7 @@
       }
     },
     {
-      "id": 11,
-      "url": "https://www.classaction.org/news/class-action-hundreds-of-thousands-of-dodge-jeep-chrysler-vehicles-equipped-with-defective-active-head-restraints",
-      "title": "Class Action: ‘Hundreds of Thousands’ of Dodge, Jeep, Chrysler Vehicles Equipped with Defective Active Head Restraints",
-      "publishedAt": null,
-      "quote": "the plaintiffs aim to compel Chrysler and Grammer AG to both notify owners of all affected vehicles as to the AHR defect and fix the problem.",
-      "excerpt": {
-        "before": "to equip its vehicles with the feature while “refusing” to issue a recall, fix the problem or reimburse drivers for out-of-pocket expenses. “To the contrary,” the suit says, “when presented with deployed, defective headrests, Chrysler refuses to cover the cost of replacing the defective AHR after it spontaneously deploys, blaming the consumer and disclaiming any responsibility.\" Due to what the lawsuit claims is the defendants’ “fraudulent concealment” of the apparent AHR defect, buyers and lessees have been deprived of the benefits of their bargain in paying for the above-listed vehicles.",
-        "after": "According to the case, consumers would not have bought or leased the affected vehicle models—or would have paid far less for the cars—had they known of the AHR issue. Case Spotlight Video Game Addiction Lawsuits If your child suffers from video game addiction — including Fortnite addiction or Roblox addiction — you may be able to take legal action. Gamers 18 to 22 may also qualify. Learn more:Video Game Addiction Lawsuit --- Kratom 7-OH Lawsuits Anyone who has used 7-OH kratom products and suffered a serious injury, such as overdose, heart attack or addiction, may be able to take legal"
-      }
-    },
-    {
-      "id": 12,
-      "url": "https://www.law360.com/articles/2393563/in-chancery-bankrupt-first-brands-accused-of-deal-breach",
-      "title": "In Chancery, Bankrupt First Brands Accused Of Deal Breach - Law360",
-      "publishedAt": null,
-      "quote": "Automotive manufacturer Grammer Inc. filed a suit in the Delaware Chancery Court accusing APC Parent LLC and guarantor First Brands Group, which filed for Chapter 11 protection on Sunday, of breaching multiple agreements and withholding more than $20 million in payments involved with a $40 million merger.",
-      "excerpt": {
-        "before": "Cap Healthcare Authority Deals & Corporate Governance Digital Health & Technology Other Policy & Compliance Law360 Global Products Law360 UK Commercial Litigation UK Corporate Crime & Compliance UK Employment UK Financial Services UK Insurance UK Intellectual Property UK Property & Construction UK Pulse UK Transactions UK Law360 Australia Commercial Disputes AU Financial Services AU ![PM Protege Hold Up](/sponsors/click/13235?utm source=article-page&utm medium=web&zone=1&version=1) In Chancery, Bankrupt First Brands Accused Of Deal Breach By Jarek Rutz ( September 29, 2025, 8:07 PM EDT) --",
-        "after": ". . . Law360 is on it, so you are, too. A Law360 subscription puts you at the center of fast-moving legal issues, trends and developments so you can act with speed and confidence. Over 200 articles are published daily across more than 60 topics, industries, practice areas and jurisdictions. A Law360 subscription includes features such as Daily newsletters Expert analysis Mobile app Advanced search Judge information Real-time alerts 450K+ searchable archived articles And more! Experience Law360 today with a free 7-day trial. Start Free Trial Already a subscriber? Click here to login ![LM"
-      }
-    },
-    {
-      "id": 13,
+      "id": 7,
       "url": "https://www.grammer.com/en/investor-relations/rating",
       "title": "GRAMMER Rating | GRAMMER AG",
       "publishedAt": null,
@@ -954,7 +884,7 @@
       }
     },
     {
-      "id": 14,
+      "id": 8,
       "url": "https://www.grammer.com/en/investor-relations/rating",
       "title": "GRAMMER Rating | GRAMMER AG",
       "publishedAt": null,
@@ -965,7 +895,7 @@
       }
     },
     {
-      "id": 15,
+      "id": 9,
       "url": "https://www.grammer.com/en/investor-relations/rating",
       "title": "GRAMMER Rating | GRAMMER AG",
       "publishedAt": null,
@@ -976,7 +906,7 @@
       }
     },
     {
-      "id": 16,
+      "id": 10,
       "url": "https://www.grammer.com/en/investor-relations/rating",
       "title": "GRAMMER Rating | GRAMMER AG",
       "publishedAt": null,
@@ -987,7 +917,7 @@
       }
     },
     {
-      "id": 17,
+      "id": 11,
       "url": "https://www.grammer.com/en/investor-relations/rating",
       "title": "GRAMMER Rating | GRAMMER AG",
       "publishedAt": null,
@@ -998,7 +928,7 @@
       }
     },
     {
-      "id": 18,
+      "id": 12,
       "url": "https://www.grammer.com/en/supplier-support-1/purchasing",
       "title": "Purchasing | GRAMMER AG",
       "publishedAt": null,
@@ -1009,7 +939,7 @@
       }
     },
     {
-      "id": 19,
+      "id": 13,
       "url": "https://www.grammer.com/en/supplier-support-1/purchasing",
       "title": "Purchasing | GRAMMER AG",
       "publishedAt": null,
@@ -1020,7 +950,7 @@
       }
     },
     {
-      "id": 20,
+      "id": 14,
       "url": "https://www.grammer.com/en/supplier-support-1/purchasing",
       "title": "Purchasing | GRAMMER AG",
       "publishedAt": null,
@@ -1031,7 +961,7 @@
       }
     },
     {
-      "id": 21,
+      "id": 15,
       "url": "https://www.grammer.com/en/supplier-support-1/purchasing",
       "title": "Purchasing | GRAMMER AG",
       "publishedAt": null,
@@ -1042,7 +972,7 @@
       }
     },
     {
-      "id": 22,
+      "id": 16,
       "url": "https://www.grammer.com/en/supplier-support-1/purchasing",
       "title": "Purchasing | GRAMMER AG",
       "publishedAt": null,
@@ -1053,7 +983,7 @@
       }
     },
     {
-      "id": 23,
+      "id": 17,
       "url": "https://mashinii.com/score/GMM.XETRA",
       "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
       "publishedAt": null,
@@ -1064,7 +994,7 @@
       }
     },
     {
-      "id": 24,
+      "id": 18,
       "url": "https://mashinii.com/score/GMM.XETRA",
       "title": "GRAMMER Ethics Score & Company Evidence | Mashinii",
       "publishedAt": null,
@@ -1076,8 +1006,8 @@
     }
   ],
   "run": {
-    "seconds": 44.9,
-    "costUsd": 0.0247,
+    "seconds": 26.2,
+    "costUsd": 0.0185,
     "tavilyCredits": 35,
     "models": [
       "nvidia/Nemotron-3-Ultra-550b-a55b",
