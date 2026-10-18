@@ -1,11 +1,11 @@
 import { TOTAL_RISK_WEIGHTS } from "@/lib/suppliers/criteria";
 import { loadDatasetSuppliers } from "@/lib/suppliers/dataset";
 import { buildProfile, parseComponent } from "@/lib/suppliers/profiles";
-import { findAlternatives, rankSuppliers, type RankedSupplier } from "@/lib/suppliers/scoring";
-import { BoardView, type BoardRow } from "./board-view";
+import { rankSuppliers } from "@/lib/suppliers/scoring";
+import { BoardView } from "./board-view";
+import { toBoardRow } from "./board-rows";
 
 const LEADERBOARD_SIZE = 100;
-const ALTERNATIVE_COUNT = 3;
 
 export async function SupplierBoard({ component }: { component: unknown }) {
   const profile = buildProfile(parseComponent(component));
@@ -28,30 +28,13 @@ export async function SupplierBoard({ component }: { component: unknown }) {
     profile.boosts.length > 0
       ? new Map(rankSuppliers(loaded.suppliers, TOTAL_RISK_WEIGHTS).map((entry) => [entry.supplier.id, entry.rank]))
       : null;
-
-  const toRow = ({ supplier, rank, risk }: RankedSupplier, withAlternatives: boolean): BoardRow => {
-    const found = withAlternatives ? findAlternatives(supplier, ranked, profile.weights, ALTERNATIVE_COUNT) : null;
-    return {
-      id: supplier.id,
-      name: supplier.name,
-      origin: supplier.origin,
-      rank,
-      risk: Math.round(risk.worst * 10) / 10,
-      rankChange: defaultRanks ? (defaultRanks.get(supplier.id) ?? rank) - rank : null,
-      scores: supplier.scores,
-      alternatives: found && {
-        driver: found.driver,
-        kind: found.kind,
-        rows: found.alternatives.map((entry) => toRow(entry, false)),
-      },
-    };
-  };
+  const context = { ranked, weights: profile.weights, defaultRanks };
 
   return (
     <BoardView
       key={profile.component}
       profile={profile}
-      rows={ranked.slice(0, LEADERBOARD_SIZE).map((entry) => toRow(entry, true))}
+      rows={ranked.slice(0, LEADERBOARD_SIZE).map((entry) => toBoardRow(entry, context, true))}
       supplierCount={loaded.suppliers.length}
     />
   );

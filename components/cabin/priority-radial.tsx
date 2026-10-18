@@ -34,14 +34,21 @@ export function PriorityRadial({ criteria, focusCount, highlighted, onHighlight,
     <figure className="flex flex-col items-center gap-2">
       <svg
         viewBox={`0 0 ${SIZE} ${SIZE}`}
-        className="w-full max-w-[19rem] overflow-visible"
+        className="w-full max-w-[22rem] overflow-visible"
         role="group"
         aria-label="Risk driver priorities, highest first, clockwise from the top"
       >
         {ticks.map((tick) => (
           <g key={tick} aria-hidden="true">
             <circle cx={CENTER} cy={CENTER} r={radius(tick)} fill="none" stroke="var(--blueprint-rule)" strokeWidth={1} />
-            <text x={CENTER + 3} y={CENTER - radius(tick) - 2} className="fill-[var(--blueprint-muted)] font-mono text-[8px]">
+            {/* In the gap just left of 12 o'clock, where the smallest driver ends before the ring. */}
+            <text
+              x={CENTER + radius(tick) * Math.cos(-Math.PI / 2 - slot / 2)}
+              y={CENTER + radius(tick) * Math.sin(-Math.PI / 2 - slot / 2)}
+              dx={-2}
+              textAnchor="end"
+              className="fill-[var(--blueprint-muted)] font-mono text-[8px]"
+            >
               {tick}%
             </text>
           </g>

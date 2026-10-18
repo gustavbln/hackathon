@@ -56,7 +56,6 @@ export function RiskFingerprint({
             fill="none"
             stroke={level === 75 ? "var(--risk-critical)" : "var(--blueprint-rule)"}
             strokeOpacity={level === 75 ? 0.45 : 1}
-            strokeDasharray="2 4"
           />
         ))}
       {wedges.map(({ criterion, start, end }) => {

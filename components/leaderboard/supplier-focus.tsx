@@ -17,6 +17,8 @@ interface SupplierFocusProps {
   activeCriterion: CriterionKey | null;
   onCriterionHover: (criterion: CriterionKey | null) => void;
   onSelect: (supplier: BoardRow) => void;
+  /** 1 when the supplier is the page's subject, 2 inside the board. */
+  headingLevel?: 1 | 2;
 }
 
 export function SupplierFocus({
@@ -27,7 +29,9 @@ export function SupplierFocus({
   activeCriterion,
   onCriterionHover,
   onSelect,
+  headingLevel = 2,
 }: SupplierFocusProps) {
+  const Heading = headingLevel === 1 ? "h1" : "h2";
   const parts = contributions(supplier.scores, weights);
   const total = parts.reduce((sum, part) => sum + part.points, 0);
   const watchOuts = criteria.filter(({ key }) => (supplier.scores[key] ?? 0) >= 50);
@@ -41,7 +45,7 @@ export function SupplierFocus({
           <p className="blueprint-label">
             #{supplier.rank} of {supplierCount.toLocaleString("en")} · {supplier.id}
           </p>
-          <h2 className="mt-1 truncate text-2xl font-medium tracking-[-0.02em]">{supplier.name}</h2>
+          <Heading className="mt-1 truncate text-2xl font-medium tracking-[-0.02em]">{supplier.name}</Heading>
         </div>
         <div className="text-right">
           <p className="blueprint-label">Weighted risk</p>
