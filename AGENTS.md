@@ -159,7 +159,8 @@ Split by folder so we rarely touch the same files.
 
 `lib/` holds data access, scoring and tool functions: one source of truth that the UI, the chatbot
 and the agents all call. `lib/suppliers/` is the dataset foundation: `criteria.ts` (the 18 criteria
-with their exact weights), `dataset.ts` (rows from the shared loader in `lib/suppliers.ts`, keyed by criterion), `profiles.ts`
+with their exact weights), `contract.ts` (supplier schemas and metric metadata; re-exported by `lib/chat-contract.ts`),
+`dataset.ts` (rows from the shared loader in `lib/suppliers.ts`, keyed by criterion), `profiles.ts`
 (weights per component, each boost with its reason) and `scoring.ts` (profile risk, ranking, "why"
 contributions, alternatives). Shared files (`lib/`, `app/layout.tsx`, `app/globals.css`, `components/ui/`,
 `package.json`): small changes only, tell the team.

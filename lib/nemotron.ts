@@ -1,7 +1,8 @@
 import "server-only";
 import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
-import { ChatError, type ModelCall } from "./chat-contract.ts";
+import { ChatError } from "./errors.ts";
+import type { ModelCall } from "./chat-contract.ts";
 
 const toolCallSchema = z.object({ id: z.string().min(1).max(200), type: z.literal("function"), function: z.object({ name: z.string().max(100), arguments: z.string().max(8_000) }) });
 export const assistantMessageSchema = z.object({ role: z.literal("assistant"), content: z.string().max(50_000).nullable().optional(), tool_calls: z.array(toolCallSchema).max(4).nullish() });

@@ -7,12 +7,11 @@ import { MathUtils } from "three";
 export type CabinView = {
   zoom: number;
   setZoom: Dispatch<SetStateAction<number>>;
-  resetView: number;
 };
 
 export const clampZoom = (zoom: number) => MathUtils.clamp(zoom, 0.85, 2.2);
 
-export function CabinControls({ setZoom, resetView, dragged, enabled = true }: CabinView & { dragged: RefObject<boolean>; enabled?: boolean }) {
+export function CabinControls({ setZoom, dragged, enabled = true }: CabinView & { dragged: RefObject<boolean>; enabled?: boolean }) {
   const { camera, gl, invalidate, size } = useThree();
   const angles = useRef({ yaw: 0, pitch: -0.04 });
 
@@ -20,7 +19,7 @@ export function CabinControls({ setZoom, resetView, dragged, enabled = true }: C
     angles.current = { yaw: 0, pitch: -0.04 };
     camera.rotation.set(-0.04, 0, 0, "YXZ");
     invalidate();
-  }, [camera, resetView, invalidate]);
+  }, [camera, invalidate]);
 
   useEffect(() => {
     if (!enabled) return;

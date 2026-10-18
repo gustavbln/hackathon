@@ -137,7 +137,7 @@ const CABIN_PARTS: { label: string; boxes: PartBox[] }[] = [
   ] },
 ];
 
-export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotating, reducedMotion, journeyProgress, ...selection }: CabinSelection & CabinView & {
+export default function CabinCanvas({ fallback, zoom, setZoom, rotating, reducedMotion, journeyProgress, ...selection }: CabinSelection & CabinView & {
   fallback: ReactNode; rotating: boolean; reducedMotion: boolean; journeyProgress?: number;
 }) {
   const dragged = useRef(false);
@@ -157,7 +157,7 @@ export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotati
       <Canvas shadows camera={{ position: [0, 1.65, 4.6], near: 0.03, far: 1200 }} dpr={[1, 1.5]} frameloop="demand" gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
         fallback={fallback} style={{ touchAction: journeyProgress !== undefined ? "pan-y" : "none" }} aria-label="Explore cabin components. Select a seat to open supplier sourcing.">
         {journeyProgress !== undefined && <TrainJourneyCamera progress={journeyProgress} reducedMotion={reducedMotion} />}
-        {journeyProgress === undefined && <CabinControls zoom={zoom} setZoom={setZoom} resetView={resetView} dragged={dragged} enabled={!selection.selectedSeatId} />}
+        {journeyProgress === undefined && <CabinControls zoom={zoom} setZoom={setZoom} dragged={dragged} enabled={!selection.selectedSeatId} />}
         <ambientLight intensity={0.8 + cabinLight * 0.6} />
         <directionalLight position={[0, 2.5, 3]} intensity={1.6 * cabinLight} />
         <directionalLight position={[65, 85, 45]} intensity={2 * (1 - cabinLight)} castShadow={cabinLight < 0.99}

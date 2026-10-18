@@ -88,7 +88,7 @@ export function CabinScene({ initialSeatId = null, initialWeights = null, journe
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${journey ? "h-svh w-screen" : "h-[max(calc(100svh-8.5rem),40rem)] w-[calc(100vw-2.5rem)]"}`}>
               <CabinBoundary>
                 <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={intro ? () => {} : selectSeat}
-                  journeyProgress={intro ? journey.progress : undefined} zoom={zoom} setZoom={setZoom} resetView={0} rotating={rotating} reducedMotion={prefersReducedMotion} fallback={<CabinFallback />} />
+                  journeyProgress={intro ? journey.progress : undefined} zoom={zoom} setZoom={setZoom} rotating={rotating} reducedMotion={prefersReducedMotion} fallback={<CabinFallback />} />
               </CabinBoundary>
             </div>
             {focused && (

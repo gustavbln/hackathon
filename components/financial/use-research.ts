@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import { readEvents } from "@/lib/sse";
 
 import {
   researchEventSchema,
@@ -55,7 +56,7 @@ export function useResearch() {
       );
       if (!response.ok || response.body === null) throw new Error(await errorMessage(response));
 
-      for await (const event of readEvents(response.body)) {
+      for await (const event of readEvents(response.body, researchEventSchema)) {
         if (request.kind === "replay") await sleep(REPLAY_GAP_MS, controller.signal);
         setState((current) =>
           current.request !== request
@@ -86,28 +87,6 @@ export function useResearch() {
   }, []);
 
   return { state, run };
-}
-
-/** Parses a Server-Sent Events body: one `data: <ResearchEvent JSON>` block per event. */
-async function* readEvents(body: ReadableStream<Uint8Array>): AsyncGenerator<ResearchEvent> {
-  const reader = body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
-    const blocks = buffer.split("\n\n");
-    buffer = blocks.pop() ?? "";
-    for (const block of blocks) {
-      const data = block
-        .split("\n")
-        .filter((line) => line.startsWith("data:"))
-        .map((line) => line.slice(5).trimStart())
-        .join("\n");
-      if (data !== "") yield researchEventSchema.parse(JSON.parse(data));
-    }
-  }
 }
 
 async function errorMessage(response: Response): Promise<string> {

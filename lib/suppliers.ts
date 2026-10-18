@@ -4,20 +4,14 @@ import { createHash } from "node:crypto";
 import { join } from "node:path";
 import { parse } from "csv-parse/sync";
 import { z } from "zod";
+import { ChatError } from "./errors.ts";
 import {
-  ChatError, riskDefinitions, metricDefinitions, metricKeySchema, riskLevelSchema,
-  supplierIdSchema, querySuppliersSchema, getSuppliersSchema, datasetResultSchema,
-  type MetricKey, type SupplierFacts,
-} from "./chat-contract.ts";
+  riskDefinitions, metricDefinitions, riskLevelSchema, datasetSupplierSchema,
+  querySuppliersSchema, getSuppliersSchema, datasetResultSchema,
+  type MetricKey, type SupplierFacts, type DatasetSupplier as Supplier,
+} from "./suppliers/contract.ts";
 
-const supplierSchema = z.object({
-  id: supplierIdSchema,
-  name: z.string().trim().min(1).max(200),
-  metrics: z.record(metricKeySchema, z.number().finite()),
-  sourcingRisk: z.enum(["Low", "Medium", "High"]),
-  complexity: z.enum(["Simple", "Moderate", "Complex"]),
-});
-export type Supplier = z.infer<typeof supplierSchema>;
+export type { DatasetSupplier as Supplier } from "./suppliers/contract.ts";
 export function riskLevel(value: number) {
   return riskLevelSchema.parse(value < 25 ? "Low" : value < 50 ? "Medium" : value < 75 ? "High" : "Critical");
 }
@@ -38,7 +32,7 @@ export function parseSupplierCsv(content: string): Supplier[] {
       return [key, number];
     }));
     values.criticalRiskCount = riskDefinitions.filter(([key]) => (values[key] ?? 0) >= 75).length;
-    const supplier = supplierSchema.parse({
+    const supplier = datasetSupplierSchema.parse({
       id: row.supplierID, name: row["Supplier Name"], metrics: values,
       sourcingRisk: row["Sourcing Risk Level"], complexity: row["Supply Chain Complexity"],
     });

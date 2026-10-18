@@ -3,61 +3,17 @@ import { researchedIdSchema } from "./research/contract.ts";
 import { CRITERIA } from "./suppliers/criteria.ts";
 import { seatCriteriaResponseSchema } from "./seat-criteria-contract.ts";
 import { shortlistInstructionSchema } from "./seat-shortlist-contract.ts";
+import {
+  datasetResultSchema, idsSchema, metricKeySchema, metricsSchema, supplierFactsSchema, supplierIdSchema,
+} from "./suppliers/contract.ts";
 
-export const riskDefinitions = [
-  ["Financial_Health_Score", "Financial health risk", 10],
-  ["Operational_Resilience_Score", "Operational resilience risk", 10],
-  ["Quality_Risk_Score", "Quality risk", 10],
-  ["Compliance_Risk_Score", "Compliance risk", 8],
-  ["Sub_Tier_Visibility_Score", "Sub-tier visibility risk", 6],
-  ["Safety_Incident_Score", "Workplace safety incident risk", 6],
-  ["Credit_Rating_Score", "Credit risk", 6],
-  ["ESG_Performance_Score", "ESG risk", 5],
-  ["Governance_Risk_Score", "Governance risk", 5],
-  ["Geopolitical_Risk_Score", "Geopolitical risk", 5],
-  ["Industry_Benchmark_Score", "Industry benchmark risk", 4],
-  ["Labor_Stability_Score", "Labor stability risk", 4],
-  ["Environmental_Exposure_Score", "Environmental exposure risk", 4],
-  ["Digital_Security_Score", "Digital security risk", 4],
-  ["Political_Stability_Score", "Political stability risk", 4],
-  ["Media_Sentiment_Score", "Media sentiment risk", 3],
-  ["External_Intelligence_Score", "External intelligence risk", 3],
-  ["Market_Sentiment_Score", "Market sentiment risk", 3],
-] as const;
+export {
+  riskDefinitions, metricDefinitions, metricKeySchema, supplierIdSchema, riskLevelSchema, defaultMetrics,
+  querySuppliersSchema, getSuppliersSchema, supplierFactsSchema, datasetResultSchema,
+  type MetricKey, type SupplierFacts, type DatasetResult,
+} from "./suppliers/contract.ts";
+export { ChatError } from "./errors.ts";
 
-export const metricDefinitions = [
-  ...riskDefinitions.map(([key, label, weight]) => ({ key, label, unit: "risk points", direction: "lower", weight })),
-  { key: "Total_Risk_Index", label: "Overall risk", unit: "risk points", direction: "lower", weight: null },
-  { key: "Supplier Delivery Rating", label: "Delivery rating", unit: "%", direction: "higher", weight: null },
-  { key: "Order Confirmation Rate", label: "Order confirmation rate", unit: "%", direction: "higher", weight: null },
-  { key: "Order Change Rate", label: "Order change rate", unit: "%", direction: "lower", weight: null },
-  { key: "Purchase Order Volume (EUR)", label: "Existing purchase order exposure", unit: "EUR", direction: "context", weight: null },
-  { key: "criticalRiskCount", label: "Critical risk categories", unit: "categories", direction: "lower", weight: null },
-] as const;
-
-export const metricKeySchema = z.enum(metricDefinitions.map((metric) => metric.key));
-export type MetricKey = z.infer<typeof metricKeySchema>;
-export const supplierIdSchema = z.string().regex(/^SUPP_\d{5}$/);
-export const riskLevelSchema = z.enum(["Low", "Medium", "High", "Critical"]);
-export const defaultMetrics: MetricKey[] = ["Total_Risk_Index", "Financial_Health_Score", "Quality_Risk_Score", "Supplier Delivery Rating"];
-const metricsSchema = z.array(metricKeySchema).min(1).max(24).refine((keys) => new Set(keys).size === keys.length, "Duplicate metrics");
-const idsSchema = z.array(supplierIdSchema).min(1).max(20).refine((ids) => new Set(ids).size === ids.length, "Duplicate supplier IDs");
-
-export const querySuppliersSchema = z.strictObject({
-  ids: idsSchema.optional(),
-  filters: z.array(z.strictObject({
-    metric: metricKeySchema,
-    operator: z.enum(["eq", "lt", "lte", "gt", "gte"]),
-    value: z.number().finite(),
-  })).max(12).default([]),
-  sourcingRisk: z.enum(["Low", "Medium", "High"]).optional(),
-  complexity: z.enum(["Simple", "Moderate", "Complex"]).optional(),
-  sort: z.strictObject({ metric: metricKeySchema, direction: z.enum(["asc", "desc"]) })
-    .default({ metric: "Total_Risk_Index", direction: "asc" }),
-  metrics: metricsSchema.default(defaultMetrics),
-  limit: z.number().int().min(1).max(20).default(20),
-});
-export const getSuppliersSchema = z.strictObject({ ids: idsSchema, metrics: metricsSchema.default(defaultMetrics) });
 export const lastViewSchema = z.strictObject({ supplierIds: idsSchema, metricKeys: metricsSchema });
 const criterionKeySchema = z.enum(CRITERIA.map(({ key }) => key));
 const seatIdSchema = z.string().regex(/^\d{1,2}[A-Z]$/);
@@ -113,28 +69,6 @@ export const chatRequestSchema = z.strictObject({
 });
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
 
-export const supplierFactsSchema = z.object({
-  id: supplierIdSchema,
-  name: z.string(),
-  values: z.array(z.object({
-    metric: metricKeySchema,
-    value: z.number().finite(),
-    level: riskLevelSchema.nullable(),
-    contribution: z.number().nullable(),
-  })),
-  sourcingRisk: z.enum(["Low", "Medium", "High"]),
-  complexity: z.enum(["Simple", "Moderate", "Complex"]),
-});
-export type SupplierFacts = z.infer<typeof supplierFactsSchema>;
-export const datasetResultSchema = z.object({
-  source: z.object({ name: z.literal("supplier_risk_dataset.csv"), version: z.string() }),
-  rows: z.array(supplierFactsSchema).max(20),
-  matchedCount: z.number().int().nonnegative(),
-  missingIds: z.array(supplierIdSchema),
-  metricKeys: metricsSchema,
-  sort: z.object({ metric: metricKeySchema, direction: z.enum(["asc", "desc"]) }).nullable(),
-});
-export type DatasetResult = z.infer<typeof datasetResultSchema>;
 export const answerRecipeSchema = z.strictObject({
   text: z.string().trim().min(1).max(2_000),
   resultId: z.string().max(200).nullable(),
@@ -207,14 +141,3 @@ export const chatEventSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("error"), error: z.object({ code: z.string(), message: z.string() }) }),
 ]);
 export type ChatEvent = z.infer<typeof chatEventSchema>;
-
-export class ChatError extends Error {
-  code: string;
-  status: number;
-  constructor(code: string, message: string, status = 502) {
-    super(message);
-    this.name = "ChatError";
-    this.code = code;
-    this.status = status;
-  }
-}

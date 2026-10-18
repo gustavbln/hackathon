@@ -1,6 +1,6 @@
 import "server-only";
 import { z } from "zod";
-import { ChatError } from "./chat-contract.ts";
+import { ChatError } from "./errors.ts";
 import { completeNemotron, type ModelMessage, type UsageSink } from "./nemotron.ts";
 import { CRITERIA, type Weights } from "./suppliers/criteria.ts";
 import { seatEvaluationSchema, seatCriteriaResponseSchema } from "./seat-criteria-contract.ts";

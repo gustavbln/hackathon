@@ -23,6 +23,29 @@ function csv(rows: Supplier[]) {
     .map((cells) => cells.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(",")).join("\n");
 }
 
+test("risk metadata preserves the public metric order, labels and percentage weights", () => {
+  assert.deepEqual(riskDefinitions, [
+    ["Financial_Health_Score", "Financial health risk", 10],
+    ["Operational_Resilience_Score", "Operational resilience risk", 10],
+    ["Quality_Risk_Score", "Quality risk", 10],
+    ["Compliance_Risk_Score", "Compliance risk", 8],
+    ["Sub_Tier_Visibility_Score", "Sub-tier visibility risk", 6],
+    ["Safety_Incident_Score", "Workplace safety incident risk", 6],
+    ["Credit_Rating_Score", "Credit risk", 6],
+    ["ESG_Performance_Score", "ESG risk", 5],
+    ["Governance_Risk_Score", "Governance risk", 5],
+    ["Geopolitical_Risk_Score", "Geopolitical risk", 5],
+    ["Industry_Benchmark_Score", "Industry benchmark risk", 4],
+    ["Labor_Stability_Score", "Labor stability risk", 4],
+    ["Environmental_Exposure_Score", "Environmental exposure risk", 4],
+    ["Digital_Security_Score", "Digital security risk", 4],
+    ["Political_Stability_Score", "Political stability risk", 4],
+    ["Media_Sentiment_Score", "Media sentiment risk", 3],
+    ["External_Intelligence_Score", "External intelligence risk", 3],
+    ["Market_Sentiment_Score", "Market sentiment risk", 3],
+  ]);
+});
+
 test("CSV parses quoted names, derives critical categories and rejects invalid data", () => {
   const row = supplier(1, 80);
   row.name = 'Rail, "Example"';
