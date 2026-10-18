@@ -1,22 +1,33 @@
 /** Longest quote kept; longer passages are summaries in disguise. */
-export const MAX_QUOTE_LENGTH = 300;
+export const MAX_QUOTE_LENGTH = 400;
 
 const normalize = (text: string) => text.replace(/\s+/g, " ").trim().toLowerCase();
 
-/** A quote only counts as evidence when it appears word for word in the fetched text. */
+/** A quote only counts as evidence when it appears word for word in the fetched text, read without its Markdown. */
 export function isVerbatim(quote: string, text: string): boolean {
-  const needle = normalize(quote);
-  return needle.length >= 12 && needle.length <= MAX_QUOTE_LENGTH && normalize(text).includes(needle);
+  const needle = normalize(readable(quote));
+  return needle.length >= 12 && needle.length <= MAX_QUOTE_LENGTH && normalize(readable(text)).includes(needle);
 }
 
 /** Legal forms and filler words that say nothing about which company is meant. */
 const GENERIC = new Set(["ag", "gmbh", "se", "sa", "spa", "inc", "ltd", "llc", "plc", "kg", "co", "group", "holding", "the", "and", "und", "company"]);
 
-/** True when the text names the company by a distinctive part of its name, e.g. "grammer" for "GRAMMER AG". */
+/**
+ * True when the text names the company by the distinctive part of one of its names, as a phrase: "grammer" for
+ * "GRAMMER AG", but "franz kiel" for "Franz Kiel GmbH", since "Kiel" alone is a city and "Franz" a first name.
+ */
 export function mentionsCompany(text: string, names: string[]): boolean {
-  const haystack = normalize(text);
-  const tokens = names.flatMap((name) => normalize(name).split(/[^a-z0-9]+/)).filter((token) => token.length >= 4 && !GENERIC.has(token));
-  return tokens.some((token) => haystack.includes(token));
+  const words = ` ${normalize(text).replace(/[^a-z0-9]+/g, " ")} `;
+  return names.some((name) => {
+    const tokens = normalize(name).split(/[^a-z0-9]+/).filter((token) => token.length >= 2 && !GENERIC.has(token));
+    return tokens.some((token) => token.length >= 4) && words.includes(` ${tokens.join(" ")} `);
+  });
+}
+
+/** Looser than mentionsCompany: any distinctive part of a name, e.g. "kiel". Only safe on a page already about the company. */
+export function mentionsNamePart(text: string, names: string[]): boolean {
+  const words = ` ${normalize(text).replace(/[^a-z0-9]+/g, " ")} `;
+  return names.some((name) => normalize(name).split(/[^a-z0-9]+/).some((token) => token.length >= 4 && !GENERIC.has(token) && words.includes(` ${token} `)));
 }
 
 /** The JSON object in a model reply, ignoring code fences or stray text around it; null when there is none. */
@@ -36,7 +47,7 @@ export function extractJson(content: string): unknown {
  * page order up to the limit. Long reports put the relevant part far below their navigation.
  */
 export function relevantPassages(text: string, topic: string[], limit: number): string[] {
-  const lines = text.split(/\n+/).map((line) => line.trim()).filter((line) => line.length > 0);
+  const lines = text.split(/\n+/).map(readable).filter((line) => line.length > 0);
   if (text.length <= limit) return lines;
   const words = [...new Set(topic.flatMap((part) => part.toLowerCase().match(/[a-z0-9]{4,}/g) ?? []))];
   const scored = lines.map((line, index) => ({ line, index, score: words.filter((word) => line.toLowerCase().includes(word)).length }));

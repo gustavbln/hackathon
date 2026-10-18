@@ -19,9 +19,9 @@ const CACHE_MS = 24 * 60 * 60 * 1_000;
 // ponytail: per-process cache, lost on restart; a shared store once the app runs on several instances.
 const cache = new Map<string, { at: number; results: WebResult[] }>();
 
-/** One basic Tavily search (1 credit, five results), cached for a day per normalized query. */
-export async function searchWeb(query: string, signal: AbortSignal): Promise<{ results: WebResult[]; credits: number }> {
-  const key = query.trim().toLowerCase().replace(/\s+/g, " ");
+/** One basic Tavily search (1 credit, five results), cached for a day per normalized query; optionally on one site only. */
+export async function searchWeb(query: string, signal: AbortSignal, site: string | null = null): Promise<{ results: WebResult[]; credits: number }> {
+  const key = `${site ?? ""} ${query.trim().toLowerCase().replace(/\s+/g, " ")}`;
   const cached = cache.get(key);
   if (cached && Date.now() - cached.at < CACHE_MS) return { results: cached.results, credits: 0 };
   const config = envSchema.safeParse(process.env);
@@ -31,7 +31,7 @@ export async function searchWeb(query: string, signal: AbortSignal): Promise<{ r
     headers: { Authorization: `Bearer ${config.data.TAVILY_API_KEY}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       query, search_depth: "basic", max_results: 5, auto_parameters: false, include_usage: true,
-      exclude_domains: ["reddit.com", "quora.com"],
+      ...(site ? { include_domains: [site] } : { exclude_domains: ["reddit.com", "quora.com"] }),
     }),
   });
   if (!response.ok) {

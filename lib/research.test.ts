@@ -2,13 +2,14 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { allowsFraming } from "./research/embeddable.ts";
 import { researchedIdFor, researchedSupplierSchema, toSupplier, type ResearchedSupplier } from "./research/contract.ts";
-import { excerptAround, extractJson, isVerbatim, keepKnownCitations, mentionsCompany, relevantPassages } from "./research/evidence.ts";
+import { excerptAround, extractJson, isVerbatim, keepKnownCitations, mentionsCompany, mentionsNamePart, relevantPassages } from "./research/evidence.ts";
 
 test("quotes count only when they appear verbatim in the fetched text", () => {
   const page = "In 2025 the group reported   a net loss of EUR 12 million.\nRevenue grew 4%.";
   assert.equal(isVerbatim("reported a net loss of EUR 12 million", page), true);
   assert.equal(isVerbatim("reported a net profit of EUR 12 million", page), false);
   assert.equal(isVerbatim("net loss", page), false);
+  assert.equal(isVerbatim("Kiel opened a new plant in North Macedonia", "**Kiel** opened a [new plant](https://kiel.example/news) in North Macedonia."), true);
 });
 
 test("ids are stable slugs that never look like dataset suppliers", () => {
@@ -63,6 +64,10 @@ test("evidence must name the company, not just share its industry", () => {
   assert.equal(mentionsCompany("GRAMMER AG reported a loss", ["GRAMMER AG"]), true);
   assert.equal(mentionsCompany("JPMorgan credit risk exposure", ["GRAMMER AG"]), false);
   assert.equal(mentionsCompany("The AG group announced", ["GRAMMER AG"]), false);
+  assert.equal(mentionsCompany("Kiel Institute for the World Economy report", ["Franz Kiel GmbH"]), false);
+  assert.equal(mentionsCompany("Franz Müller, Kiel: annual report", ["Franz Kiel GmbH"]), false);
+  assert.equal(mentionsNamePart("Kiel employs 900 people", ["Franz Kiel GmbH"]), true);
+  assert.equal(mentionsCompany("Franz Kiel GmbH opens a plant in Nördlingen", ["Franz Kiel GmbH"]), true);
 });
 
 test("model replies with reasoning around the JSON still parse, and prose alone does not", () => {

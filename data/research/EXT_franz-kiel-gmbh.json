@@ -1,0 +1,732 @@
+{
+  "id": "EXT_franz-kiel-gmbh",
+  "name": "Franz Kiel GmbH",
+  "legalName": "Franz Kiel GmbH",
+  "website": "https://kiel-seating.com",
+  "country": "DE",
+  "brief": "",
+  "researchedAt": "2026-10-18T15:27:37.068Z",
+  "summary": "Franz Kiel GmbH reported consolidated revenue of approximately €180 million for the 2023 fiscal year, but no profitability, cash‑flow, debt or liquidity data are disclosed. [1] The company employs about 1,500 people worldwide with 250 at its Nördlingen headquarters, indicating operational scale. [1] It holds ISO 14001:2015 certification and publishes annual environmental reports that track energy, water consumption and waste volumes, with reduction targets consistently met. [7] [8] Despite a ~20 % production increase in 2023 versus 2022, significant reductions in environmental impact were still achieved. [8] Products are designed as modular, repairable systems using lightweight materials to lower fuel consumption, and the sustainability policy emphasizes innovative materials, environmentally friendly manufacturing and an internal employee‑suggestion scheme. [9] [10] [11]",
+  "insights": [
+    {
+      "headline": "Financial transparency limited to revenue only",
+      "criterion": "financialHealth",
+      "sourceIds": [
+        1
+      ]
+    },
+    {
+      "headline": "Revenue €180 M (2023) from a self‑reported snapshot dated 3 Sep 2025 (≈13 months old)",
+      "criterion": "financialHealth",
+      "sourceIds": [
+        1
+      ]
+    },
+    {
+      "headline": "ISO 14001:2015 certified with annual environmental reporting and met reduction targets",
+      "criterion": "esg",
+      "sourceIds": [
+        7,
+        8
+      ]
+    },
+    {
+      "headline": "20 % production growth in 2023 yet environmental impact still reduced",
+      "criterion": "esg",
+      "sourceIds": [
+        8
+      ]
+    },
+    {
+      "headline": "Modular, repairable product design with lightweight materials cuts fuel use",
+      "criterion": "esg",
+      "sourceIds": [
+        9,
+        10,
+        11
+      ]
+    },
+    {
+      "headline": "Sustainability policy drives innovative materials, eco‑friendly processes and employee suggestions",
+      "criterion": "esg",
+      "sourceIds": [
+        9
+      ]
+    }
+  ],
+  "agents": {
+    "compliance": {
+      "status": "no_evidence",
+      "estimate": null,
+      "report": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"Franz Kiel GmbH\" lawsuit fine investigation” · “\"Franz Kiel GmbH\" court proceedings regulator 2025 2026” · “\"Franz Kiel GmbH\" antitrust penalty compliance violation” · “Compliance lawsuit fine investigation” on kiel-seating.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "14 results, 1 about Franz Kiel GmbH, from kiel-seating.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: New building of a manufacturing site of the Franz Kiel Group in North Macedonia - Franz Kiel GmbH - Kiel Sitze · 10,191 characters, 1 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about compliance found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "operationalResilience": {
+      "status": "no_evidence",
+      "estimate": null,
+      "report": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"Franz Kiel GmbH\" plant closure production stop” · “\"Franz Kiel GmbH\" supply disruption capacity 2025 2026” · “\"Franz Kiel GmbH\" production sites manufacturing footprint” · “Operational resilience plant closure production stop” on kiel-seating.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "18 results, 14 about Franz Kiel GmbH, from kiel-seating.com, econmarketresearch.com, bus-news.com, dataintelo.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Company - Franz Kiel GmbH - Kiel Sitze · 12,077 characters, 15 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read econmarketresearch.com: Bus Seat Market Size, Share & Industry Report, 2026-2035 · 37,748 characters, 28 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read bus-news.com: 80 Years of Bus Seating with Kiel | Bus-News · 12,074 characters, 11 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read dataintelo.com: Bus and Train Seats Market Research Report 2034 · 70,612 characters, 11 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Founding of Kiel Macedonia DOOEL, further increasing EU production capabilities.",
+          "sourceIds": [
+            2
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "Kiel enters a joint venture in China, launching the Jiangsu ARSALE Kiel Seat Co ltd.",
+          "sourceIds": [
+            3
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "Kiel also signs a licence agreement for the production of bus seats in India, and founds joint ventures in both China and Russia.",
+          "sourceIds": [
+            4
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "In addition to this global growth, Kiel introduces a rigorous quality management system to further optimise products and production.",
+          "sourceIds": [
+            5
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "note",
+          "text": "1 of 5 proposed quotes were dropped: not word for word on their page, or not about Franz Kiel GmbH.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "The evidence found does not speak to operational resilience, so it stays unscored.",
+          "sourceIds": [
+            2,
+            3,
+            4,
+            5
+          ],
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        }
+      ]
+    },
+    "subTierVisibility": {
+      "status": "no_evidence",
+      "estimate": null,
+      "report": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"Franz Kiel GmbH\" supply chain due diligence suppliers” · “\"Franz Kiel GmbH\" supplier problems bottleneck 2025 2026” · “\"Franz Kiel GmbH\" supplier code of conduct human rights” · “Sub-tier visibility supply chain due diligence suppliers” on kiel-seating.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "20 results, 7 about Franz Kiel GmbH, from kiel-seating.com, etiskhandel.se.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Legal Information - Franz Kiel GmbH - Kiel Sitze · 53,609 characters, 18 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read etiskhandel.se: human rights risks behind trains and trams in swedish · 80,000 characters, 5 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Company - Franz Kiel GmbH - Kiel Sitze · 12,077 characters, 5 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Service - Franz Kiel GmbH - Kiel Sitze · 5,493 characters",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "2 of 2 proposed quotes were dropped: not word for word on their page, or not about Franz Kiel GmbH.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about sub-tier visibility found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "financialHealth": {
+      "status": "estimated",
+      "estimate": {
+        "value": 50,
+        "confidence": "low",
+        "rationale": "Revenue of €180M (2023) shows meaningful scale, but the complete absence of profitability, leverage, and liquidity metrics prevents a lower risk assessment. Self-reported, unaudited data from 2023 (viewed Sept 2025) is thin evidence, so confidence is low and the score sits at the bottom of the high-risk band.",
+        "sourceIds": [
+          1
+        ]
+      },
+      "report": {
+        "headline": "Revenue disclosed but no profitability or liquidity data",
+        "findings": [
+          {
+            "text": "Consolidated revenue for 2023 was approximately €180 million, as stated on the company's 'Facts and Figures' page dated September 3, 2025.",
+            "sourceIds": [
+              1
+            ]
+          },
+          {
+            "text": "The company employs approximately 1,500 people worldwide and 250 at the Nördlingen headquarters, indicating operational scale.",
+            "sourceIds": [
+              1
+            ]
+          },
+          {
+            "text": "No profit margins, EBITDA, net income, cash flow, debt levels, or liquidity ratios are disclosed in the available evidence.",
+            "sourceIds": [
+              1
+            ]
+          },
+          {
+            "text": "The evidence is a self-reported snapshot from September 2025 (about 13 months old) covering the 2023 fiscal year; no audited financial statements or third-party credit ratings are provided.",
+            "sourceIds": [
+              1
+            ]
+          }
+        ],
+        "openQuestions": [
+          "What were the EBITDA margin, net profit, and free cash flow for 2023 and 2024?",
+          "What is the current net debt position, debt maturity profile, and interest coverage ratio?",
+          "Are audited consolidated financial statements (IFRS or HGB) available for the last two fiscal years?",
+          "Has the company obtained an external credit rating or bank reference letter recently?"
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"Franz Kiel GmbH\" annual report revenue net income results” · “\"Franz Kiel GmbH\" profit warning loss restructuring 2025 2026” · “\"Franz Kiel GmbH\" refinancing liquidity equity ratio” · “Financial health annual report revenue net income results” on kiel-seating.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "20 results, 5 about Franz Kiel GmbH, from kiel-seating.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Facts and Figures · 1,334 characters",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Legal Information - Franz Kiel GmbH - Kiel Sitze · 53,609 characters, 15 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Career - Franz Kiel GmbH - Kiel Sitze · 9,917 characters, 4 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Career - Franz Kiel GmbH - Kiel Sitze · 9,917 characters, 4 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Revenue: approx. €180 million (2023, consolidated)",
+          "sourceIds": [
+            1
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "Revenue of €180M (2023) shows meaningful scale, but the complete absence of profitability, leverage, and liquidity metrics prevents a lower risk assessment. Self-reported, unaudited data from 2023 (viewed Sept 2025) is thin evidence, so confidence is low and the score sits at the bottom of the high-risk band.",
+          "sourceIds": [
+            1
+          ],
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        }
+      ]
+    },
+    "quality": {
+      "status": "no_evidence",
+      "estimate": null,
+      "report": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"Franz Kiel GmbH\" recall defect quality problems” · “\"Franz Kiel GmbH\" quality issues customers 2025 2026” · “\"Franz Kiel GmbH\" quality certification IATF IRIS award” · “Quality recall defect quality problems” on kiel-seating.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "20 results, 11 about Franz Kiel GmbH, from rocketreach.co, railmarket.com, kiel-seating.com, bebee.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Skimmed rocketreach.co: Franz Kiel GmbH Information · 2,130 characters",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read railmarket.com: Component Producers companies in Europe | RAILMARKET.com · 80,000 characters, 29 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: “We provide solutions today to the mobility issues of tomorrow”:The Kiel Group is setting the course for a successful future - Franz Kiel GmbH - Kiel Sitze · 7,877 characters, 4 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read bebee.com: Franz Kiel GmbH - Stellen | BeBee · 840 characters",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "Franz Kiel GmbH is a railroad manufacture company based out of Nürnberger Str. 62, Nördlingen, Germany.",
+          "sourceIds": [
+            6
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "note",
+          "text": "4 of 5 proposed quotes were dropped: not word for word on their page, or not about Franz Kiel GmbH.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "The evidence found does not speak to quality, so it stays unscored.",
+          "sourceIds": [
+            6
+          ],
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        }
+      ]
+    },
+    "laborStability": {
+      "status": "no_evidence",
+      "estimate": null,
+      "report": null,
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"Franz Kiel GmbH\" strike union works council” · “\"Franz Kiel GmbH\" job cuts layoffs protest 2025 2026” · “\"Franz Kiel GmbH\" collective agreement workforce” · “Labor stability strike union works council” on kiel-seating.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "16 results, 3 about Franz Kiel GmbH, from kiel-seating.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Rechtsangaben - Franz Kiel GmbH - Kiel Sitze · 54,734 characters, 3 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Legal Information - Franz Kiel GmbH - Kiel Sitze · 53,609 characters, 11 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: [PDF] Kiel Group · 9,074 characters, 4 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "2 of 2 proposed quotes were dropped: not word for word on their page, or not about Franz Kiel GmbH.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "note",
+          "text": "No verifiable public evidence about labor stability found.",
+          "sourceIds": [],
+          "model": null
+        }
+      ]
+    },
+    "esg": {
+      "status": "estimated",
+      "estimate": {
+        "value": 20,
+        "confidence": "low",
+        "rationale": "Evidence shows documented environmental management system (ISO 14001:2015), annual reporting with achieved reduction targets even during 20% production growth (2023 vs 2022), and product design for circularity. These are concrete strengths lowering ESG risk. However, all quotes are undated marketing/PDF content with no independent verification; the ISO standard cited is from 2015 (superseded 2018); no quantitative KPIs, Scope 3 data, social or governance evidence provided. Thin, self-reported,,",
+        "sourceIds": [
+          7,
+          8,
+          9,
+          10,
+          11
+        ]
+      },
+      "report": {
+        "headline": "ISO 14001 certified with annual environmental reporting and modular product design",
+        "findings": [
+          {
+            "text": "Company holds ISO 14001:2015 certification for its environmental management system.",
+            "sourceIds": [
+              7
+            ]
+          },
+          {
+            "text": "Annual environmental report tracks energy, water consumption and waste volumes; reduction targets set and consistently achieved.",
+            "sourceIds": [
+              7,
+              8
+            ]
+          },
+          {
+            "text": "Despite ~20% production increase in 2023 vs 2022, significant reductions in environmental impact were still achieved.",
+            "sourceIds": [
+              8
+            ]
+          },
+          {
+            "text": "Products designed as modular systems for repairability and end-of-life recyclability; lightweight materials reduce fuel consumption.",
+            "sourceIds": [
+              9,
+              10,
+              11
+            ]
+          },
+          {
+            "text": "Sustainability policy includes innovative materials, environmentally friendly manufacturing processes and internal employee suggestion scheme.",
+            "sourceIds": [
+              9
+            ]
+          }
+        ],
+        "openQuestions": [
+          "What are the specific quantitative reduction targets and actual KPI results for energy, water and waste for the last 3 years?",
+          "Is the ISO 14001 certificate current (2015 standard was replaced by 2018 version) and what was the last audit date?",
+          "What is the scope of the environmental report – does it cover Scope 1, 2 and 3 emissions?",
+          "Are there any social or governance certifications (e.g., ISO 45001, SA8000, EcoVadis) or supply chain due-diligence processes documented?"
+        ]
+      },
+      "thread": [
+        {
+          "kind": "plan",
+          "text": "4 searches: “\"Franz Kiel GmbH\" sustainability report CO2 targets” · “\"Franz Kiel GmbH\" ESG rating EcoVadis CDP 2025” · “\"Franz Kiel GmbH\" emissions environmental controversy” · “ESG sustainability report CO2 targets” on kiel-seating.com",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "search",
+          "text": "20 results, 5 about Franz Kiel GmbH, from kiel-seating.com.",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Franz-Kiel-GmbH-today.pdf · 9,229 characters, 1 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Company - Franz Kiel GmbH - Kiel Sitze · 12,077 characters, 7 relevant passages",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Service - Franz Kiel GmbH - Kiel Sitze · 5,493 characters",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "read",
+          "text": "Read kiel-seating.com: Service - Franz Kiel GmbH - Kiel Sitze · 5,493 characters",
+          "sourceIds": [],
+          "model": null
+        },
+        {
+          "kind": "evidence",
+          "text": "As an ISO 14001:2015 certified company, Kiel operates a comprehensive environmental management system.",
+          "sourceIds": [
+            7
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "Each year, the company prepares an environmental report covering energy and water consumption as well as waste vo",
+          "sourceIds": [
+            8
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "We make sustainable use of resources by developing and utilizing innovative materials and products and, where possible, using environmentally friendly processes in our manufacturing operations.",
+          "sourceIds": [
+            9
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "Our seats are consciously designed as a modular system. This allows us to flexibly address the requirements of customers as well as the individual markets, and to supply custom solutions. Naturally, our products also meet the statutory environmental requirements, are repairable and can be dissembled into their basic elements at the end of their lifetime, making them easy to recycle.",
+          "sourceIds": [
+            10
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "evidence",
+          "text": "In addition, we pay attention to achieving as low a weight as possible for all of our products. This has a positive effect on energy consumption and therefore economy and the environment.",
+          "sourceIds": [
+            11
+          ],
+          "model": "nvidia/Nemotron-3_5-Lightning"
+        },
+        {
+          "kind": "verdict",
+          "text": "Evidence shows documented environmental management system (ISO 14001:2015), annual reporting with achieved reduction targets even during 20% production growth (2023 vs 2022), and product design for circularity. These are concrete strengths lowering ESG risk. However, all quotes are undated marketing/PDF content with no independent verification; the ISO standard cited is from 2015 (superseded 2018); no quantitative KPIs, Scope 3 data, social or governance evidence provided. Thin, self-reported,,",
+          "sourceIds": [
+            7,
+            8,
+            9,
+            10,
+            11
+          ],
+          "model": "nvidia/Nemotron-3-Ultra-550b-a55b"
+        }
+      ]
+    }
+  },
+  "sources": [
+    {
+      "id": 1,
+      "url": "https://kiel-seating.com/wp-content/releases/facts-and-figures-franz-kiel-gmbh.pdf",
+      "title": "Facts and Figures",
+      "publishedAt": null,
+      "quote": "Revenue: approx. €180 million (2023, consolidated)",
+      "excerpt": {
+        "before": "through innovative developments and efficient manufacturing processes Headquarters: Nürnberger Str. 62, 86720 Nördlingen, Germany Core Markets: Germany, Austria, Switzerland, France, Spain, Italy, Turkey, Poland, Hungary, Slovenia, Belgium, Netherlands, USA Subsidiaries: North Macedonia: KIEL Macedonia DOOEL Turkey: FKT Koltuk Sistemleri A.Ş. Spain: Emar Kiel USA: Kiel N.A. L.L.C. (2 sites) Poland: Kiel Polska Sp. z o.o. France: Kiel France s.a.r.l Netherlands: Franz Kiel B.V. China: Jiangsu ARSALE KIEL Seat Co., Ltd Number of Employees: approx. 1,500 worldwide, approx. 250 in Nördlingen",
+        "after": "Contact: Phone: +49 (0 90 81) 21 03 – 0 E-mail: info@kiel-sitze.de www.kiel-seating.com As of: September 3, 2025"
+      }
+    },
+    {
+      "id": 2,
+      "url": "https://bus-news.com/80-years-of-bus-seating-with-kiel",
+      "title": "80 Years of Bus Seating with Kiel | Bus-News",
+      "publishedAt": null,
+      "quote": "Founding of Kiel Macedonia DOOEL, further increasing EU production capabilities.",
+      "excerpt": {
+        "before": "UK, and Kiel N.A. LLC, which opens the door to the North American market. A new production site is built in Turkey and sales activities expand to include Scandinavia, Greece, Israel, Hungary, Slovenia, Croatia, Bosnia and Herzegovina, Serbia, Montenegro, Kosovo and North Macedonia. Kiel also signs a licence agreement for the production of bus seats in India, and founds joint ventures in both China and Russia. In addition to this global growth, Kiel introduces a rigorous quality management system to further optimise products and production. 2016 Acquisition of Spanish partner Emar Kiel. 2017",
+        "after": "2018 Launch of the Avance X, designed for premium coach travel, this seating product is known for its comfort, sleek design and modular components. 2019 Kiel enters a joint venture in China, launching the Jiangsu ARSALE Kiel Seat Co ltd. 2025 Kiel marks its 80th anniversary with global operations, 1,500 employees and a footprint in Europe, North America, Australia, Asia and the Middle East. Looking to the Future Kiel’s journey from ironworks to international seat systems supplier has been defined by adaptability, craftsmanship and customer focus. Looking ahead it aims to strengthen its"
+      }
+    },
+    {
+      "id": 3,
+      "url": "https://bus-news.com/80-years-of-bus-seating-with-kiel",
+      "title": "80 Years of Bus Seating with Kiel | Bus-News",
+      "publishedAt": null,
+      "quote": "Kiel enters a joint venture in China, launching the Jiangsu ARSALE Kiel Seat Co ltd.",
+      "excerpt": {
+        "before": "Serbia, Montenegro, Kosovo and North Macedonia. Kiel also signs a licence agreement for the production of bus seats in India, and founds joint ventures in both China and Russia. In addition to this global growth, Kiel introduces a rigorous quality management system to further optimise products and production. 2016 Acquisition of Spanish partner Emar Kiel. 2017 Founding of Kiel Macedonia DOOEL, further increasing EU production capabilities. 2018 Launch of the Avance X, designed for premium coach travel, this seating product is known for its comfort, sleek design and modular components. 2019",
+        "after": "2025 Kiel marks its 80th anniversary with global operations, 1,500 employees and a footprint in Europe, North America, Australia, Asia and the Middle East. Looking to the Future Kiel’s journey from ironworks to international seat systems supplier has been defined by adaptability, craftsmanship and customer focus. Looking ahead it aims to strengthen its position as a leading seating system manufacturer while continuing to grow internationally. As buses become more sustainable, connected and passenger-centric, the role of seating will only grow in importance. Whether it’s through lighter"
+      }
+    },
+    {
+      "id": 4,
+      "url": "https://bus-news.com/80-years-of-bus-seating-with-kiel",
+      "title": "80 Years of Bus Seating with Kiel | Bus-News",
+      "publishedAt": null,
+      "quote": "Kiel also signs a licence agreement for the production of bus seats in India, and founds joint ventures in both China and Russia.",
+      "excerpt": {
+        "before": "supplier to a full systems provider, offering development production, delivery and installation of complete seating systems. 2000s Expansion continues with the acquisition of Deco Seating in the Netherlands, renamed Kiel B.V., and launches – including but not limited to – Kiel France s.a.r.l, Kiel Seating in the UK, and Kiel N.A. LLC, which opens the door to the North American market. A new production site is built in Turkey and sales activities expand to include Scandinavia, Greece, Israel, Hungary, Slovenia, Croatia, Bosnia and Herzegovina, Serbia, Montenegro, Kosovo and North Macedonia.",
+        "after": "In addition to this global growth, Kiel introduces a rigorous quality management system to further optimise products and production. 2016 Acquisition of Spanish partner Emar Kiel. 2017 Founding of Kiel Macedonia DOOEL, further increasing EU production capabilities. 2018 Launch of the Avance X, designed for premium coach travel, this seating product is known for its comfort, sleek design and modular components. 2019 Kiel enters a joint venture in China, launching the Jiangsu ARSALE Kiel Seat Co ltd. 2025 Kiel marks its 80th anniversary with global operations, 1,500 employees and a footprint"
+      }
+    },
+    {
+      "id": 5,
+      "url": "https://bus-news.com/80-years-of-bus-seating-with-kiel",
+      "title": "80 Years of Bus Seating with Kiel | Bus-News",
+      "publishedAt": null,
+      "quote": "In addition to this global growth, Kiel introduces a rigorous quality management system to further optimise products and production.",
+      "excerpt": {
+        "before": "Expansion continues with the acquisition of Deco Seating in the Netherlands, renamed Kiel B.V., and launches – including but not limited to – Kiel France s.a.r.l, Kiel Seating in the UK, and Kiel N.A. LLC, which opens the door to the North American market. A new production site is built in Turkey and sales activities expand to include Scandinavia, Greece, Israel, Hungary, Slovenia, Croatia, Bosnia and Herzegovina, Serbia, Montenegro, Kosovo and North Macedonia. Kiel also signs a licence agreement for the production of bus seats in India, and founds joint ventures in both China and Russia.",
+        "after": "2016 Acquisition of Spanish partner Emar Kiel. 2017 Founding of Kiel Macedonia DOOEL, further increasing EU production capabilities. 2018 Launch of the Avance X, designed for premium coach travel, this seating product is known for its comfort, sleek design and modular components. 2019 Kiel enters a joint venture in China, launching the Jiangsu ARSALE Kiel Seat Co ltd. 2025 Kiel marks its 80th anniversary with global operations, 1,500 employees and a footprint in Europe, North America, Australia, Asia and the Middle East. Looking to the Future Kiel’s journey from ironworks to international"
+      }
+    },
+    {
+      "id": 6,
+      "url": "https://rocketreach.co/franz-kiel-gmbh-profile_b59d64a9f9641b73",
+      "title": "Franz Kiel GmbH Information",
+      "publishedAt": null,
+      "quote": "Franz Kiel GmbH is a railroad manufacture company based out of Nürnberger Str. 62, Nördlingen, Germany.",
+      "excerpt": {
+        "before": "Title: Franz Kiel GmbH Information Image 5: Franz Kiel GmbH. Franz Kiel GmbH Information. View Top Employees from Franz Kiel GmbH.",
+        "after": "Looking for a particular Franz Kiel GmbH employee's phone or email? Franz Kiel GmbH Questions . What is the annual revenue of Franz Kiel GmbH? The Franz Kiel GmbH annual revenue was $32.1 million in 2026. Who is the CEO of Franz Kiel GmbH? Gerhard Hellweg is the CEO of Franz Kiel GmbH. How many people are employed at Franz Kiel GmbH? Where is Franz Kiel GmbH based? Franz Kiel GmbH is based in Noerdlingen, Bavaria . What is the SIC code for Franz Kiel GmbH? Top Franz Kiel GmbH Employees. Image 6: Franz Kiel GmbH Employee Nataliya Rud's profile photo Gerhard Hellweg Chief Executive Officer at"
+      }
+    },
+    {
+      "id": 7,
+      "url": "https://kiel-seating.com/wp-content/releases/Franz-Kiel-GmbH-today.pdf",
+      "title": "Franz-Kiel-GmbH-today.pdf",
+      "publishedAt": null,
+      "quote": "As an ISO 14001:2015 certified company, Kiel operates a comprehensive environmental management system.",
+      "excerpt": {
+        "before": "trains, thereby expanding its product portfolio. Recently, Kiel has also begun working on concepts and designs for vehicle interiors, such as partitions or modular equipment systems, which enhance the travel experience and meet the requirements of modern mobility concepts. Sustainability as a Guiding Principle Kiel places great emphasis on sustainability in both production and product design: seating systems are built in modular fashion to simplify repairs and recycling and to avoid waste. Materials used are as lightweight as possible to reduce fuel consumption, durable, and recyclable.",
+        "after": "Each year, the company prepares an environmental report covering energy and water consumption as well as waste volumes. Based on this, reduction targets are set and consistently achieved. Although production increased by around 20 percent in 2023 compared to 2022, Kiel still achieved significant reductions. Natural gas consumption was reduced by 17.58 percent, district heating by 28 percent, electricity by 9.21 percent, and water consumption by 6.95 percent. Training and Skilled Workforce Development in Nördlingen As one of the largest employers in Nördlingen, Kiel provides training in"
+      }
+    },
+    {
+      "id": 8,
+      "url": "https://kiel-seating.com/wp-content/releases/Franz-Kiel-GmbH-today.pdf",
+      "title": "Franz-Kiel-GmbH-today.pdf",
+      "publishedAt": null,
+      "quote": "Each year, the company prepares an environmental report covering energy and water consumption as well as waste vo",
+      "excerpt": {
+        "before": "and designs for vehicle interiors, such as partitions or modular equipment systems, which enhance the travel experience and meet the requirements of modern mobility concepts. Sustainability as a Guiding Principle Kiel places great emphasis on sustainability in both production and product design: seating systems are built in modular fashion to simplify repairs and recycling and to avoid waste. Materials used are as lightweight as possible to reduce fuel consumption, durable, and recyclable. As an ISO 14001:2015 certified company, Kiel operates a comprehensive environmental management system.",
+        "after": "lumes. Based on this, reduction targets are set and consistently achieved. Although production increased by around 20 percent in 2023 compared to 2022, Kiel still achieved significant reductions. Natural gas consumption was reduced by 17.58 percent, district heating by 28 percent, electricity by 9.21 percent, and water consumption by 6.95 percent. Training and Skilled Workforce Development in Nördlingen As one of the largest employers in Nördlingen, Kiel provides training in various technical and commercial professions. This is supplemented by dual study programs in cooperation with regional"
+      }
+    },
+    {
+      "id": 9,
+      "url": "https://kiel-seating.com/en/company",
+      "title": "Company - Franz Kiel GmbH - Kiel Sitze",
+      "publishedAt": null,
+      "quote": "We make sustainable use of resources by developing and utilizing innovative materials and products and, where possible, using environmentally friendly processes in our manufacturing operations.",
+      "excerpt": {
+        "before": "to environmental regulations and legal norms, such as those from the German and international Road Traffic Law, and the fulfilment of the highest safety standards. We are constantly improving our products. We have implemented a comprehensive quality management system for this purpose. In addition to regular audits of internal processes, products and suppliers, this also includes special problem-solving methods, the accurate documentation of all processes and their improvement, and the implementation of an internal suggestion scheme, which employees are heavily involved in. Sustainability",
+        "after": "Our seats are consciously designed as a modular system. This allows us to flexibly address the requirements of customers as well as the individual markets, and to supply custom solutions. Naturally, our products also meet the statutory environmental requirements, are repairable and can be dissembled into their basic elements at the end of their lifetime, making them easy to recycle. In addition, we pay attention to achieving as low a weight as possible for all of our products. This has a positive effect on energy consumption and therefore economy and the environment. Production Insight into"
+      }
+    },
+    {
+      "id": 10,
+      "url": "https://kiel-seating.com/en/company",
+      "title": "Company - Franz Kiel GmbH - Kiel Sitze",
+      "publishedAt": null,
+      "quote": "Our seats are consciously designed as a modular system. This allows us to flexibly address the requirements of customers as well as the individual markets, and to supply custom solutions. Naturally, our products also meet the statutory environmental requirements, are repairable and can be dissembled into their basic elements at the end of their lifetime, making them easy to recycle.",
+      "excerpt": {
+        "before": "our products. We have implemented a comprehensive quality management system for this purpose. In addition to regular audits of internal processes, products and suppliers, this also includes special problem-solving methods, the accurate documentation of all processes and their improvement, and the implementation of an internal suggestion scheme, which employees are heavily involved in. Sustainability We make sustainable use of resources by developing and utilizing innovative materials and products and, where possible, using environmentally friendly processes in our manufacturing operations.",
+        "after": "In addition, we pay attention to achieving as low a weight as possible for all of our products. This has a positive effect on energy consumption and therefore economy and the environment. Production Insight into our production We are able to cover the entire production chain for passenger seats and complete seating systems for local, regional, intercity and long-distance transport. The main stages of production are metalworking, including welding and bending, painting, upholstering and finally assembly. We use a laser plant with automatic material feed and removal for our production with"
+      }
+    },
+    {
+      "id": 11,
+      "url": "https://kiel-seating.com/en/company",
+      "title": "Company - Franz Kiel GmbH - Kiel Sitze",
+      "publishedAt": null,
+      "quote": "In addition, we pay attention to achieving as low a weight as possible for all of our products. This has a positive effect on energy consumption and therefore economy and the environment.",
+      "excerpt": {
+        "before": "in. Sustainability We make sustainable use of resources by developing and utilizing innovative materials and products and, where possible, using environmentally friendly processes in our manufacturing operations. Our seats are consciously designed as a modular system. This allows us to flexibly address the requirements of customers as well as the individual markets, and to supply custom solutions. Naturally, our products also meet the statutory environmental requirements, are repairable and can be dissembled into their basic elements at the end of their lifetime, making them easy to recycle.",
+        "after": "Production Insight into our production We are able to cover the entire production chain for passenger seats and complete seating systems for local, regional, intercity and long-distance transport. The main stages of production are metalworking, including welding and bending, painting, upholstering and finally assembly. We use a laser plant with automatic material feed and removal for our production with two-shift operation. We use SAP to support the planning and management of all capacities within the Kiel Group. This allows us to achieve operative excellence, process security and a low"
+      }
+    }
+  ],
+  "run": {
+    "seconds": 21.4,
+    "costUsd": 0.0151,
+    "tavilyCredits": 34,
+    "models": [
+      "nvidia/Nemotron-3-Ultra-550b-a55b",
+      "nvidia/Nemotron-3_5-Lightning"
+    ]
+  }
+}

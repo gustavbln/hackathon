@@ -13,7 +13,7 @@ import {
   type ResearchSource,
   type ThreadEntry,
 } from "./contract.ts";
-import { excerptAround, extractJson, isVerbatim, keepKnownCitations, mentionsCompany, relevantPassages } from "./evidence.ts";
+import { excerptAround, extractJson, isVerbatim, keepKnownCitations, mentionsCompany, mentionsNamePart, relevantPassages } from "./evidence.ts";
 import { readPages, type Page } from "./extract.ts";
 import { SEARCH_TERMS } from "./search-terms.ts";
 import { saveResearched } from "./store.ts";
@@ -54,6 +54,12 @@ interface Run {
   emit: (event: ResearchEvent) => void;
   addSource: (page: ReadPage, quote: string) => ResearchSource;
   spend: { costUsd: number; credits: number };
+}
+
+interface Search {
+  query: string;
+  /** Restricts the search to one site, e.g. the company's own. */
+  site: string | null;
 }
 
 /** A page an agent read (in full when Tavily could extract it, otherwise its snippet) and the parts about its risk. */
@@ -172,7 +178,7 @@ async function run(input: ResearchInput, signal: AbortSignal, emit: Run["emit"])
 async function scout(input: ResearchInput, context: Run): Promise<Company> {
   context.emit({ type: "scout", status: "running", text: `Identifying ${input.name}`, model: MODELS.scout });
   const host = input.website ? new URL(input.website).hostname : "";
-  const { results, credits } = await search(`${input.name} ${host} company headquarters legal entity`, context.signal);
+  const { results, credits } = await search(`${input.name} ${host} company headquarters legal entity`, null, context.signal);
   context.spend.credits += credits;
   const found = await askJson(scoutSchema, MODELS.scout, [
     { role: "system", content: `Identify the company the buyer means. Use only the results. ${DATA_RULE}` },
@@ -206,9 +212,14 @@ async function driverAgent(criterion: CriterionInfo, company: Company, brief: st
   try {
     context.emit({ type: "agent", criterion: criterion.key, status: "running", entry: null, estimate: null });
 
-    // The quoted name keeps search engines from drifting to other companies' reports.
-    const queries = SEARCH_TERMS[criterion.key].map((terms) => `"${company.name}" ${terms}`);
-    log({ kind: "plan", text: `${queries.length} searches: ${queries.map((query) => `“${query}”`).join(" · ")}`, sourceIds: [], model: null });
+    // The quoted name keeps search engines from drifting to other companies' reports; the company's own site is often
+    // the richest public source on a small private supplier.
+    const [firstTerms] = SEARCH_TERMS[criterion.key];
+    const queries: Search[] = [
+      ...SEARCH_TERMS[criterion.key].map((terms) => ({ query: `"${company.name}" ${terms}`, site: null })),
+      ...(ownHost ? [{ query: `${criterion.label} ${firstTerms}`, site: ownHost }] : []),
+    ];
+    log({ kind: "plan", text: `${queries.length} searches: ${queries.map(({ query, site }) => `“${query}”${site ? ` on ${site}` : ""}`).join(" · ")}`, sourceIds: [], model: null });
     const { results, failed } = await searchAll(queries, context);
     const ranked = relevant(results);
     const failures = failed.length > 0 ? ` ${failed.length} of ${queries.length} searches failed (${failed[0]}).` : "";
@@ -216,15 +227,18 @@ async function driverAgent(criterion: CriterionInfo, company: Company, brief: st
 
     const pages = await readTop(pickPages(ranked, PAGES_PER_AGENT), topic, context, log);
     const read = await readEvidence(criterion, who, brief, pages, context);
-    const kept = keepEvidence(read.quotes, pages, aboutCompany, context);
+    const kept = keepEvidence(read.quotes, pages, names, ownHost, context);
     for (const source of kept) log({ kind: "evidence", text: source.quote, sourceIds: [source.id], model: MODELS.reader });
+    if (read.quotes.length > kept.length) {
+      log({ kind: "note", text: `${read.quotes.length - kept.length} of ${read.quotes.length} proposed quotes were dropped: not word for word on their page, or not about ${company.name}.`, sourceIds: [], model: null });
+    }
 
     if (read.followUp && kept.length > 0) {
       const query = `"${company.name}" ${read.followUp}`;
       log({ kind: "follow_up", text: `Digging deeper: “${query}”`, sourceIds: [], model: MODELS.reader });
-      const fresh = relevant((await searchAll([query], context)).results).filter(({ url }) => !pages.some((page) => page.url === url));
+      const fresh = relevant((await searchAll([{ query, site: null }], context)).results).filter(({ url }) => !pages.some((page) => page.url === url));
       const morePages = await readTop(fresh.slice(0, 1), [...topic, read.followUp], context, log);
-      const more = keepEvidence((await readEvidence(criterion, who, brief, morePages, context)).quotes, morePages, aboutCompany, context);
+      const more = keepEvidence((await readEvidence(criterion, who, brief, morePages, context)).quotes, morePages, names, ownHost, context);
       for (const source of more) log({ kind: "evidence", text: source.quote, sourceIds: [source.id], model: MODELS.reader });
       kept.push(...more);
     }
@@ -234,7 +248,7 @@ async function driverAgent(criterion: CriterionInfo, company: Company, brief: st
     }
 
     const analysis = await askJson(analystSchema, MODELS.analyst, [
-      { role: "system", content: `You are a procurement risk analyst. From the quoted evidence only (the page title and the text around each quote tell you what a figure refers to and which period it covers), write a short report on one risk of one company: a headline, up to 6 findings each citing evidence ids, the open questions a buyer should still ask, and a score. First decide whether the quotes actually concern this risk of this company; if not, set relevant to false. Business descriptions, marketing and the mere existence of a policy are not evidence of a risk level. Missing bad news is not evidence of low risk. ${SCALE} Documented problems raise the score, documented strengths lower it. Thin or old evidence means low confidence. Write the company name exactly as given and say findings in plain words a buyer understands, not in a website's own scoring jargon. Keep the concrete figures, dates and names from the quotes, and say how old the evidence is. Today is ${new Date().toISOString().slice(0, 10)}. ${DATA_RULE}` },
+      { role: "system", content: `You are a procurement risk analyst. From the quoted evidence only (the page title and the text around each quote tell you what a figure refers to and which period it covers), write a short report on one risk of one company: a headline of at most 15 words, up to 6 findings each citing evidence ids, the open questions a buyer should still ask, and a score. First decide whether the quotes actually concern this risk of this company; if not, set relevant to false. Business descriptions, marketing and the mere existence of a policy are not evidence of a risk level. Missing bad news is not evidence of low risk. ${SCALE} Documented problems raise the score, documented strengths lower it. Thin or old evidence means low confidence. Write the company name exactly as given and say findings in plain words a buyer understands, not in a website's own scoring jargon. Keep the concrete figures, dates and names from the quotes, and say how old the evidence is. Today is ${new Date().toISOString().slice(0, 10)}. ${DATA_RULE}` },
       { role: "user", content: JSON.stringify({ company: who, risk: criterion.label, meaning: criterion.description, buyerNotes: brief, evidence: kept.map(({ id, quote, url, title, publishedAt, excerpt }) => ({ id, quote, site: hostOf(url), pageTitle: title, publishedAt, textBefore: excerpt?.before.slice(-300) ?? "", textAfter: excerpt?.after.slice(0, 200) ?? "" })) }) },
     ], context);
     const known = new Set(kept.map(({ id }) => id));
@@ -255,11 +269,11 @@ async function driverAgent(criterion: CriterionInfo, company: Company, brief: st
 }
 
 /** Runs the searches one after the other; a failed search contributes nothing but its reason, so the thread can say why. */
-async function searchAll(queries: string[], context: Run): Promise<{ results: WebResult[]; failed: string[] }> {
+async function searchAll(queries: Search[], context: Run): Promise<{ results: WebResult[]; failed: string[] }> {
   const lists: WebResult[][] = [];
   const failed: string[] = [];
-  for (const query of queries) {
-    const found = await search(query, context.signal).catch((error: unknown) => {
+  for (const { query, site } of queries) {
+    const found = await search(query, site, context.signal).catch((error: unknown) => {
       if (context.signal.aborted) throw error;
       failed.push(error instanceof Error ? error.message : "search failed");
       return { results: [], credits: 0 };
@@ -292,18 +306,22 @@ async function readTop(results: WebResult[], topic: string[], context: Run, log:
 async function readEvidence(criterion: CriterionInfo, who: string, brief: string, pages: ReadPage[], context: Run): Promise<z.infer<typeof readSchema>> {
   if (pages.length === 0) return { quotes: [], followUp: null };
   return askJson(readSchema, MODELS.reader, [
-    { role: "system", content: `Copy up to ${QUOTES_PER_AGENT} complete sentences VERBATIM, subject included, from the pages that say something concrete about the company's ${criterion.label.toLowerCase()} risk (${criterion.description}). Never paraphrase. If the pages hint at a problem without the details, suggest one short follow-up search of a few words, without the company name; otherwise null. ${DATA_RULE}` },
+    { role: "system", content: `Copy up to ${QUOTES_PER_AGENT} sentences or list items VERBATIM from the pages that state concrete facts about the company's ${criterion.label.toLowerCase()} (${criterion.description}): problems that raise this risk or strengths that lower it. Never paraphrase. If the pages hint at a problem without the details, suggest one short follow-up search of a few words, without the company name; otherwise null. ${DATA_RULE}` },
     { role: "user", content: JSON.stringify({ company: who, buyerNotes: brief, pages: pages.map(({ url, title, publishedAt, passages }, index) => ({ page: index, site: hostOf(url), title, publishedAt, passages: passages.join("\n") })) }) },
   ], context);
 }
 
-/** Keeps quotes that appear verbatim on their page and are about this company: named in the quote or the title, or on its own site. */
-function keepEvidence(quotes: { page: number; quote: string }[], pages: ReadPage[], aboutCompany: (text: string, url: string) => boolean, context: Run): ResearchSource[] {
+/**
+ * Keeps quotes that appear verbatim on their page. Every page already names the company in full (or is its own site), so
+ * a quote may use the short form ("Kiel"); a quote naming no part of the company counts on its own site or a page titled after it.
+ */
+function keepEvidence(quotes: { page: number; quote: string }[], pages: ReadPage[], names: string[], ownHost: string | null, context: Run): ResearchSource[] {
   return quotes
     .flatMap(({ page, quote }) => {
       const source = pages[page];
       if (!source || !isVerbatim(quote, source.content)) return [];
-      if (!aboutCompany(quote, source.url) && !aboutCompany(source.title, source.url)) return [];
+      const onOwnSite = ownHost !== null && source.url.includes(ownHost);
+      if (!onOwnSite && !mentionsNamePart(quote, names) && !mentionsNamePart(source.title, names)) return [];
       return [context.addSource(source, quote.trim())];
     })
     .slice(0, QUOTES_PER_AGENT);
@@ -358,16 +376,16 @@ async function askJson<T>(
 }
 
 /** A Tavily search that waits and retries when the rate limit answers 429. */
-async function search(query: string, signal: AbortSignal): ReturnType<typeof searchWeb> {
+async function search(query: string, site: string | null, signal: AbortSignal): ReturnType<typeof searchWeb> {
   for (const wait of SEARCH_RETRIES) {
     try {
-      return await searchWeb(query, AbortSignal.any([signal, AbortSignal.timeout(SEARCH_TIMEOUT_MS)]));
+      return await searchWeb(query, AbortSignal.any([signal, AbortSignal.timeout(SEARCH_TIMEOUT_MS)]), site);
     } catch (error) {
       if (!(error instanceof Error) || !error.message.includes("429")) throw error;
       await delay(wait, undefined, { signal });
     }
   }
-  return searchWeb(query, AbortSignal.any([signal, AbortSignal.timeout(SEARCH_TIMEOUT_MS)]));
+  return searchWeb(query, AbortSignal.any([signal, AbortSignal.timeout(SEARCH_TIMEOUT_MS)]), site);
 }
 
 /** What a model sees of search results: numbered, trimmed. */
