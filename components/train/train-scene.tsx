@@ -137,7 +137,6 @@ export function TrainScene({ children }: { children?: ReactNode }) {
             <Button onClick={enter} size="lg" className="h-12 rounded-full bg-[var(--blueprint-ink)] px-7 text-[var(--blueprint-paper)] hover:bg-[var(--blueprint-ink)]/90">
               Enter the cabin <ArrowDown strokeWidth={1.5} />
             </Button>
-            <span className="rounded-full bg-[var(--blueprint-paper)]/85 px-3 py-1 text-xs text-[var(--blueprint-ink)]">or scroll to open the workshop</span>
           </div>
           <div className="pointer-events-none absolute inset-x-5 bottom-5 z-20 flex items-center justify-between gap-4 text-[var(--blueprint-ink)] sm:inset-x-10 lg:inset-x-16" style={{ opacity: Math.min(1, progress * 10) * Math.min(1, (1 - progress) * 10) }}>
             <p className="rounded bg-[var(--blueprint-paper)]/85 px-3 py-1.5 font-mono text-[10px] tracking-widest uppercase">
