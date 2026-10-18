@@ -44,3 +44,6 @@ next-env.d.ts
 # Siemens dataset: keep it out of git while the repo is public. Recorded research runs are tracked.
 /data/*
 !/data/research/
+
+# JetBrains editor settings
+/.idea/
