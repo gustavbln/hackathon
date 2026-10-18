@@ -3,11 +3,10 @@ import { z } from "zod";
 import {
   ChatError, answerRecipeSchema, chatResponseSchema, getSuppliersSchema,
   metricDefinitions, nextSeatSuppliersSchema, querySuppliersSchema, rerankSeatSchema, riskDefinitions,
-  type ChatRequest, type ChatResponse, type DatasetResult, type SeatFocus,
+  type ChatRequest, type ChatResponse, type DatasetResult, type PageAction, type PageContext,
 } from "./chat-contract.ts";
-import { nextSeatSupplierIds, seatShortlist } from "./seat-shortlist.ts";
-import type { SeatShortlist } from "./seat-shortlist-contract.ts";
-import { CRITERIA, CRITERION_BY_KEY } from "./suppliers/criteria.ts";
+import { nextSeatSupplierIds, seatShortlist, SHORTLIST_SIZE } from "./seat-shortlist.ts";
+import { CRITERIA, CRITERION_BY_KEY, type Weights } from "./suppliers/criteria.ts";
 import { getSuppliers, querySuppliers } from "./suppliers.ts";
 import { completeNemotron, type ModelMessage, type ModelTool } from "./nemotron.ts";
 import { evaluateSeatCriteria } from "./seat-criteria.ts";
@@ -36,48 +35,66 @@ const tools: ModelTool[] = [
 
 const nextSeatSuppliersTool: ModelTool = { type: "function", function: {
   name: "next_seat_suppliers",
-  description: "Only with a seat focus: the next-best dataset suppliers after the buyer's shortlist, ranked by the SAME focus weights. Use for 'new', 'more', 'other' or 'alternative' suppliers for this seat. offset 20 starts right after the top 20.",
+  description: "Only on the seat page: the next-best dataset suppliers after the buyer's shortlist, ranked by the SAME page weights. Use for 'new', 'more', 'other' or 'alternative' suppliers for this seat. offset 20 starts right after the top 20.",
   parameters: z.toJSONSchema(nextSeatSuppliersSchema),
 } };
 
 const rerankSeatTool: ModelTool = { type: "function", function: {
   name: "rerank_seat_priorities",
-  description: "Only with a seat focus: re-weight the seat priorities from the buyer's own wording (e.g. 'ESG matters most', 'ignore market sentiment') and re-rank all suppliers. The page shows the new shortlist. Pass the buyer's request as instruction.",
+  description: "Only on the seat page: re-weight the seat priorities from the buyer's own wording (e.g. 'ESG matters most', 'ignore market sentiment') and re-rank all suppliers. The page applies the new weights. Pass the buyer's request as instruction.",
   parameters: z.toJSONSchema(rerankSeatSchema),
 } };
 
-const focusPrompt = `When the request has a focus, the buyer is on the cabin page sourcing passenger seats for that seat.
-They see a shortlist (focus.shortlist, best first) ranked by focus.priorities, optionally re-ranked by their own
-focus.instruction. "This shortlist", "the top 3" or "#1" refer to focus.shortlist in order: fetch them with
-get_suppliers. For new, more or alternative suppliers for this seat call next_seat_suppliers. When the
-buyer wants to change what matters, re-weight or re-rank, call rerank_seat_priorities with their wording and
-summarise how the priorities and the top suppliers changed. Real companies
-outside the dataset are not available yet: say so if asked.`;
+const pagePrompts: Record<PageContext["page"], string> = {
+  seat: `The buyer is on the cabin page sourcing passenger seats for page.seatId. They see a shortlist
+(page.shortlist, best first) ranked by page.priorities, which they may have set themselves by dragging.
+"This shortlist", "the top 3" or "#1" refer to page.shortlist in order: fetch them with get_suppliers.
+For new, more or alternative suppliers for this seat call next_seat_suppliers. When the buyer wants to change
+what matters, re-weight or re-rank, call rerank_seat_priorities with their wording and summarise how the
+priorities and the top suppliers changed.`,
+  driver: `The buyer is on the detail page of one risk driver (page.driver): how all suppliers score on it and
+how their seat shortlist (page.shortlist) compares. Answer about that driver; use its description and weight.`,
+  supplier: `The buyer is on the detail page of supplier page.supplierId. "This supplier" means that id. For "why"
+questions fetch it with get_suppliers, Total_Risk_Index and ALL 18 risk metrics, and explain the largest weighted
+contributions under page.priorities, the weights the buyer uses on screen.`,
+};
 
-/** Short, readable focus for the model; the full weights stay on the server for ranking. */
-function describeFocus(focus: SeatFocus) {
-  const priorities = CRITERIA.map(({ key, label, column }) => ({ label, column, percent: Math.round(focus.weights[key] * 1000) / 10 }))
+const PAGE_RULES = `Real companies outside the dataset are not available yet: say so if asked.`;
+
+/** Short, readable page facts for the model, loaded on the server from the ids the page sent. */
+async function describePage(page: PageContext) {
+  const priorities = CRITERIA.map(({ key, label, column }) => ({ label, column, percent: Math.round(page.weights[key] * 1000) / 10 }))
     .sort((a, b) => b.percent - a.percent).slice(0, 5);
-  return { seatId: focus.seatId, shortlist: focus.supplierIds, priorities, instruction: focus.instruction };
+  const shortlist = page.page === "supplier" ? undefined : await nextSeatSupplierIds(page.weights as Weights, 0, SHORTLIST_SIZE);
+  if (page.page === "seat") return { page: "seat", seatId: page.seatId, shortlist, priorities, instruction: page.instruction };
+  if (page.page === "driver") {
+    const driver = CRITERION_BY_KEY[page.driverKey];
+    return {
+      page: "driver", seatId: page.seatId, shortlist, priorities,
+      driver: { label: driver.label, column: driver.column, description: driver.description, percent: Math.round(page.weights[page.driverKey] * 1000) / 10 },
+    };
+  }
+  return { page: "supplier", seatId: page.seatId, supplierId: page.supplierId, priorities };
 }
 
-/** Next-best suppliers for the focus weights, with the total and the three heaviest criteria as metrics. */
-async function nextSeatSuppliers(focus: SeatFocus, input: unknown) {
+/** Next-best suppliers for the page weights, with the total and the three heaviest criteria as metrics. */
+async function nextSeatSuppliers(weights: Weights, input: unknown) {
   const { offset, limit } = nextSeatSuppliersSchema.parse(input);
-  const ids = await nextSeatSupplierIds(focus.weights, offset, limit);
-  const heaviest = CRITERIA.toSorted((a, b) => focus.weights[b.key] - focus.weights[a.key]).slice(0, 3).map(({ column }) => column);
+  const ids = await nextSeatSupplierIds(weights, offset, limit);
+  const heaviest = CRITERIA.toSorted((a, b) => weights[b.key] - weights[a.key]).slice(0, 3).map(({ column }) => column);
   return getSuppliers({ ids, metrics: ["Total_Risk_Index", ...heaviest] });
 }
 
 const OUTPUT_RULES = "Tool errors are not evidence:";
 
-/** Re-weights with Nemotron, then returns the new top 10 with the total and the three heaviest criteria. */
-async function rerankSeat(input: unknown, signal: AbortSignal) {
+/** Re-weights with Nemotron and returns the new top 10, plus the weights for the page to apply. */
+async function rerankSeat(input: unknown, signal: AbortSignal): Promise<{ action: PageAction; result: DatasetResult }> {
   const { instruction } = rerankSeatSchema.parse(input);
   const shortlist = await seatShortlist("nemotron", instruction, signal);
   const heaviest = shortlist.criteria.slice(0, 3).map(({ key }) => CRITERION_BY_KEY[key].column);
   const result = await getSuppliers({ ids: shortlist.suppliers.slice(0, 10).map(({ id }) => id), metrics: ["Total_Risk_Index", ...heaviest] });
-  return { shortlist, result };
+  const weights = Object.fromEntries(shortlist.criteria.map(({ key, weightPercent }) => [key, weightPercent / 100])) as Weights;
+  return { action: { type: "set_weights", weights, instruction: shortlist.instruction }, result };
 }
 
 const systemPrompt = `You help rail procurement buyers explore an anonymized supplier risk CSV and prioritize risk criteria for train seats.
@@ -176,16 +193,18 @@ async function repairRecipe(messages: ModelMessage[], content: string | null | u
 }
 
 export async function answerChat(request: ChatRequest, signal: AbortSignal) {
+  const page = request.page;
   const messages: ModelMessage[] = [
-    { role: "system", content: request.focus ? systemPrompt.replace(OUTPUT_RULES, `${focusPrompt}\n${OUTPUT_RULES}`) : systemPrompt },
+    { role: "system", content: page ? systemPrompt.replace(OUTPUT_RULES, `${pagePrompts[page.page]}\n${PAGE_RULES}\n${OUTPUT_RULES}`) : systemPrompt },
     ...request.history,
     { role: "user", content: JSON.stringify({
       message: request.message, selectedIds: request.selectedIds, lastView: request.lastView,
-      focus: request.focus && describeFocus(request.focus),
+      page: page && await describePage(page),
     }) },
   ];
-  const availableTools = request.focus ? [...tools, nextSeatSuppliersTool, rerankSeatTool] : tools;
-  let rerank: SeatShortlist | undefined;
+  const seatPage = page?.page === "seat" ? page : null;
+  const availableTools = seatPage ? [...tools, nextSeatSuppliersTool, rerankSeatTool] : tools;
+  const actions: PageAction[] = [];
   const evidence = new Map<string, ChatEvidence>();
   let seatEvaluation: SeatCriteriaResponse | undefined;
   const receipts: ChatResponse["tools"] = [];
@@ -196,8 +215,7 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal) {
       seatEvaluation ? z.toJSONSchema(answerRecipeSchema) : undefined);
     if (!message.tool_calls?.length) {
       const recipe = parseRecipe(message.content) ?? await repairRecipe(messages, message.content, signal);
-      const response = hydrateAnswer(recipe, evidence, model, receipts);
-      return rerank ? { ...response, rerank } : response;
+      return { ...hydrateAnswer(recipe, evidence, model, receipts), actions };
     }
     if (receipts.length + message.tool_calls.length > 4) throw new ChatError("tool_limit", "This question needs too many lookups. Try a narrower question.");
     messages.push({ ...message, content: message.content ?? null });
@@ -213,14 +231,14 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal) {
         if (call.function.name === "evaluate_seat_criteria") {
           seatCriteriaArgs.parse(args);
           result = seatEvaluation ??= await evaluateSeatCriteria(signal);
-        } else if (call.function.name === "rerank_seat_priorities" && request.focus) {
+        } else if (call.function.name === "rerank_seat_priorities" && seatPage) {
           const reranked = await rerankSeat(args, signal);
-          rerank = reranked.shortlist;
+          actions.push(reranked.action);
           result = reranked.result;
         } else {
           result = call.function.name === "query_suppliers" ? await querySuppliers(args)
             : call.function.name === "get_suppliers" ? await getSuppliers(args)
-            : call.function.name === "next_seat_suppliers" && request.focus ? await nextSeatSuppliers(request.focus, args) : null;
+            : call.function.name === "next_seat_suppliers" && seatPage ? await nextSeatSuppliers(seatPage.weights as Weights, args) : null;
         }
         if (!result) throw new Error("Unknown tool");
         evidence.set(call.id, result);

@@ -6,7 +6,11 @@ import { ArrowLeftIcon, XIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Sidebar, SidebarProvider, useSidebar } from "@/components/ui/sidebar"
-import { chatResponseSchema, type SeatFocus } from "@/lib/chat-contract"
+import { useRouter } from "next/navigation"
+
+import { chatResponseSchema, type PageAction, type PageContext } from "@/lib/chat-contract"
+import { CRITERION_BY_KEY } from "@/lib/suppliers/criteria"
+import { encodeWeights } from "@/lib/suppliers/profiles"
 
 import { AssistantAvatar, assistantName } from "./assistant-avatar"
 import { ChatComposer, ChatThread } from "./chat"
@@ -22,7 +26,7 @@ function toHistory(messages: ChatMessage[]) {
   )
 }
 
-async function askChat(text: string, previous: ChatMessage[], focus: SeatFocus | null) {
+async function askChat(text: string, previous: ChatMessage[], page: PageContext | null) {
   const lastAnswer = previous.findLast((message) => message.role === "assistant")
   const lastView = lastAnswer?.role === "assistant" ? lastAnswer.response.lastView : null
   const response = await fetch("/api/chat", {
@@ -32,7 +36,7 @@ async function askChat(text: string, previous: ChatMessage[], focus: SeatFocus |
       message: text,
       history: toHistory(previous),
       ...(lastView && { lastView }),
-      ...(focus && { focus }),
+      ...(page && { page }),
     }),
   })
   const body: unknown = await response.json()
@@ -78,7 +82,18 @@ function ChatPanel() {
   const [status, setStatus] = useState<ChatStatus>("ready")
   const [error, setError] = useState<string | null>(null)
   const { isMobile, open, setOpen, openMobile, setOpenMobile } = useSidebar()
-  const { focus, applyRerank } = useChatFocus()
+  const { page, applyActions } = useChatFocus()
+  const router = useRouter()
+
+  // Opening a supplier is navigation, so the dock handles it; everything else belongs to the page on screen.
+  function apply(actions: PageAction[]) {
+    const open = actions.find((action) => action.type === "open_supplier")
+    if (open && page) {
+      const query = new URLSearchParams({ ...(page.seatId && { seat: page.seatId }), w: encodeWeights(page.weights) })
+      router.push(`/suppliers/${open.supplierId}?${query}`)
+    }
+    applyActions(actions.filter((action) => action.type !== "open_supplier"))
+  }
 
   function close() {
     if (isMobile) setOpenMobile(false)
@@ -92,8 +107,8 @@ function ChatPanel() {
     setError(null)
     setMessages([...previous, { id: crypto.randomUUID(), role: "user", text }])
     try {
-      const response = await askChat(text, previous, focus)
-      if (response.rerank) applyRerank(response.rerank)
+      const response = await askChat(text, previous, page)
+      apply(response.actions)
       setMessages((current) => [...current, { id: crypto.randomUUID(), role: "assistant", response }])
       setStatus("ready")
     } catch (failure) {
@@ -112,10 +127,8 @@ function ChatPanel() {
       <header className="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--blueprint-rule)] py-4 pr-3 pl-4">
         <div className="min-w-0">
           <h2 className="blueprint-label">{assistantName} / Runs on NVIDIA Nemotron</h2>
-          {focus && (
-            <p className="mt-1 truncate text-xs text-[var(--blueprint-muted)]">
-              Looking at seat {focus.seatId} and its top {focus.supplierIds.length} suppliers
-            </p>
+          {page && (
+            <p className="mt-1 truncate text-xs text-[var(--blueprint-muted)]">{describePage(page)}</p>
           )}
         </div>
         <Button
@@ -154,4 +167,10 @@ function ChatPanel() {
       {open && panel}
     </Sidebar>
   )
+}
+
+function describePage(page: PageContext): string {
+  if (page.page === "seat") return `Looking at seat ${page.seatId} and its top 20 suppliers`
+  if (page.page === "driver") return `Looking at the ${CRITERION_BY_KEY[page.driverKey].label.toLowerCase()} driver`
+  return `Looking at supplier ${page.supplierId}`
 }

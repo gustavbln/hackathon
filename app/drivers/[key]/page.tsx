@@ -48,13 +48,14 @@ export default async function DriverPage({ params, searchParams }: PageProps<"/d
 
   const weightRank = [...CRITERIA].sort((a, b) => context.weights[b.key] - context.weights[a.key]).findIndex(({ key: k }) => k === criterion.key) + 1;
   const reasons = context.fromSeatView ? [] : buildProfile("seats").boosts.filter((boost) => boost.criterion === criterion.key);
-  const focus = context.seatId
-    ? { seatId: context.seatId, weights: context.weights, supplierIds: shortlist.map(({ id }) => id), instruction: null }
-    : null;
 
   return (
     <ChatWorkspace>
-      <DetailShell backHref={context.backHref} section="Risk driver / Seats" focus={focus}>
+      <DetailShell
+        backHref={context.backHref}
+        section="Risk driver / Seats"
+        page={{ page: "driver", driverKey: criterion.key, seatId: context.seatId, weights: context.weights }}
+      >
         <section className="pt-7 pb-6 sm:pt-9" aria-labelledby="driver-heading">
           <p className="blueprint-label mb-2">03 / Risk driver · {criterion.group === "location" ? "location risk" : "company risk"}</p>
           <h1 id="driver-heading" className="text-3xl font-medium tracking-tight sm:text-4xl">{criterion.label}</h1>

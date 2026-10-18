@@ -7,6 +7,7 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { SeatShortlistPanel } from "@/components/cabin/seat-shortlist-panel";
+import type { Weights } from "@/lib/suppliers/criteria";
 import { ChatDock } from "@/components/chat/chat-dock";
 import { CABIN_SEATS } from "./cabin-layout";
 
@@ -38,8 +39,14 @@ class CabinBoundary extends Component<{ children: ReactNode }, { failed: boolean
   render() { return this.state.failed ? <CabinFallback /> : this.props.children; }
 }
 
-/** `initialSeatId` comes from `?seat=`, so detail pages can link back to the seat they came from. */
-export function CabinScene({ initialSeatId = null }: { initialSeatId?: string | null }) {
+interface CabinSceneProps {
+  /** From `?seat=`, so detail pages can link back to the seat they came from. */
+  initialSeatId?: string | null;
+  /** From `?w=`: the weighting the buyer set before leaving the seat view. */
+  initialWeights?: Weights | null;
+}
+
+export function CabinScene({ initialSeatId = null, initialWeights = null }: CabinSceneProps) {
   const [selectedSeatId, setSelectedSeatId] = useState<string | null>(
     CABIN_SEATS.some(({ id }) => id === initialSeatId) ? initialSeatId : null,
   );
@@ -94,7 +101,13 @@ export function CabinScene({ initialSeatId = null }: { initialSeatId?: string | 
             )}
           </figure>
           <div className={focused ? "min-w-0 animate-in fade-in-0 slide-in-from-right-8 duration-700 motion-reduce:animate-none" : "hidden min-w-0 @min-[720px]:block"}>
-            {selectedSeatId && <SeatShortlistPanel seatId={selectedSeatId} onClose={() => selectSeat(null)} />}
+            {selectedSeatId && (
+              <SeatShortlistPanel
+                seatId={selectedSeatId}
+                initialWeights={selectedSeatId === initialSeatId ? initialWeights : null}
+                onClose={() => selectSeat(null)}
+              />
+            )}
           </div>
         </div>
         {!focused && (

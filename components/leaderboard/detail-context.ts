@@ -18,5 +18,6 @@ export function detailContext(seat: unknown, encodedWeights: unknown): DetailCon
   const parsed = parseWeights(encodedWeights);
   const weights = parsed ?? buildProfile("seats").weights;
   const query = new URLSearchParams({ ...(seatId && { seat: seatId }), w: encodeWeights(weights) }).toString();
-  return { seatId, weights, fromSeatView: parsed !== null, query, backHref: seatId ? `/cabin?seat=${seatId}` : "/cabin" };
+  const back = new URLSearchParams({ ...(seatId && { seat: seatId }), ...(parsed && { w: encodeWeights(weights) }) }).toString();
+  return { seatId, weights, fromSeatView: parsed !== null, query, backHref: back ? `/cabin?${back}` : "/cabin" };
 }

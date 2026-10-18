@@ -2,35 +2,37 @@
 
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react"
 
-import type { SeatFocus } from "@/lib/chat-contract"
-import type { SeatShortlist } from "@/lib/seat-shortlist-contract"
+import type { PageAction, PageContext } from "@/lib/chat-contract"
 
-type RerankHandler = (shortlist: SeatShortlist) => void
+type ActionHandler = (action: PageAction) => void
 
 type FocusState = {
-  focus: SeatFocus | null
-  setFocus: (focus: SeatFocus | null) => void
-  /** The panel showing the shortlist listens here; returns the unsubscribe. */
-  onRerank: (handler: RerankHandler) => () => void
-  /** The assistant hands over a shortlist it re-ranked, so the page shows it without a second fetch. */
-  applyRerank: RerankHandler
+  /** The page on screen, as ids and the buyer's inputs; the assistant answers about this. */
+  page: PageContext | null
+  setPage: (page: PageContext | null) => void
+  /** Parts of the page on screen register how they apply the assistant's actions; returns the unsubscribe. */
+  onAction: (handler: ActionHandler) => () => void
+  applyActions: (actions: PageAction[]) => void
 }
 
 const ChatFocusContext = createContext<FocusState | null>(null)
 
-/** Shares what the page shows (seat, weights, shortlist) with the assistant, and the assistant's re-ranks back. */
+/** Shares what the page shows with the assistant, and hands the assistant's actions back to that page. */
 export function ChatFocusProvider({ children }: { children: ReactNode }) {
-  const [focus, setFocus] = useState<SeatFocus | null>(null)
-  const handler = useRef<RerankHandler | null>(null)
+  const [page, setPage] = useState<PageContext | null>(null)
+  // Each handler ignores the actions it doesn't own, so a page can split them across its parts.
+  const handlers = useRef(new Set<ActionHandler>())
 
-  const onRerank = useCallback((next: RerankHandler) => {
-    handler.current = next
+  const onAction = useCallback((handler: ActionHandler) => {
+    handlers.current.add(handler)
     return () => {
-      if (handler.current === next) handler.current = null
+      handlers.current.delete(handler)
     }
   }, [])
-  const applyRerank = useCallback((shortlist: SeatShortlist) => handler.current?.(shortlist), [])
-  const value = useMemo(() => ({ focus, setFocus, onRerank, applyRerank }), [focus, onRerank, applyRerank])
+  const applyActions = useCallback((actions: PageAction[]) => {
+    for (const action of actions) for (const handler of handlers.current) handler(action)
+  }, [])
+  const value = useMemo(() => ({ page, setPage, onAction, applyActions }), [page, onAction, applyActions])
 
   return <ChatFocusContext value={value}>{children}</ChatFocusContext>
 }

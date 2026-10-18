@@ -1,28 +1,46 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 import { ChatDock } from "@/components/chat/chat-dock";
 import { useChatFocus } from "@/components/chat/chat-focus";
-import type { SeatFocus } from "@/lib/chat-contract";
+import type { PageContext } from "@/lib/chat-contract";
+import { encodeWeights } from "@/lib/suppliers/profiles";
 
 interface DetailShellProps {
   backHref: string;
   section: string;
-  /** What the assistant should answer about while this page is open; null when no seat is known. */
-  focus: SeatFocus | null;
+  /** What the assistant answers about while this page is open. */
+  page: PageContext;
   children: ReactNode;
 }
 
 /** Shared frame for the driver and supplier detail pages, matching the cabin's header. */
-export function DetailShell({ backHref, section, focus, children }: DetailShellProps) {
-  const { setFocus } = useChatFocus();
-  const focusKey = JSON.stringify(focus);
+export function DetailShell({ backHref, section, page, children }: DetailShellProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const { setPage, onAction } = useChatFocus();
+  const pageKey = JSON.stringify(page);
 
   useEffect(() => {
-    setFocus(focusKey === "null" ? null : (JSON.parse(focusKey) as SeatFocus));
-  }, [focusKey, setFocus]);
+    setPage(JSON.parse(pageKey) as PageContext);
+    return () => setPage(null);
+  }, [pageKey, setPage]);
+
+  // New weights from the assistant re-rank this page through its URL, like the seat view does.
+  useEffect(
+    () =>
+      onAction((action) => {
+        if (action.type !== "set_weights") return;
+        const query = new URLSearchParams(searchParams);
+        query.set("w", encodeWeights(action.weights));
+        router.replace(`${pathname}?${query}`, { scroll: false });
+      }),
+    [onAction, pathname, router, searchParams],
+  );
 
   return (
     <main className="blueprint-page relative flex min-h-svh min-w-0 flex-1 flex-col px-5 pb-12 sm:px-10 lg:px-16">

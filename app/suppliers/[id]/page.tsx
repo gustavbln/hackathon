@@ -23,13 +23,14 @@ export default async function SupplierPage({ params, searchParams }: PageProps<"
   if (!entry) notFound();
 
   const row = toBoardRow(entry, { ranked, weights: context.weights, defaultRanks: null }, true);
-  const focus = context.seatId
-    ? { seatId: context.seatId, weights: context.weights, supplierIds: [row.id], instruction: null }
-    : null;
 
   return (
     <ChatWorkspace>
-      <DetailShell backHref={context.backHref} section="Supplier / Seats" focus={focus}>
+      <DetailShell
+        backHref={context.backHref}
+        section="Supplier / Seats"
+        page={{ page: "supplier", supplierId: row.id, seatId: context.seatId, weights: context.weights }}
+      >
         <section className="pt-7 pb-6 sm:pt-9">
           <p className="blueprint-label mb-2">03 / Supplier details</p>
           <p className="text-sm text-[var(--blueprint-muted)]">

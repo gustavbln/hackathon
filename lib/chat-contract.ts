@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { CRITERIA } from "./suppliers/criteria.ts";
 import { seatCriteriaResponseSchema } from "./seat-criteria-contract.ts";
-import { seatShortlistSchema, shortlistInstructionSchema } from "./seat-shortlist-contract.ts";
+import { shortlistInstructionSchema } from "./seat-shortlist-contract.ts";
 
 export const riskDefinitions = [
   ["Financial_Health_Score", "Financial health risk", 10],
@@ -59,15 +59,28 @@ export const querySuppliersSchema = z.strictObject({
 export const getSuppliersSchema = z.strictObject({ ids: idsSchema, metrics: metricsSchema.default(defaultMetrics) });
 export const lastViewSchema = z.strictObject({ supplierIds: idsSchema, metricKeys: metricsSchema });
 const criterionKeySchema = z.enum(CRITERIA.map(({ key }) => key));
-/** What the buyer is looking at in the cabin: the seat, the active weights and the shortlist they produce. */
-export const seatFocusSchema = z.strictObject({
-  seatId: z.string().regex(/^\d{1,2}[A-Z]$/),
-  weights: z.record(criterionKeySchema, z.number().min(0).max(1))
-    .refine((weights) => Object.values(weights).some((weight) => weight > 0), "At least one weight must be positive"),
-  supplierIds: idsSchema,
-  instruction: z.string().trim().max(300).nullable(),
-});
-export type SeatFocus = z.infer<typeof seatFocusSchema>;
+const seatIdSchema = z.string().regex(/^\d{1,2}[A-Z]$/);
+const weightsSchema = z.record(criterionKeySchema, z.number().min(0).max(1))
+  .refine((weights) => Object.values(weights).some((weight) => weight > 0), "At least one weight must be positive");
+
+/**
+ * The page the buyer is on. Pages send only ids and the buyer's own inputs (the weights); the server loads every
+ * fact again from these, so nothing on screen is trusted as evidence.
+ */
+export const pageContextSchema = z.discriminatedUnion("page", [
+  z.strictObject({ page: z.literal("seat"), seatId: seatIdSchema, weights: weightsSchema, instruction: z.string().trim().max(300).nullable() }),
+  z.strictObject({ page: z.literal("driver"), driverKey: criterionKeySchema, seatId: seatIdSchema.nullable(), weights: weightsSchema }),
+  z.strictObject({ page: z.literal("supplier"), supplierId: supplierIdSchema, seatId: seatIdSchema.nullable(), weights: weightsSchema }),
+]);
+export type PageContext = z.infer<typeof pageContextSchema>;
+
+/** What the assistant may change on the page. Only tool code creates actions; the page on screen applies them. */
+export const pageActionSchema = z.discriminatedUnion("type", [
+  z.strictObject({ type: z.literal("set_weights"), weights: weightsSchema, instruction: z.string().trim().max(300).nullable() }),
+  z.strictObject({ type: z.literal("highlight_driver"), driverKey: criterionKeySchema }),
+  z.strictObject({ type: z.literal("open_supplier"), supplierId: supplierIdSchema }),
+]);
+export type PageAction = z.infer<typeof pageActionSchema>;
 export const nextSeatSuppliersSchema = z.strictObject({
   offset: z.number().int().min(0).max(500).default(20),
   limit: z.number().int().min(1).max(20).default(10),
@@ -78,7 +91,7 @@ export const chatRequestSchema = z.strictObject({
   history: z.array(z.strictObject({ role: z.enum(["user", "assistant"]), content: z.string().max(2_000) })).max(12).default([]),
   selectedIds: z.array(supplierIdSchema).max(20).default([]),
   lastView: lastViewSchema.optional(),
-  focus: seatFocusSchema.optional(),
+  page: pageContextSchema.optional(),
 });
 export type ChatRequest = z.infer<typeof chatRequestSchema>;
 
@@ -124,8 +137,8 @@ export const chatResponseSchema = z.object({
   lastView: lastViewSchema.nullable(),
   tools: z.array(z.object({ name: z.string(), status: z.enum(["ok", "error"]), resultId: z.string() })),
   seatCriteria: seatCriteriaResponseSchema.optional(),
-  /** Set when the buyer re-ranked the seat priorities through the chat; the page shows the new shortlist. */
-  rerank: seatShortlistSchema.optional(),
+  /** Changes for the page on screen, e.g. new weights after the buyer re-ranked through the chat. */
+  actions: z.array(pageActionSchema).default([]),
 });
 export type ChatResponse = z.infer<typeof chatResponseSchema>;
 

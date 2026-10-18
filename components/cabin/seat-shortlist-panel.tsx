@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpIcon, ArrowUpRightIcon, XIcon } from "lucide-react";
@@ -9,7 +9,7 @@ import { AssistantAvatar } from "@/components/chat/assistant-avatar";
 import { useChatFocus } from "@/components/chat/chat-focus";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { SeatFocus } from "@/lib/chat-contract";
+import type { PageContext } from "@/lib/chat-contract";
 import { seatShortlistSchema, type SeatShortlist, type ShortlistSource } from "@/lib/seat-shortlist-contract";
 import { CRITERION_BY_KEY, type CriterionKey, type Weights } from "@/lib/suppliers/criteria";
 import { encodeWeights } from "@/lib/suppliers/profiles";
@@ -41,21 +41,23 @@ async function fetchShortlist({ source, instruction }: ShortlistRequest, signal:
   return seatShortlistSchema.parse(body);
 }
 
-export function SeatShortlistPanel({ seatId, onClose }: { seatId: string; onClose: () => void }) {
+interface SeatShortlistPanelProps {
+  seatId: string;
+  /** Weights the buyer set earlier, from `?w=`; they win over a fresh Nemotron weighting until reset. */
+  initialWeights?: Weights | null;
+  onClose: () => void;
+}
+
+export function SeatShortlistPanel({ seatId, initialWeights = null, onClose }: SeatShortlistPanelProps) {
   const [request, setRequest] = useState<ShortlistRequest>({ source: "nemotron", instruction: null });
+  const [startWeights, setStartWeights] = useState(initialWeights);
   // A missing entry means "not fetched yet"; ready and failed results stay cached per request.
   const [loads, setLoads] = useState<Record<string, Load>>({});
   const key = requestKey(request);
   const entry = loads[key];
   const load = entry ?? { state: "loading" };
-  const { setFocus, onRerank } = useChatFocus();
-
-  // A re-rank asked through Gauge arrives with its result; show it as if the buyer had typed it here.
-  useEffect(() => onRerank((shortlist) => {
-    const next = { source: "nemotron" as const, instruction: shortlist.instruction };
-    setLoads((current) => ({ ...current, [requestKey(next)]: { state: "ready", shortlist } }));
-    setRequest(next);
-  }), [onRerank]);
+  const { setPage } = useChatFocus();
+  useEffect(() => () => setPage(null), [setPage]);
 
   useEffect(() => {
     if (entry) return;
@@ -70,19 +72,6 @@ export function SeatShortlistPanel({ seatId, onClose }: { seatId: string; onClos
     );
     return () => controller.abort();
   }, [request, key, entry]);
-
-  // Gauge answers about whatever shortlist is on screen.
-  const shortlist = load.state === "ready" ? load.shortlist : null;
-  useEffect(() => {
-    if (!shortlist) return;
-    setFocus({
-      seatId,
-      weights: Object.fromEntries(shortlist.criteria.map(({ key, weightPercent }) => [key, weightPercent / 100])) as SeatFocus["weights"],
-      supplierIds: shortlist.suppliers.map(({ id }) => id),
-      instruction: shortlist.instruction,
-    });
-  }, [seatId, shortlist, setFocus]);
-  useEffect(() => () => setFocus(null), [setFocus]);
 
   function retry() {
     setLoads((current) => {
@@ -120,7 +109,11 @@ export function SeatShortlistPanel({ seatId, onClose }: { seatId: string; onClos
       <RerankForm
         instruction={request.instruction}
         disabled={load.state === "loading"}
-        onRerank={(instruction) => setRequest({ source: "nemotron", instruction })}
+        onRerank={(instruction) => {
+          // An explicit Nemotron re-rank replaces the buyer's dragged weights.
+          setStartWeights(null);
+          setRequest({ source: "nemotron", instruction });
+        }}
       />
 
       <div className="min-h-0 flex-1 overflow-y-auto">
@@ -139,6 +132,7 @@ export function SeatShortlistPanel({ seatId, onClose }: { seatId: string; onClos
             key={load.shortlist.criteria.map(({ key: criterion, weightPercent }) => `${criterion}${weightPercent.toFixed(2)}`).join()}
             shortlist={load.shortlist}
             seatId={seatId}
+            startWeights={startWeights}
           />
         )}
       </div>
@@ -216,17 +210,24 @@ function ShortlistLoading({ source }: { source: ShortlistSource }) {
   );
 }
 
-function ShortlistResult({ shortlist, seatId }: { shortlist: SeatShortlist; seatId: string }) {
+/** Spider values for a weighting: the top driver sits at 60% of the radius, so any driver can be pulled out past it. */
+function toSpiderValues(weights: Record<CriterionKey, number>): Record<CriterionKey, number> {
+  const max = Math.max(...Object.values(weights)) || 1;
+  return Object.fromEntries(Object.entries(weights).map(([key, weight]) => [key, (weight / max) * START_SHARE])) as Record<CriterionKey, number>;
+}
+
+function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatShortlist; seatId: string; startWeights: Weights | null }) {
   const router = useRouter();
-  const { setFocus } = useChatFocus();
+  const { setPage, onAction } = useChatFocus();
   const matrix = useSupplierScores();
-  const keys = shortlist.criteria.map(({ key }) => key);
-  const maxWeight = shortlist.criteria[0]?.weightPercent || 1;
-  // The top driver starts at 60% of the radius, so any driver can be pulled out past it.
-  const initial = Object.fromEntries(
-    shortlist.criteria.map(({ key, weightPercent }) => [key, (weightPercent / maxWeight) * START_SHARE]),
-  ) as Record<CriterionKey, number>;
-  const [values, setValues] = useState(initial);
+  const keys = useMemo(() => shortlist.criteria.map(({ key }) => key), [shortlist]);
+  const initial = useMemo(
+    () => toSpiderValues(Object.fromEntries(shortlist.criteria.map(({ key, weightPercent }) => [key, weightPercent])) as Record<CriterionKey, number>),
+    [shortlist],
+  );
+  const [values, setValues] = useState(() => (startWeights ? toSpiderValues(startWeights) : initial));
+  const [committed, setCommitted] = useState(values);
+  const [instruction, setInstruction] = useState(startWeights ? null : shortlist.instruction);
   const [active, setActive] = useState<CriterionKey | null>(null);
 
   const total = keys.reduce((sum, key) => sum + values[key], 0) || 1;
@@ -250,15 +251,31 @@ function ShortlistResult({ shortlist, seatId }: { shortlist: SeatShortlist; seat
         activePoints: active ? (contributions[active] ?? 0) : null,
       }));
 
-  const commit = (next: Record<CriterionKey, number> = values) => {
-    const sum = keys.reduce((total, key) => total + next[key], 0) || 1;
-    setFocus({
-      seatId,
-      weights: Object.fromEntries(keys.map((key) => [key, next[key] / sum])) as SeatFocus["weights"],
-      supplierIds: top.map(({ id }) => id),
-      instruction: next === initial ? shortlist.instruction : null,
-    });
-  };
+  const commit = useCallback((next: Record<CriterionKey, number>, nextInstruction: string | null = null) => {
+    setCommitted(next);
+    setInstruction(nextInstruction);
+  }, []);
+
+  // The committed weighting is the source of truth: the URL keeps it across pages, the assistant answers about it.
+  useEffect(() => {
+    const sum = keys.reduce((total, key) => total + committed[key], 0) || 1;
+    const committedWeights = Object.fromEntries(keys.map((key) => [key, committed[key] / sum])) as Weights;
+    const isInitial = keys.every((key) => Math.abs(committed[key] - initial[key]) < 1e-6);
+    const url = isInitial ? `/cabin?seat=${seatId}` : `/cabin?seat=${seatId}&w=${encodeWeights(committedWeights)}`;
+    window.history.replaceState(window.history.state, "", url);
+    const page: PageContext = { page: "seat", seatId, weights: committedWeights, instruction };
+    setPage(page);
+  }, [committed, instruction, seatId, setPage, keys, initial]);
+
+  useEffect(() => onAction((action) => {
+    if (action.type === "set_weights") {
+      const next = toSpiderValues(action.weights as Record<CriterionKey, number>);
+      setValues(next);
+      commit(next, action.instruction);
+    } else if (action.type === "highlight_driver") {
+      setActive(action.driverKey);
+    }
+  }), [onAction, commit]);
   const activeCriterion = shortlist.criteria.find(({ key }) => key === active);
 
   return (
@@ -279,7 +296,7 @@ function ShortlistResult({ shortlist, seatId }: { shortlist: SeatShortlist; seat
             active={active}
             onActive={setActive}
             onChange={(key, value) => setValues((current) => ({ ...current, [key]: value }))}
-            onCommit={() => commit()}
+            onCommit={() => commit(values)}
             hrefFor={(key) => `/drivers/${key}?${query}`}
           />
         </section>
@@ -311,7 +328,7 @@ function ShortlistResult({ shortlist, seatId }: { shortlist: SeatShortlist; seat
             disabled={!edited}
             onClick={() => {
               setValues(initial);
-              commit(initial);
+              commit(initial, shortlist.instruction);
             }}
             className="w-fit rounded-none border-[var(--blueprint-rule)] bg-transparent"
           >

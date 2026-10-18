@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useChatFocus } from "@/components/chat/chat-focus";
 import { CRITERIA, type CriterionKey, type Weights } from "@/lib/suppliers/criteria";
 import type { BoardRow } from "./board-view";
 import { SupplierFocus } from "./supplier-focus";
@@ -17,6 +18,8 @@ interface SupplierDetailProps {
 export function SupplierDetail({ supplier, supplierCount, weights, query }: SupplierDetailProps) {
   const router = useRouter();
   const [activeCriterion, setActiveCriterion] = useState<CriterionKey | null>(null);
+  const { onAction } = useChatFocus();
+  useEffect(() => onAction((action) => action.type === "highlight_driver" && setActiveCriterion(action.driverKey)), [onAction]);
   const criteria = [...CRITERIA].sort((a, b) => weights[b.key] - weights[a.key]);
 
   return (
