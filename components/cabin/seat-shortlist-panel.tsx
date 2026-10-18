@@ -21,6 +21,8 @@ import { WeightSpider } from "./weight-spider";
 
 const SHORTLIST_SIZE = 20;
 const START_SHARE = 0.6;
+/** A seat buyer tunes the few drivers that matter for seats; the rest weigh nothing. */
+const SEAT_DRIVERS = 7;
 
 type Load =
   | { state: "loading" }
@@ -131,17 +133,27 @@ function toSpiderValues(weights: Record<CriterionKey, number>): Record<Criterion
   return Object.fromEntries(Object.entries(weights).map(([key, weight]) => [key, (weight / max) * START_SHARE])) as Record<CriterionKey, number>;
 }
 
+/** The weighting restricted to the shown drivers; every other driver gets zero weight. */
+function keepDrivers(weights: Record<CriterionKey, number>, shown: CriterionKey[]): Record<CriterionKey, number> {
+  return Object.fromEntries(Object.entries(weights).map(([key, weight]) => [key, shown.includes(key as CriterionKey) ? weight : 0])) as Record<CriterionKey, number>;
+}
+
 function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatShortlist; seatId: string; startWeights: Weights | null }) {
   const router = useRouter();
   const { setPage, onAction, ask } = useChatFocus();
   const matrix = useSupplierScores();
   const { researched } = useResearchedSuppliers();
   const keys = useMemo(() => shortlist.criteria.map(({ key }) => key), [shortlist]);
+  // Nemotron's heaviest drivers for seats, kept in axis order so the spider reads the same every run.
+  const shown = useMemo(() => {
+    const heaviest = [...shortlist.criteria].sort((a, b) => b.weightPercent - a.weightPercent).slice(0, SEAT_DRIVERS).map(({ key }) => key);
+    return keys.filter((key) => heaviest.includes(key));
+  }, [shortlist, keys]);
   const initial = useMemo(
-    () => toSpiderValues(Object.fromEntries(shortlist.criteria.map(({ key, weightPercent }) => [key, weightPercent])) as Record<CriterionKey, number>),
-    [shortlist],
+    () => toSpiderValues(keepDrivers(Object.fromEntries(shortlist.criteria.map(({ key, weightPercent }) => [key, weightPercent])) as Record<CriterionKey, number>, shown)),
+    [shortlist, shown],
   );
-  const [values, setValues] = useState(() => (startWeights ? toSpiderValues(startWeights) : initial));
+  const [values, setValues] = useState(() => (startWeights ? toSpiderValues(keepDrivers(startWeights, shown)) : initial));
   const [committed, setCommitted] = useState(values);
   const [instruction, setInstruction] = useState(startWeights ? null : shortlist.instruction);
   const [active, setActive] = useState<CriterionKey | null>(null);
@@ -213,13 +225,13 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
 
   useEffect(() => onAction((action) => {
     if (action.type === "set_weights") {
-      const next = toSpiderValues(action.weights as Record<CriterionKey, number>);
+      const next = toSpiderValues(keepDrivers(action.weights as Record<CriterionKey, number>, shown));
       setValues(next);
       commit(next, action.instruction);
     } else if (action.type === "highlight_driver") {
       setActive(action.driverKey);
     }
-  }), [onAction, commit]);
+  }), [onAction, commit, shown]);
   const focusCriterion = shortlist.criteria.find(({ key }) => key === focus);
 
   return (
@@ -237,7 +249,7 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
         <section aria-labelledby="seat-criteria-heading" className="flex min-w-0 flex-col items-center gap-2">
           <h3 id="seat-criteria-heading" className="blueprint-label self-start">Priorities · drag a point to reweight</h3>
           <WeightSpider
-            keys={keys}
+            keys={shown}
             values={values}
             active={focus}
             onActive={setActive}
@@ -287,7 +299,7 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
               </div>
             ) : (
               <p className="text-xs leading-relaxed text-[var(--blueprint-muted)]">
-                Drag a point outward to weight a driver more, inward to weight it less. The columns re-rank across
+                Drag a point outward to weight a driver more, inward to weight it less. The ranking re-sorts across
                 all {shortlist.supplierCount.toLocaleString("en")} suppliers as you drag. Click a driver to see what it means.
               </p>
             )}
@@ -305,9 +317,9 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
             Reset weighting
           </Button>
           <section aria-labelledby="seat-weights-heading" className="text-xs">
-            <h3 id="seat-weights-heading" className="blueprint-label mb-1">All {keys.length} weights</h3>
+            <h3 id="seat-weights-heading" className="blueprint-label mb-1">The {shown.length} drivers that matter for seats</h3>
             <ul className="grid grid-cols-2 gap-x-5">
-              {keys.map((key) => (
+              {shown.map((key) => (
                 <li key={key} className="flex justify-between gap-2 border-t border-[var(--blueprint-rule)] py-1">
                   <Link href={`/drivers/${key}?${query}`} className="truncate hover:underline">{CRITERION_BY_KEY[key].label}</Link>
                   <span className="font-mono tabular-nums">{(weights[key] * 100).toFixed(1)}%</span>
