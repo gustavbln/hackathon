@@ -12,7 +12,7 @@ import {
 import { nextSeatSupplierIds, seatShortlist, SHORTLIST_SIZE } from "./seat-shortlist.ts";
 import { CRITERIA, CRITERION_BY_KEY, TOTAL_RISK_WEIGHTS, type Weights } from "./suppliers/criteria.ts";
 import { getSuppliers, querySuppliers } from "./suppliers.ts";
-import { completeNemotron, type ModelMessage, type ModelTool, type UsageSink } from "./nemotron.ts";
+import { completeNemotron, type AssistantMessage, type ModelMessage, type ModelTool, type UsageSink } from "./nemotron.ts";
 import { evaluateSeatCriteria } from "./seat-criteria.ts";
 import type { SeatCriteriaResponse } from "./seat-criteria-contract.ts";
 import { guardedSearchSchema, searchContext, type WebContext } from "./web-context.ts";
@@ -381,14 +381,14 @@ function parseRecipe(content: string | null | undefined) {
  * recovers the recipe. The retry is checked like the first answer.
  */
 async function repairRecipe(messages: ModelMessage[], content: string | null | undefined, problem: string | null, outputSchema: Record<string, unknown>, signal: AbortSignal, onUsage: UsageSink) {
-  const { message } = await completeNemotron([
+  const { message, model } = await completeNemotron([
     ...messages,
     { role: "assistant", content: content ?? "" },
     { role: "user", content: `${problem ? `That answer was rejected: ${problem} ` : ""}Return the answer now as ONLY the JSON object in the required format.` },
   ], [], signal, outputSchema, { onUsage });
   const recipe = parseRecipe(message.content);
   if (!recipe) throw new ChatError("invalid_answer", "Nemotron returned an unreadable answer. Please retry.");
-  return recipe;
+  return { recipe, model };
 }
 
 
@@ -401,6 +401,9 @@ const answerTool: ModelTool = { type: "function", function: {
 
 /** "Context from the web" buttons and "(web)" chips are an explicit request: the search runs, Nemotron picks the queries. */
 const ASKS_FOR_WEB = /\bweb\b/i;
+
+/** Stands in for a reply cut off at the token limit: no tool calls, no readable answer. */
+const RUNAWAY_REPLY: AssistantMessage = { role: "assistant", content: null };
 
 /** Tools without a trace label report their own steps, each with its own meter. */
 const SELF_TRACED: Meter = { onUsage: () => {}, addCredits: () => {} };
@@ -437,13 +440,15 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
   const definitions: ModelTool[] = [...available.map(({ definition }) => ({ type: "function" as const, function: definition })), answerTool];
   const receipts: ChatResponse["tools"] = [];
   const callIds = new Set<string>();
+  // Nemotron sometimes insists on a tool that does not exist; after one such call it answers with what it has.
+  let strayed = false;
   for (let round = 0; round < 5; round++) {
     signal.throwIfAborted();
     // Seat priorities are answered as they are; more lookups would only blur them. Once web text is in the
     // conversation no tool is offered, so nothing a web page says can trigger one; Ultra writes with thinking on.
     const web = webContextIn(evidence);
     const writer = (web?.sources.length ?? 0) > 0;
-    const final = writer || [...evidence.values()].some((result) => "runCount" in result);
+    const final = writer || strayed || [...evidence.values()].some((result) => "runCount" in result);
     const offered = web ? definitions.filter(({ function: { name } }) => name !== "search_context") : definitions;
     // The writer can only cite dataset results: decoding enforces that web text never stands in for them.
     const datasetIds = [...evidence].flatMap(([id, result]) => result === web ? [] : [id]);
@@ -453,26 +458,31 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
         ? completeNemotron(messages, [], signal, recipeSchema, { onUsage, thinking: writer, maxTokens: writer ? 8_192 : undefined })
         : completeNemotron(messages, offered, signal, undefined, {
           onUsage, ...(round === 0 && ASKS_FOR_WEB.test(request.message) && { toolChoice: { type: "function", function: { name: "search_context" } } }),
+        }).catch((error: unknown) => {
+          // A runaway prose reply hits the token limit; the schema-bound retry below writes the answer again, briefly.
+          if (error instanceof ChatError && error.code === "incomplete_answer") return { message: RUNAWAY_REPLY, model: "", usage: null };
+          throw error;
         }),
       ({ message }) => {
         const names = message.tool_calls?.map(({ function: { name } }) => name).filter((name) => name !== answerTool.function.name) ?? [];
-        return names.length ? `Chose ${names.join(", ")}` : "Wrote the answer";
+        return names.length ? `Chose ${names.join(", ")}` : message.content === null && !message.tool_calls?.length ? "Ran past the length limit" : "Wrote the answer";
       });
     const answer = message.tool_calls?.length === 1 && message.tool_calls[0]?.function.name === answerTool.function.name
       ? message.tool_calls[0].function.arguments : null;
     if (answer !== null || !message.tool_calls?.length) {
       const content = answer ?? message.content;
-      let recipe = parseRecipe(content)
-        ?? await step("Formatted the answer", "nemotron", ({ onUsage }) => repairRecipe(messages, content, null, recipeSchema, signal, onUsage));
+      const parsed = parseRecipe(content);
+      let { recipe, model: author } = parsed ? { recipe: parsed, model }
+        : await step("Formatted the answer", "nemotron", ({ onUsage }) => repairRecipe(messages, content, null, recipeSchema, signal, onUsage));
       let response: ChatResponse;
       try {
-        response = hydrateAnswer(recipe, evidence, model, receipts);
+        response = hydrateAnswer(recipe, evidence, author, receipts);
       } catch (error) {
         if (!(error instanceof ChatError) || error.code !== "ungrounded_answer") throw error;
         const rejected = JSON.stringify(recipe);
-        recipe = await step("Corrected an ungrounded answer", "nemotron",
-          ({ onUsage }) => repairRecipe(messages, rejected, error.message.replace(" Please retry.", ""), recipeSchema, signal, onUsage));
-        response = hydrateAnswer(recipe, evidence, model, receipts);
+        ({ recipe, model: author } = await step("Corrected an ungrounded answer", "nemotron",
+          ({ onUsage }) => repairRecipe(messages, rejected, error.message.replace(" Please retry.", ""), recipeSchema, signal, onUsage)));
+        response = hydrateAnswer(recipe, evidence, author, receipts);
       }
       const top = facts?.kind === "supplier_explanation" && recipe.resultId === PAGE_RESULT_ID && facts.drivers[0];
       if (top) context.actions.push({ type: "highlight_driver", driverKey: top.key });
@@ -487,6 +497,7 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
       if (callIds.has(call.id)) throw new ChatError("invalid_provider_response", "Nemotron repeated a tool call identifier. Please retry.");
       callIds.add(call.id);
       const tool = available.find(({ definition }) => definition.name === call.function.name);
+      if (!tool) strayed = true;
       let output: unknown;
       let status: "ok" | "error" = "error";
       try {
