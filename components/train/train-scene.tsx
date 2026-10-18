@@ -115,12 +115,12 @@ export function TrainScene({ children }: { children?: ReactNode }) {
         style={entered ? undefined : { height: `calc(100svh - ${topInset}px)` }}>
         <CabinScene journey={{ progress, entered, onBack: back }} />
         {!entered && <>
-          {children && <div className="pointer-events-none absolute top-6 left-6" style={{ opacity: 1 - progress }}>{children}</div>}
-          <div className="absolute inset-x-0 bottom-6 z-30 flex flex-col items-center gap-3" style={{ opacity: Math.max(0, 1 - progress * 2) }}>
-            <Button onClick={enter} variant="outline" size="lg" className="rounded-none border-[var(--blueprint-ink)] bg-[var(--blueprint-paper)] text-[var(--blueprint-ink)]">
-              Enter cabin <ArrowDown strokeWidth={1.25} />
+          {children && <div className="pointer-events-none absolute inset-x-0 top-0 z-20 px-5 pt-6 sm:px-10 lg:px-16" style={{ opacity: Math.max(0, 1 - progress * 2) }}>{children}</div>}
+          <div className="absolute inset-x-0 bottom-10 z-30 flex flex-col items-center gap-3" style={{ opacity: Math.max(0, 1 - progress * 2) }}>
+            <Button onClick={enter} size="lg" className="h-12 rounded-full bg-[var(--blueprint-ink)] px-7 text-[var(--blueprint-paper)] hover:bg-[var(--blueprint-ink)]/90">
+              Enter the cabin <ArrowDown strokeWidth={1.5} />
             </Button>
-            <span className="blueprint-label rounded bg-[var(--blueprint-paper)]/90 px-3 py-1">Or scroll through the window</span>
+            <span className="text-xs text-[var(--blueprint-ink)]">or scroll through the window</span>
           </div>
         </>}
       </div>
