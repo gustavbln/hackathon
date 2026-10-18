@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowUpIcon, ArrowUpRightIcon, XIcon } from "lucide-react";
+import { ArrowUpIcon, XIcon } from "lucide-react";
 
 import { AssistantAvatar } from "@/components/chat/assistant-avatar";
 import { useChatFocus } from "@/components/chat/chat-focus";
@@ -352,12 +352,6 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
               </tbody>
             </table>
           </details>
-          <Link
-            href="/suppliers?component=seats"
-            className="blueprint-label mt-auto inline-flex items-center gap-1 hover:text-[var(--blueprint-ink)]"
-          >
-            Full benchmark <ArrowUpRightIcon className="size-3" />
-          </Link>
         </aside>
       </div>
     </div>

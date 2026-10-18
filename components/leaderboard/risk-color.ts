@@ -19,7 +19,3 @@ const CRITERION_COLOR = {
 export function criterionColor(score: number | null, tone: keyof typeof CRITERION_COLOR = "quiet"): string {
   return score === null ? "transparent" : CRITERION_COLOR[tone][riskLevel(score)];
 }
-
-export function inkColor(percent: number): string {
-  return ink(percent);
-}
