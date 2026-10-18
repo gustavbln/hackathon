@@ -185,6 +185,10 @@ Each person connects the Mobbin MCP in their own agent. It does not go into this
 
 ## 3D train (Yogos)
 
+- Landing asset: original procedural high-speed train in `public/models/high-speed-train.glb`.
+  Source: `components/train/create-train.ts`; regenerate with
+  `docker compose exec web node --experimental-strip-types scripts/export-train.mjs`.
+  Blueprint colors live in `app/globals.css` (`--train-*`) and are baked into the export.
 - Model: [ICE-3 by J-m@n](https://3dwarehouse.sketchup.com/model/e6593c7243820ab45bef0d098ed74c1d/ICE-3),
   the real ICE 3/Velaro shape. GLB, 5.6 MB, 126k triangles, 4 cars. Units are inches: scale by 0.0254.
 - Licence (3D Warehouse General Model License): fine inside our app, never offered as a standalone

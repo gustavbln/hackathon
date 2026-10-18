@@ -49,6 +49,10 @@
 }
 
 :root {
+  --train-surface: #e7edf0;
+  --train-line: #245781;
+  --train-glass: #aec7d7;
+  --train-mechanical: #8199aa;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
