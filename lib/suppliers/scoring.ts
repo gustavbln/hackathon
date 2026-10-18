@@ -81,6 +81,29 @@ export function findAlternatives(
   return { driver, kind: "different-driver", alternatives: neighbours };
 }
 
+/**
+ * The `limit` lowest weighted risks over a flat score matrix (row-major, one row per supplier, columns in
+ * `weights` order), lowest first; ties keep row order. Fast enough to run on every drag frame for 10,000 rows.
+ */
+export function topByWeights(
+  scores: ArrayLike<number>,
+  weights: readonly number[],
+  limit: number,
+): { row: number; risk: number }[] {
+  const columns = weights.length;
+  const best: { row: number; risk: number }[] = [];
+  for (let row = 0; row * columns < scores.length; row++) {
+    let risk = 0;
+    for (let column = 0; column < columns; column++) risk += weights[column] * scores[row * columns + column];
+    if (best.length === limit && risk >= best[limit - 1].risk) continue;
+    let position = best.length;
+    while (position > 0 && best[position - 1].risk > risk) position--;
+    best.splice(position, 0, { row, risk });
+    if (best.length > limit) best.pop();
+  }
+  return best;
+}
+
 /** Lowest risk first. Ranks by the worst case, so missing data never helps a supplier. */
 export function rankSuppliers(suppliers: readonly Supplier[], weights: Weights): RankedSupplier[] {
   return suppliers
