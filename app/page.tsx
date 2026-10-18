@@ -28,7 +28,18 @@ export default function Home() {
         </h1>
       </section>
 
-      <TrainScene />
+      <TrainScene>
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-lg font-medium tracking-tight sm:text-2xl">
+            Know your suppliers. Keep production moving.
+          </p>
+          <ul className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-[var(--blueprint-muted)] sm:text-sm" aria-label="Platform capabilities">
+            <li>Supplier management</li>
+            <li>Risk assessment</li>
+            <li>Just-in-time planning</li>
+          </ul>
+        </div>
+      </TrainScene>
 
       <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--blueprint-rule)] py-5">
         <span className="blueprint-label">01 / High-speed rail</span>
