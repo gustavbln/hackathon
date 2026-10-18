@@ -37,8 +37,11 @@ class CabinBoundary extends Component<{ children: ReactNode }, { failed: boolean
   render() { return this.state.failed ? <CabinFallback /> : this.props.children; }
 }
 
-export function CabinScene() {
-  const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
+/** `initialSeatId` comes from `?seat=`, so detail pages can link back to the seat they came from. */
+export function CabinScene({ initialSeatId = null }: { initialSeatId?: string | null }) {
+  const [selectedSeatId, setSelectedSeatId] = useState<string | null>(
+    CABIN_SEATS.some(({ id }) => id === initialSeatId) ? initialSeatId : null,
+  );
   const [zoom, setZoom] = useState(1);
   const [resetView, setResetView] = useState(0);
   const [selectedComponentId, setSelectedComponentId] = useState<CabinComponentId | null>(null);

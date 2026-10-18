@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowUpIcon, ArrowUpRightIcon, XIcon } from "lucide-react";
 
 import { AssistantAvatar } from "@/components/chat/assistant-avatar";
@@ -10,8 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { SeatFocus } from "@/lib/chat-contract";
 import { seatShortlistSchema, type SeatShortlist, type ShortlistSource } from "@/lib/seat-shortlist-contract";
-
-const TOP_CRITERIA = 5;
+import type { CriterionKey, Weights } from "@/lib/suppliers/criteria";
+import { encodeWeights } from "@/lib/suppliers/profiles";
+import { PriorityRadial } from "./priority-radial";
+import { FOCUS_SERIES } from "./series-color";
+import { SupplierRiskBars } from "./supplier-risk-bars";
 
 type Load =
   | { state: "loading" }
@@ -125,7 +129,7 @@ export function SeatShortlistPanel({ seatId, onClose }: { seatId: string; onClos
             </Button>
           </div>
         )}
-        {load.state === "ready" && <ShortlistResult shortlist={load.shortlist} />}
+        {load.state === "ready" && <ShortlistResult shortlist={load.shortlist} seatId={seatId} />}
       </div>
     </section>
   );
@@ -201,68 +205,57 @@ function ShortlistLoading({ source }: { source: ShortlistSource }) {
   );
 }
 
-function ShortlistResult({ shortlist }: { shortlist: SeatShortlist }) {
-  const [showAll, setShowAll] = useState(false);
-  const visible = showAll ? shortlist.criteria : shortlist.criteria.slice(0, TOP_CRITERIA);
-  const maxWeight = shortlist.criteria[0]?.weightPercent ?? 1;
+function ShortlistResult({ shortlist, seatId }: { shortlist: SeatShortlist; seatId: string }) {
+  const router = useRouter();
+  const [highlighted, setHighlighted] = useState<CriterionKey | null>(null);
+  const weights = Object.fromEntries(shortlist.criteria.map(({ key, weightPercent }) => [key, weightPercent / 100])) as Weights;
+  // Detail pages rank with exactly this weighting and know which seat to return to.
+  const query = new URLSearchParams({ seat: seatId, w: encodeWeights(weights) }).toString();
+  const focusKeys = shortlist.criteria.slice(0, FOCUS_SERIES).map(({ key }) => key);
 
   return (
-    <div className="grid @min-[680px]/shortlist:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+    <div className="grid @min-[680px]/shortlist:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
       <section aria-labelledby="seat-criteria-heading" className="min-w-0 p-5">
-        <h3 id="seat-criteria-heading" className="blueprint-label mb-4">Priorities</h3>
-        <ol className="flex flex-col gap-4">
-          {visible.map((criterion, index) => (
-            <li key={criterion.key} title={criterion.reason ?? undefined}>
-              <div className="flex items-baseline justify-between gap-3 text-sm">
-                <span>{criterion.label}</span>
-                <span className="font-mono text-xs text-[var(--blueprint-muted)] tabular-nums">
-                  {criterion.weightPercent.toFixed(0)}%
-                </span>
-              </div>
-              <div className="mt-1.5 h-px bg-[var(--blueprint-rule)]">
-                <div className="h-px bg-[var(--blueprint-ink)]" style={{ width: `${(criterion.weightPercent / maxWeight) * 100}%` }} />
-              </div>
-              {index < TOP_CRITERIA && (
-                <p className="mt-1.5 text-xs leading-relaxed text-[var(--blueprint-muted)]">
-                  {criterion.reason ?? "Priority inherited from the dataset’s baseline weights."}
-                </p>
-              )}
-            </li>
-          ))}
-        </ol>
-        <button
-          type="button"
-          onClick={() => setShowAll((current) => !current)}
-          aria-expanded={showAll}
-          className="blueprint-label mt-4 hover:text-[var(--blueprint-ink)]"
-        >
-          {showAll ? `Show top ${TOP_CRITERIA}` : `Show all ${shortlist.criteria.length}`}
-        </button>
+        <h3 id="seat-criteria-heading" className="blueprint-label mb-2">Priorities</h3>
+        <PriorityRadial
+          criteria={shortlist.criteria}
+          focusCount={FOCUS_SERIES}
+          highlighted={highlighted}
+          onHighlight={setHighlighted}
+          onOpen={(key) => router.push(`/drivers/${key}?${query}`)}
+        />
+        <details className="mt-3 text-xs">
+          <summary className="blueprint-label cursor-pointer hover:text-[var(--blueprint-ink)]">
+            All {shortlist.criteria.length} drivers as a table
+          </summary>
+          <table className="mt-2 w-full">
+            <caption className="sr-only">Risk driver weights for this seat</caption>
+            <tbody>
+              {shortlist.criteria.map((criterion) => (
+                <tr key={criterion.key} className="border-t border-[var(--blueprint-rule)]">
+                  <th scope="row" className="py-1 text-left font-normal">
+                    <Link href={`/drivers/${criterion.key}?${query}`} className="hover:underline">{criterion.label}</Link>
+                  </th>
+                  <td className="py-1 text-right font-mono tabular-nums">{criterion.weightPercent.toFixed(1)}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </details>
       </section>
 
       <section aria-labelledby="seat-shortlist-heading" className="min-w-0 p-5 @min-[680px]/shortlist:border-l @min-[680px]/shortlist:border-[var(--blueprint-rule)]">
-        <div className="mb-2 flex items-baseline justify-between gap-3">
-          <h3 id="seat-shortlist-heading" className="blueprint-label">
-            Top {shortlist.suppliers.length} of {shortlist.supplierCount.toLocaleString("en")}
-          </h3>
-          <span className="blueprint-label">Risk</span>
-        </div>
-        <ol className="divide-y divide-[var(--blueprint-rule)]">
-          {shortlist.suppliers.map((supplier) => (
-            <li key={supplier.id} className="flex items-baseline gap-3 py-2 text-sm">
-              <span className="w-5 shrink-0 font-mono text-[10px] text-[var(--blueprint-muted)] tabular-nums">
-                {String(supplier.rank).padStart(2, "0")}
-              </span>
-              <span className="shrink-0 font-mono text-xs">{supplier.id}</span>
-              <span className="min-w-0 flex-1 truncate text-xs text-[var(--blueprint-muted)]">
-                {supplier.drivers[0]?.label}
-              </span>
-              <span className="shrink-0 font-mono text-xs tabular-nums">{supplier.risk.toFixed(1)}</span>
-            </li>
-          ))}
-        </ol>
+        <h3 id="seat-shortlist-heading" className="sr-only">Suppliers compared with these priorities</h3>
+        <SupplierRiskBars
+          suppliers={shortlist.suppliers}
+          supplierCount={shortlist.supplierCount}
+          focusKeys={focusKeys}
+          highlighted={highlighted}
+          onHighlight={setHighlighted}
+          onOpen={(id) => router.push(`/suppliers/${id}?${query}`)}
+        />
         <Link
-          href="/suppliers?component=seats&train=high-speed"
+          href="/suppliers?component=seats"
           className="blueprint-label mt-5 inline-flex items-center gap-1 hover:text-[var(--blueprint-ink)]"
         >
           Full benchmark <ArrowUpRightIcon className="size-3" />

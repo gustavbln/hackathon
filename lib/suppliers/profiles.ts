@@ -50,6 +50,20 @@ export function buildProfile(component: ComponentId): Profile {
   return { component, weights, boosts };
 }
 
+/** Weights as a compact URL value (percent, CRITERIA order), so detail pages rank like the view they came from. */
+export function encodeWeights(weights: Weights): string {
+  return CRITERIA.map(({ key }) => Math.round(weights[key] * 1000) / 10).join("_");
+}
+
+/** The inverse of `encodeWeights`; null for anything malformed, so callers fall back to a known profile. */
+export function parseWeights(value: unknown): Weights | null {
+  if (typeof value !== "string") return null;
+  const parts = value.split("_").map(Number);
+  const total = parts.reduce((sum, part) => sum + part, 0);
+  if (parts.length !== CRITERIA.length || parts.some((part) => !Number.isFinite(part) || part < 0) || total <= 0) return null;
+  return Object.fromEntries(CRITERIA.map(({ key }, index) => [key, parts[index] / total])) as Weights;
+}
+
 export function parseComponent(value: unknown): ComponentId {
   return COMPONENTS.find((component) => component.id === value)?.id ?? "seats";
 }

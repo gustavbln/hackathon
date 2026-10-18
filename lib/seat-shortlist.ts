@@ -13,15 +13,19 @@ const round = (value: number) => Math.round(value * 10) / 10;
 
 /** Top suppliers for the weights, each with the three criteria that add the most risk points. */
 export function buildShortlist(suppliers: readonly Supplier[], weights: Weights): SeatShortlist["suppliers"] {
-  return rankSuppliers(suppliers, weights).slice(0, SHORTLIST_SIZE).map(({ supplier, rank, risk }) => ({
-    id: supplier.id,
-    name: supplier.name,
-    rank,
-    risk: round(risk.worst),
-    drivers: contributions(supplier.scores, weights).slice(0, 3).map(({ criterion, points }) => ({
-      key: criterion, label: CRITERION_BY_KEY[criterion].label, points: round(points),
-    })),
-  }));
+  return rankSuppliers(suppliers, weights).slice(0, SHORTLIST_SIZE).map(({ supplier, rank, risk }) => {
+    const parts = contributions(supplier.scores, weights);
+    return {
+      id: supplier.id,
+      name: supplier.name,
+      rank,
+      risk: round(risk.worst),
+      drivers: parts.slice(0, 3).map(({ criterion, points }) => ({
+        key: criterion, label: CRITERION_BY_KEY[criterion].label, points: round(points),
+      })),
+      contributions: Object.fromEntries(parts.map(({ criterion, points }) => [criterion, points])),
+    };
+  });
 }
 
 /** IDs ranked by the weights, skipping the first `offset`: the next-best candidates after a shortlist. */

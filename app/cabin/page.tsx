@@ -7,10 +7,11 @@ export const metadata: Metadata = {
   description: "Explore the high-speed train cabin and select a seat.",
 };
 
-export default function CabinPage() {
+export default async function CabinPage({ searchParams }: PageProps<"/cabin">) {
+  const { seat } = await searchParams;
   return (
     <ChatWorkspace>
-      <CabinScene />
+      <CabinScene initialSeatId={typeof seat === "string" ? seat : null} />
     </ChatWorkspace>
   );
 }

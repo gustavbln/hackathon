@@ -26,6 +26,8 @@ export const seatShortlistSchema = z.object({
     rank: z.number().int().positive(),
     risk: z.number().min(0).max(100),
     drivers: z.array(z.object({ key: criterionKeySchema, label: z.string(), points: z.number() })).max(3),
+    /** Risk points per criterion (weight × score); they add up to `risk`. */
+    contributions: z.partialRecord(criterionKeySchema, z.number().min(0)),
   })).max(20),
   supplierCount: z.number().int().nonnegative(),
 });

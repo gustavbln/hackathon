@@ -59,10 +59,17 @@
   --blueprint-muted: #667177;
   --blueprint-rule: #b7b9b580;
   --blueprint-grid: #53616b0b;
-  --risk-low: #7fe0bd;
-  --risk-medium: #f2dc85;
-  --risk-high: #f6a15e;
-  --risk-critical: #ff7088;
+  /* Risk levels use the fixed status palette and always ship with a text label. */
+  --risk-low: #0ca30c;
+  --risk-medium: #fab219;
+  --risk-high: #ec835a;
+  --risk-critical: #d03b3b;
+  /* Chart series in fixed order, validated for colour vision deficiency on the paper surfaces. */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-other: color-mix(in oklab, var(--blueprint-ink) 22%, transparent);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
