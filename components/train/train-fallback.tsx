@@ -8,7 +8,7 @@ export function TrainFallback({ loading = false }: { loading?: boolean }) {
         alt="Blueprint illustration of a modern three-car high-speed train"
         fill
         sizes="(max-width: 640px) 100vw, 85vw"
-        className="object-contain mix-blend-screen invert"
+        className="object-contain mix-blend-multiply"
       />
       <p className="blueprint-label absolute inset-x-0 bottom-6 text-center">
         {loading ? "Preparing the train view…" : "Static train preview"}

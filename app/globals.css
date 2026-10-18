@@ -49,16 +49,16 @@
 }
 
 :root {
-  --train-surface: #17598a;
-  --train-line: #d7f2ff;
-  --train-glass: #2475a5;
-  --train-mechanical: #124b78;
-  --blueprint-paper: #236da2;
-  --blueprint-paper-deep: #15548c;
-  --blueprint-ink: #eff8ff;
-  --blueprint-muted: #c3deef;
-  --blueprint-rule: #ffffff30;
-  --blueprint-grid: #ffffff0b;
+  --train-surface: #deddd5;
+  --train-line: #4d626d;
+  --train-glass: #b7c5c9;
+  --train-mechanical: #8d999b;
+  --blueprint-paper: #f3f1eb;
+  --blueprint-paper-deep: #e9e6df;
+  --blueprint-ink: #35434a;
+  --blueprint-muted: #667177;
+  --blueprint-rule: #b7b9b580;
+  --blueprint-grid: #53616b0b;
   --risk-low: #7fe0bd;
   --risk-medium: #f2dc85;
   --risk-high: #f6a15e;
