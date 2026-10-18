@@ -24,8 +24,9 @@ The selected view has one **Back to cabin** action in the page header, with no s
 Open Gauge in the cabin header: on desktop it docks beside the resized workspace; on phones it
 fills the screen. Closing and reopening keeps the conversation for the current page session.
 
-The chat backend uses NVIDIA Nemotron through Nebius. Copy the private hackathon files into
-`data/supplier_risk_dataset.csv` and `data/risk_criteria_description.md` (gitignored).
+The chat backend uses NVIDIA Nemotron through Nebius. The supplier dataset is included at
+`data/supplier_risk_dataset.csv`. The optional column reference, `data/risk_criteria_description.md`,
+can be copied from the hackathon materials and remains gitignored.
 It filters all 10,000 suppliers, ranks or compares up to 20, and explains weighted risk contributions.
 No database, vector store or agent framework is required.
 
@@ -61,4 +62,4 @@ The API also supports `source=rules` for the shared seat profile. Both return up
 with their three biggest risk contributions. The typed response is in `lib/seat-shortlist-contract.ts`.
 
 Checks: `docker compose exec web npm run lint`, `npm run typecheck`, `npm test`, `npm run build`
-(run each inside the container). Tests use synthetic suppliers; private data is not needed in CI.
+(run each inside the container). Tests use synthetic suppliers and do not depend on the dataset.

@@ -81,9 +81,9 @@ What the Siemens stakeholder told us (our talk, 2026-10-18):
 
 Data:
 
-- `data/supplier_risk_dataset.csv`, 10,000 anonymized suppliers, 46 columns. Column meanings:
-  `data/risk_criteria_description.md`. Not in git while the repo is public: copy both files from
-  the hackathon materials into `data/`.
+- `data/supplier_risk_dataset.csv`, 10,000 anonymized suppliers, 46 columns, is tracked in git
+  for deployment. Column meanings: copy `data/risk_criteria_description.md` from the hackathon
+  materials if needed; that reference document remains gitignored.
 - 18 risk scores plus `Total_Risk_Index`, all from 0 (no risk) to 100 (max risk), each with a
   `_Level` column: Low 0–24, Medium 25–49, High 50–74, Critical 75–100.
 - `Total_Risk_Index` is exactly the sum of weight × score (verified, R² 0.9996, rounding only):
