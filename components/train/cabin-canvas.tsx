@@ -7,7 +7,8 @@ import { BackSide, type Group } from "three";
 import { CabinControls, type CabinView } from "./cabin-controls";
 import { CabinFocus } from "./cabin-focus";
 import { cabinBoxGeometry } from "./cabin-geometry";
-import { CABIN_CENTER, CABIN_LENGTH, CABIN_COMPONENTS, CABIN_SEATS, type CabinComponentId, type CabinSelection } from "./cabin-layout";
+import { CabinPart } from "./cabin-part";
+import { CABIN_CENTER, CABIN_LENGTH, CABIN_SEATS, type CabinSelection } from "./cabin-layout";
 import { readCabinPalette, type CabinPalette } from "./cabin-palette";
 
 type Point = [number, number, number];
@@ -65,12 +66,14 @@ export function Seat({ id, position, palette, selectedSeatId, onSeatSelect }: {
   );
 }
 
-function CabinShell({ palette }: { palette: CabinPalette }) {
+function CabinShell({ palette, interactive }: { palette: CabinPalette; interactive: boolean }) {
   const box = { palette };
   return (
     // Solid cabin surfaces block pointer hits on geometry behind them.
     <group onPointerOver={(event) => event.stopPropagation()} onClick={(event) => event.stopPropagation()}>
-      <BlueprintBox {...box} size={[3.8, 0.1, CABIN_LENGTH]} position={[0, 2.65, CABIN_CENTER]} />
+      <CabinPart label="Ceiling panels" enabled={interactive}>{(active) => (
+        <BlueprintBox {...box} color={active ? palette.upholstery : palette.surface} bright={active} size={[3.8, 0.1, CABIN_LENGTH]} position={[0, 2.65, CABIN_CENTER]} />
+      )}</CabinPart>
       <BlueprintBox {...box} size={[3.8, 2.7, 0.1]} position={[0, 1.3, -11.4]} />
       <BlueprintBox {...box} size={[3.8, 2.7, 0.1]} position={[0, 1.3, 4.8]} />
       {[-1, 1].map((side) => (
@@ -83,21 +86,29 @@ function CabinShell({ palette }: { palette: CabinPalette }) {
           ))}
           <BlueprintBox {...box} size={[0.075, 0.018, 15.8]} position={[side * 0.65, 2.58, CABIN_CENTER]} />
           <BlueprintBox {...box} color={palette.glass} size={[0.015, 0.008, 15.8]} position={[side * 0.42, 0, CABIN_CENTER]} />
-          <BlueprintBox {...box} color={palette.mechanical} size={[0.75, 0.065, 15.2]} position={[side * 1.43, 2.05, CABIN_CENTER]} />
-          <BlueprintBox {...box} color={palette.glass} size={[0.05, 0.09, 15.2]} position={[side * 1.06, 2.13, CABIN_CENTER]} />
-          <BlueprintBox {...box} color={palette.line} size={[0.025, 0.012, 15.2]} position={[side * 1.1, 2, CABIN_CENTER]} />
+          <CabinPart label="Luggage rack" enabled={interactive}>{(active) => <>
+            <BlueprintBox {...box} color={active ? palette.upholstery : palette.mechanical} bright={active} size={[0.75, 0.065, 15.2]} position={[side * 1.43, 2.05, CABIN_CENTER]} />
+            <BlueprintBox {...box} color={palette.glass} bright={active} size={[0.05, 0.09, 15.2]} position={[side * 1.06, 2.13, CABIN_CENTER]} />
+            <BlueprintBox {...box} color={palette.line} bright={active} size={[0.025, 0.012, 15.2]} position={[side * 1.1, 2, CABIN_CENTER]} />
+          </>}</CabinPart>
           {Array.from({ length: 11 }, (_, index) => 3.4 - index * 1.35).map((z) => (
             <group key={z}>
               <BlueprintBox {...box} color={palette.glass} size={[0.055, 0.5, 0.055]} position={[side * 1.09, 2.33, z]} />
-              <BlueprintBox {...box} color={palette.mechanical} size={[0.14, 0.07, 0.3]} position={[side * 1.35, 1.99, z]} />
-              <BlueprintBox {...box} color={palette.surface} size={[0.12, 0.018, 0.2]} position={[side * 1.35, 1.94, z]} />
-              <BlueprintBox {...box} color={palette.line} size={[0.025, 0.12, 0.17]} position={[side * 1.78, 0.65, z]} />
+              <CabinPart label="Reading light" enabled={interactive}>{(active) => <>
+                <BlueprintBox {...box} color={active ? palette.upholstery : palette.mechanical} bright={active} size={[0.14, 0.07, 0.3]} position={[side * 1.35, 1.99, z]} />
+                <BlueprintBox {...box} color={active ? palette.upholstery : palette.surface} bright={active} size={[0.12, 0.018, 0.2]} position={[side * 1.35, 1.94, z]} />
+              </>}</CabinPart>
+              <CabinPart label="Power outlet" enabled={interactive}>{(active) => (
+                <BlueprintBox {...box} color={active ? palette.upholstery : palette.line} bright={active} size={[0.025, 0.12, 0.17]} position={[side * 1.78, 0.65, z]} />
+              )}</CabinPart>
             </group>
           ))}
           {[2.2, -0.5, -4.5, -7.8].map((z) => (
             <group key={z}>
-              <BlueprintBox {...box} size={[0.48, 0.27, 0.64]} position={[side * 1.43, 2.22, z]} />
-              <BlueprintBox {...box} color={palette.glass} size={[0.23, 0.035, 0.08]} position={[side * 1.43, 2.38, z]} />
+              <CabinPart label="Luggage" enabled={interactive}>{(active) => <>
+                <BlueprintBox {...box} color={active ? palette.upholstery : palette.surface} bright={active} size={[0.48, 0.27, 0.64]} position={[side * 1.43, 2.22, z]} />
+                <BlueprintBox {...box} color={palette.glass} bright={active} size={[0.23, 0.035, 0.08]} position={[side * 1.43, 2.38, z]} />
+              </>}</CabinPart>
             </group>
           ))}
         </group>
@@ -134,38 +145,18 @@ function Outside({ palette }: { palette: CabinPalette }) {
 
 type PartBox = { size: Point; position: Point; color: keyof CabinPalette; opacity?: number };
 
-const CABIN_PARTS: Record<CabinComponentId, PartBox[]> = {
-  windows: [-1, 1].map((side) => ({ size: [0.04, 1.25, CABIN_LENGTH], position: [side * 1.88, 1.48, CABIN_CENTER], color: "sky", opacity: 0.12 })),
-  door: [
+const CABIN_PARTS: { label: string; boxes: PartBox[] }[] = [
+  { label: "Side windows", boxes: [-1, 1].map((side) => ({ size: [0.04, 1.25, CABIN_LENGTH], position: [side * 1.88, 1.48, CABIN_CENTER], color: "sky", opacity: 0.12 })) },
+  { label: "Interior door", boxes: [
     { size: [0.95, 2.2, 0.04], position: [0, 1.1, 4.73], color: "mechanical" },
     { size: [0.95, 2.2, 0.04], position: [0, 1.1, -11.33], color: "mechanical" },
     { size: [0.6, 0.8, 0.04], position: [0, 1.55, -11.29], color: "glass" },
-  ],
-  flooring: [
+  ] },
+  { label: "Flooring", boxes: [
     { size: [3.8, 0.1, CABIN_LENGTH], position: [0, -0.06, CABIN_CENTER], color: "mechanical" },
     { size: [0.79, 0.012, CABIN_LENGTH], position: [0, 0.001, CABIN_CENTER], color: "line" },
-  ],
-};
-
-function CabinPart({ id, boxes, palette, selectedComponentId, onComponentSelect }: {
-  id: CabinComponentId; boxes: PartBox[]; palette: CabinPalette;
-} & Pick<CabinSelection, "selectedComponentId" | "onComponentSelect">) {
-  const [hovered, setHovered] = useState(false);
-  useCursor(hovered);
-  const active = hovered || selectedComponentId === id;
-
-  return (
-    <group name={`part-${id}`}
-      onPointerOver={(event) => { event.stopPropagation(); setHovered(true); }}
-      onPointerOut={() => setHovered(false)}
-      onClick={(event) => { event.stopPropagation(); if (event.delta <= 5) onComponentSelect(id); }}>
-      {boxes.map((part, index) => (
-        <BlueprintBox key={index} palette={palette} size={part.size} position={part.position}
-          color={active ? palette.glass : palette[part.color]} bright={active} opacity={part.opacity} />
-      ))}
-    </group>
-  );
-}
+  ] },
+];
 
 export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotating, reducedMotion, ...selection }: CabinSelection & CabinView & {
   fallback: ReactNode; rotating: boolean; reducedMotion: boolean;
@@ -177,18 +168,19 @@ export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotati
 
   return (
     <Canvas camera={{ position: [0, 1.65, 4.6], near: 0.05, far: 160 }} dpr={[1, 1.5]} frameloop="demand" gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-      fallback={fallback} style={{ touchAction: "none" }} aria-label="Inside the blueprint train cabin. Click a seat, a window, the door or the floor to select it."
-      onPointerMissed={() => { if (!selection.selectedSeatId && !dragged.current) selection.onComponentSelect(null); }}>
+      fallback={fallback} style={{ touchAction: "none" }} aria-label="Explore cabin components. Select a seat to open supplier sourcing.">
       <CabinControls zoom={zoom} setZoom={setZoom} resetView={resetView} dragged={dragged} enabled={!selection.selectedSeatId} />
       <CabinFocus seatId={selection.selectedSeatId} world={world} seats={seats} zoom={zoom} rotating={rotating} reducedMotion={reducedMotion} />
       <ambientLight intensity={1.4} />
       <directionalLight position={[0, 2.5, 3]} intensity={1.6} />
       <group ref={world}>
         <Outside palette={palette} />
-        <CabinShell palette={palette} />
-        {CABIN_COMPONENTS.map(({ id }) => (
-          <CabinPart key={id} id={id} boxes={CABIN_PARTS[id]} {...selection}
-            onComponentSelect={(part) => { if (!dragged.current) selection.onComponentSelect(part); }} palette={palette} />
+        <CabinShell palette={palette} interactive={!selection.selectedSeatId} />
+        {CABIN_PARTS.map(({ label, boxes }) => (
+          <CabinPart key={label} label={label} enabled={!selection.selectedSeatId}>{(active) => (
+            boxes.map((part, index) => <BlueprintBox key={index} palette={palette} size={part.size} position={part.position}
+              color={active ? palette.upholstery : palette[part.color]} bright={active} opacity={active && part.opacity ? 0.3 : part.opacity} />)
+          )}</CabinPart>
         ))}
       </group>
       <group ref={seats}>

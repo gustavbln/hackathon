@@ -17,7 +17,7 @@ const capabilities = [
     title: "Just-in-time planning",
     description: "Keep production moving.",
     icon: Clock3,
-    position: "bottom-[9%] left-1/2 -translate-x-1/2 sm:bottom-[15%] sm:left-auto sm:right-[5%] sm:translate-x-0 lg:right-[10%]",
+    position: "bottom-[16%] left-1/2 -translate-x-1/2 sm:bottom-[15%] sm:left-auto sm:right-[5%] sm:translate-x-0 lg:right-[10%]",
   },
 ];
 

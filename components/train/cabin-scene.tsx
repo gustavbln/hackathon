@@ -6,10 +6,9 @@ import { Component, useState, useSyncExternalStore, type ReactNode } from "react
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { ComponentPreviewPanel } from "@/components/cabin/component-preview-panel";
 import { SeatShortlistPanel } from "@/components/cabin/seat-shortlist-panel";
 import { ChatDock } from "@/components/chat/chat-dock";
-import { CABIN_COMPONENTS, CABIN_SEATS, type CabinComponentId } from "./cabin-layout";
+import { CABIN_SEATS } from "./cabin-layout";
 
 function subscribeMotion(callback: () => void) {
   const query = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -46,13 +45,10 @@ export function CabinScene({ initialSeatId = null }: { initialSeatId?: string | 
   );
   const [zoom, setZoom] = useState(1);
   const [paused, setPaused] = useState(false);
-  const [selectedComponentId, setSelectedComponentId] = useState<CabinComponentId | null>(null);
   const prefersReducedMotion = useSyncExternalStore(subscribeMotion, reducedMotion, () => true);
   const focused = selectedSeatId !== null;
   const rotating = focused && !paused && !prefersReducedMotion;
-  const selectSeat = (id: string | null) => { setSelectedSeatId(id); setSelectedComponentId(null); setPaused(false); };
-  const selectComponent = (id: CabinComponentId | null) => { setSelectedComponentId(id); setSelectedSeatId(null); };
-  const componentLabel = CABIN_COMPONENTS.find(({ id }) => id === selectedComponentId)?.label;
+  const selectSeat = (id: string | null) => { setSelectedSeatId(id); setPaused(false); };
 
   return (
     <main className="blueprint-page relative flex min-h-svh min-w-0 flex-1 flex-col px-5 sm:px-10 lg:px-16">
@@ -81,7 +77,6 @@ export function CabinScene({ initialSeatId = null }: { initialSeatId?: string | 
             <div className="absolute top-1/2 left-1/2 h-[max(calc(100svh-10rem),40rem)] w-[calc(100vw-2.5rem)] -translate-x-1/2 -translate-y-1/2">
               <CabinBoundary>
                 <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={selectSeat}
-                  selectedComponentId={selectedComponentId} onComponentSelect={selectComponent}
                   zoom={zoom} setZoom={setZoom} resetView={0} rotating={rotating} reducedMotion={prefersReducedMotion} fallback={<CabinFallback />} />
               </CabinBoundary>
             </div>
@@ -106,7 +101,7 @@ export function CabinScene({ initialSeatId = null }: { initialSeatId?: string | 
           <>
             {/* Hidden until focused: the keyboard and screen-reader way to pick a seat without the 3D view. */}
             <footer className="sr-only focus-within:not-sr-only focus-within:flex focus-within:items-center focus-within:justify-between focus-within:gap-4 focus-within:py-5">
-              <p className="text-sm text-[var(--blueprint-muted)]" role="status" aria-live="polite">{componentLabel ? `${componentLabel} selected (preview)` : "Select any seat to begin"}</p>
+              <p className="text-sm text-[var(--blueprint-muted)]" role="status" aria-live="polite">Select any seat to begin</p>
               <div className="flex items-center gap-3">
                 <label htmlFor="cabin-seat" className="blueprint-label">Seat</label>
                 <NativeSelect id="cabin-seat" value="" onChange={(event) => selectSeat(event.target.value || null)}>
@@ -117,7 +112,6 @@ export function CabinScene({ initialSeatId = null }: { initialSeatId?: string | 
             </footer>
           </>
         )}
-        {selectedComponentId && <ComponentPreviewPanel componentId={selectedComponentId} onClose={() => selectComponent(null)} />}
       </section>
     </main>
   );
