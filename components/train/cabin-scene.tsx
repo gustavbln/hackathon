@@ -75,7 +75,7 @@ export function CabinScene({ initialSeatId = null, initialWeights = null, journe
         )}
         <div className="flex items-center gap-6">
           <span className="blueprint-label hidden sm:block">HS—03 / Interior</span>
-          <ChatDock />
+          {focused && <ChatDock />}
         </div>
       </header>
       <h1 className="sr-only">{focused ? "Seat sourcing" : "Passenger cabin"}</h1>
