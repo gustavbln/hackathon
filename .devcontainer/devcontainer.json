@@ -1,0 +1,11 @@
+{
+  "name": "hackathon",
+  "dockerComposeFile": "../compose.yaml",
+  "service": "web",
+  "workspaceFolder": "/app",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "bradlc.vscode-tailwindcss"]
+    }
+  }
+}
