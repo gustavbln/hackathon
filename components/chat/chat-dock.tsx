@@ -9,22 +9,46 @@ import { Sidebar, SidebarProvider, useSidebar } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 
 import { chatEventSchema, type ChatStep, type PageAction, type PageContext } from "@/lib/chat-contract"
+import { researchEventSchema, type ResearchEvent } from "@/lib/research/contract"
 import { readEvents } from "@/lib/sse"
-import { CRITERION_BY_KEY } from "@/lib/suppliers/criteria"
+import { CRITERIA, CRITERION_BY_KEY } from "@/lib/suppliers/criteria"
 import { encodeWeights } from "@/lib/suppliers/profiles"
 
 import { AssistantAvatar, assistantName } from "./assistant-avatar"
 import { ChatComposer, ChatThread, PromptChips } from "./chat"
 import { ChatFocusProvider, useChatFocus } from "./chat-focus"
+import type { ResearchRequest } from "./research-message"
+import { applyResearchEvent, newResearchRun } from "./research-run"
 import type { ChatMessage, ChatStatus } from "./types"
 
-// The backend accepts at most 12 history turns of 2,000 characters each.
+// The backend accepts at most 12 history turns of 2,000 characters each. A finished research run counts as an
+// assistant turn, so "how risky is it?" right after adding a company knows which one.
 function toHistory(messages: ChatMessage[]) {
-  return messages.slice(-12).map((message) =>
-    message.role === "user"
-      ? { role: "user" as const, content: message.text.slice(0, 2_000) }
-      : { role: "assistant" as const, content: message.response.answer.slice(0, 2_000) },
-  )
+  return messages.flatMap((message): { role: "user" | "assistant"; content: string }[] => {
+    if (message.role === "user") return [{ role: "user", content: message.text.slice(0, 2_000) }]
+    if (message.role === "assistant") return [{ role: "assistant", content: message.response.answer.slice(0, 2_000) }]
+    const supplier = message.role === "research" ? message.run.supplier : null
+    return supplier
+      ? [{ role: "assistant", content: `Researched ${supplier.name} (${supplier.id}) from public sources and added it. ${supplier.summary}`.slice(0, 2_000) }]
+      : []
+  }).slice(-12)
+}
+
+/** The "+" under the top 20 asks this; so may the buyer. It opens the intake form instead of a free conversation. */
+const ADD_SUPPLIER = /\badd (a |an )?(new )?supplier\b/i
+
+/** Streams one research run into `onEvent`; the run itself reports failures as an `error` event. */
+async function researchSupplier(body: object, onEvent: (event: ResearchEvent) => void) {
+  const response = await fetch("/api/research/supplier", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+  if (!response.ok || !response.body) {
+    const answer: unknown = await response.json().catch(() => null)
+    throw new Error((answer as { error?: { message?: string } } | null)?.error?.message ?? "The research could not start. Please retry.")
+  }
+  for await (const event of readEvents(response.body, researchEventSchema)) onEvent(event)
 }
 
 /** Streams one answer: each step goes to `onStep` as it happens, then the whole validated answer resolves. */
@@ -98,11 +122,13 @@ function ChatPanel() {
   const { page, applyActions, onAsk } = useChatFocus()
   const router = useRouter()
 
+  const busy = status === "pending" || status === "researching"
+
   // A page asks for the buyer (e.g. "Why is there this risk?"): open the panel, then send.
   const askFromPage = useEffectEvent((question: string) => {
     if (isMobile) setOpenMobile(true)
     else setOpen(true)
-    if (status !== "pending") void send(question)
+    if (!busy) handle(question)
   })
   useEffect(() => onAsk((question) => askFromPage(question)), [onAsk])
 
@@ -120,6 +146,44 @@ function ChatPanel() {
     if (isMobile) setOpenMobile(false)
     else setOpen(false)
     document.getElementById("supplier-assistant-trigger")?.focus()
+  }
+
+  function handle(text: string) {
+    if (!ADD_SUPPLIER.test(text)) return void send(text)
+    // One intake at a time: a second "+" while the form is open just brings the panel up.
+    if (messages.some((message) => message.role === "intake")) return
+    setMessages([...messages, { id: crypto.randomUUID(), role: "user", text }, { id: crypto.randomUUID(), role: "intake" }])
+  }
+
+  /** Runs one research at a time; the seat page's weighted drivers decide which agents run. */
+  async function research(request: ResearchRequest) {
+    const id = crypto.randomUUID()
+    const query = page ? new URLSearchParams({ ...(page.seatId && { seat: page.seatId }), w: encodeWeights(page.weights) }).toString() : ""
+    const drivers = page?.page === "seat" ? CRITERIA.filter(({ key }) => page.weights[key] > 0).map(({ key }) => key) : undefined
+    const told = [request.name, request.website, request.brief].filter(Boolean).join(" · ")
+    setStatus("researching")
+    setError(null)
+    setMessages((current) => [
+      ...current.filter((message) => message.role !== "intake"),
+      { id: crypto.randomUUID(), role: "user", text: `Add ${told}` },
+      { id, role: "research", name: request.name, run: newResearchRun, query },
+    ])
+    const update = (event: ResearchEvent) => setMessages((current) => current.map((message) =>
+      message.id === id && message.role === "research" ? { ...message, run: applyResearchEvent(message.run, event) } : message))
+    let added = false
+    try {
+      await researchSupplier({ ...request, ...(drivers && { drivers }) }, (event) => {
+        update(event)
+        if (event.type === "done") {
+          added = true
+          applyActions([{ type: "supplier_added", supplierId: event.supplier.id }])
+        }
+      })
+      if (!added) update({ type: "error", message: "The research stopped before the company was added. Please retry." })
+    } catch (failure) {
+      update({ type: "error", message: failure instanceof Error ? failure.message : "The research failed. Please retry." })
+    }
+    setStatus("ready")
   }
 
   async function send(text: string) {
@@ -169,10 +233,10 @@ function ChatPanel() {
           {isMobile ? <ArrowLeftIcon strokeWidth={1.5} /> : <XIcon strokeWidth={1.5} />}
         </Button>
       </header>
-      <ChatThread messages={messages} status={status} error={error} liveSteps={liveSteps} />
+      <ChatThread messages={messages} status={status} error={error} liveSteps={liveSteps} onResearch={(request) => void research(request)} />
       <div className="shrink-0 border-t border-[var(--blueprint-rule)] pb-[env(safe-area-inset-bottom)] focus-within:border-[var(--blueprint-muted)]">
-        <PromptChips prompts={promptsFor(page)} disabled={status === "pending"} onPick={send} />
-        <ChatComposer disabled={status === "pending"} onSend={send} />
+        <PromptChips prompts={promptsFor(page)} disabled={busy} onPick={handle} />
+        <ChatComposer disabled={busy} onSend={handle} />
       </div>
     </section>
   )
@@ -206,11 +270,13 @@ function promptsFor(page: PageContext | null): string[] {
     const driver = CRITERION_BY_KEY[page.driverKey].label.toLowerCase()
     return [`What does ${driver} mean for seats?`, `Worst of my top 20 on ${driver}`, "Related standards (web)"]
   }
+  if (page.page === "researched") return ["How risky is this supplier?", "What did the agents find?", "Which drivers have no evidence?"]
   return ["Why is there this risk?", "What does its top risk mean? (web)", "Show a safer alternative"]
 }
 
 function describePage(page: PageContext): string {
   if (page.page === "seat") return `Looking at seat ${page.seatId} and its top 20 suppliers`
   if (page.page === "driver") return `Looking at the ${CRITERION_BY_KEY[page.driverKey].label.toLowerCase()} driver`
+  if (page.page === "researched") return `Looking at researched supplier ${page.supplierId}`
   return `Looking at supplier ${page.supplierId}`
 }

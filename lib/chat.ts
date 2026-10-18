@@ -3,7 +3,8 @@ import { z } from "zod";
 import {
   ChatError, answerRecipeSchema, chatResponseSchema, explainDriverSchema, explainSupplierSchema, getSuppliersSchema,
   metricDefinitions, nextSeatSuppliersSchema, querySuppliersSchema, rerankSeatSchema, riskDefinitions,
-  searchContextSchema, type ChatRequest, type ChatResponse, type ChatStep, type DatasetResult, type PageAction, type PageContext,
+  researchedSupplierQuerySchema, searchContextSchema,
+  type ChatRequest, type ChatResponse, type ChatStep, type DatasetResult, type PageAction, type PageContext, type WebSource,
 } from "./chat-contract.ts";
 import { tracer, type Meter, type Step, type StepSink } from "./chat-trace.ts";
 import {
@@ -16,8 +17,12 @@ import { completeNemotron, type AssistantMessage, type ModelMessage, type ModelT
 import { evaluateSeatCriteria } from "./seat-criteria.ts";
 import type { SeatCriteriaResponse } from "./seat-criteria-contract.ts";
 import { guardedSearchSchema, searchContext, type WebContext } from "./web-context.ts";
+import { matchResearched, mentionedResearched, researchedFacts, type ResearchedFacts, type ResearchedMissing } from "./chat-research.ts";
+import { findResearched, listResearched } from "./research/store.ts";
 
-type ChatEvidence = DatasetResult | SeatCriteriaResponse | SupplierExplanation | DriverExplanation | NamedSuppliers | WebContext;
+type ChatEvidence =
+  | DatasetResult | SeatCriteriaResponse | SupplierExplanation | DriverExplanation | NamedSuppliers | WebContext
+  | ResearchedFacts | ResearchedMissing;
 const seatCriteriaArgs = z.strictObject({});
 
 /** What a tool may use and change while answering one question. */
@@ -146,6 +151,22 @@ const chatTools: ChatTool[] = [
   },
   {
     definition: {
+      name: "researched_supplier",
+      description: "A real company the buyer added through public-source research (EXT_ ids, e.g. GRAMMER AG): the agents' estimated drivers with confidence and rationale, its weighted risk range under the buyer's weights, findings and numbered sources. Pass its name or EXT_ id. Use for any question about a researched company; it is not in the anonymized dataset.",
+      parameters: z.toJSONSchema(researchedSupplierQuerySchema),
+    },
+    label: "Read a researched supplier",
+    source: "research",
+    run: async (args, context) => {
+      const { supplier } = researchedSupplierQuerySchema.parse(args);
+      const all = await listResearched();
+      const found = matchResearched(all, supplier);
+      return found ? researchedFacts(found, context.weights)
+        : { kind: "researched_missing", query: supplier, researched: all.map(({ id, name }) => ({ id, name })) };
+    },
+  },
+  {
+    definition: {
       name: "search_context",
       description: "General web context about ONE risk driver for train seat suppliers: what it means, related standards and regulation, typical incidents. Give 1–2 short English queries about the driver in general, never about a supplier: dataset suppliers are anonymized, so queries naming SUPP ids or supplier names are rejected. One search per question; the answer cites its sources as [n].",
       parameters: z.toJSONSchema(searchContextSchema),
@@ -174,6 +195,11 @@ or a new ranking without its result.`,
   driver: `The buyer is on the detail page of one risk driver: how all suppliers score on it and how their seat
 shortlist compares. The page's facts explain the driver (description, the seat profile's reasons, its weights);
 its shortlist holds the ids of the buyer's top 20: pass them to query_suppliers to see how they score on it.`,
+  researched: `The buyer is on the page of a real company the agents researched from public sources (supplierId,
+EXT_…); it is not in the anonymized dataset. The page's facts are that research: estimated drivers with confidence and
+rationale, its weighted risk range under the buyer's weights (unscored drivers count 0 in the best and 100 in the worst
+case), findings and numbered sources. Answer briefly: the weighted risk range, the scored drivers with value and
+confidence, and which drivers lack evidence. Cite each claim with its sourceIds as [n].`,
   supplier: `The buyer is on the detail page of one supplier (supplierId). "This supplier" means that id. The page's facts
 explain it exactly as the page shows it: weighted risk and rank, each driver's points and share, watch-outs and safer
 alternatives. weightedRisk uses the buyer's weights: call it the weighted risk, never Total_Risk_Index. For "why", name
@@ -183,7 +209,7 @@ To open a safer alternative call explain_supplier with openAlternative true.`,
 
 const PAGE_RULES = `read_page already returned the page: its facts are what the buyer sees, loaded from the dataset under
 its priorities. When they answer the question, answer from them and cite resultId "${PAGE_RESULT_ID}"; call tools for anything else.
-Real companies outside the dataset are not available yet: say so if asked.`;
+Real companies are known only once researched: the seat page lists them; others can be added with the "+" under the top 20.`;
 
 /** "#3" is the third supplier on the page's shortlist; resolving it here keeps Nemotron from guessing an id. */
 function referencedRanks(message: string, shortlist: string[]) {
@@ -202,11 +228,22 @@ async function loadPage(page: PageContext, message: string) {
     .sort((a, b) => b.percent - a.percent).slice(0, 5);
   if (page.page === "seat") {
     const shortlist = await nextSeatSupplierIds(weights, 0, SHORTLIST_SIZE);
-    const named = await Promise.all(referencedRanks(message, shortlist).map((id) => explainDatasetSupplier(id, weights)));
+    const [named, researched] = await Promise.all([
+      Promise.all(referencedRanks(message, shortlist).map((id) => explainDatasetSupplier(id, weights))),
+      listResearched(),
+    ]);
     return {
-      summary: { page: "seat", seatId: page.seatId, priorities, instruction: page.instruction, shortlist },
+      summary: {
+        page: "seat", seatId: page.seatId, priorities, instruction: page.instruction, shortlist,
+        researched: researched.map(({ id, name }) => ({ id, name })),
+      },
       facts: named.length ? { kind: "named_suppliers" as const, suppliers: named } : null,
     };
+  }
+  if (page.page === "researched") {
+    const researched = await findResearched(page.supplierId);
+    if (!researched) throw new ChatError("not_found", "This researched supplier is no longer stored.", 404);
+    return { summary: { page: "researched", seatId: page.seatId, supplierId: page.supplierId, priorities }, facts: researchedFacts(researched, weights) };
   }
   if (page.page === "driver") {
     const shortlist = await nextSeatSupplierIds(weights, 0, SHORTLIST_SIZE);
@@ -269,6 +306,10 @@ For why a supplier's risk is high, or for safer alternatives, call explain_suppl
 shares and ranks exactly as given: they match the page. For what a risk driver means call explain_driver.
 Distinguish a high risk indicator from a proven real-world cause. Do not infer incidents.
 Name laws, standards or certifications only where a tool result names them.
+researched_supplier covers real companies the buyer added through public research. Answer about them only from its
+result: estimated scores with their confidence and rationale, citing its sources as [n] in text, with EMPTY supplierIds
+and metricKeys. Drivers without evidence are unscored: never estimate them. Say these are public-source estimates, not
+the Siemens dataset.
 search_context adds general web context about ONE risk driver (what it means for seat suppliers, standards,
 regulation); use it when the buyer asks for web context, standards or regulation. Never search for a dataset supplier:
 they are anonymized. The dataset has no supplier regions or countries: for regional news say so instead of searching.
@@ -299,49 +340,81 @@ Never claim external research beyond search_context's sources, or changes to dat
 /** The suppliers a result covers: its rows, or the explained suppliers and their alternatives. */
 function coveredSuppliers(result: ChatEvidence): { id: string; name: string }[] {
   if ("rows" in result) return result.rows;
-  if (!("kind" in result) || result.kind === "driver_explanation" || result.kind === "web_context") return [];
-  const explained = result.kind === "named_suppliers" ? result.suppliers : [result];
-  return explained.flatMap(({ supplier, alternatives }) => [supplier, ...alternatives?.suppliers ?? []]);
+  if (!("kind" in result)) return [];
+  if (result.kind === "supplier_explanation") return explainedSuppliers(result);
+  if (result.kind === "named_suppliers") return result.suppliers.flatMap(explainedSuppliers);
+  return [];
+}
+
+function explainedSuppliers({ supplier, alternatives }: SupplierExplanation) {
+  return [supplier, ...alternatives?.suppliers ?? []];
 }
 
 function webContextIn(evidence: ReadonlyMap<string, ChatEvidence>) {
   return [...evidence.values()].find((result): result is WebContext => "kind" in result && result.kind === "web_context");
 }
 
-/** The web block: every [n] in the answer must be a source the search kept, and web text must cite at least one. */
-function citedWebContext(recipe: z.infer<typeof answerRecipeSchema>, evidence: ReadonlyMap<string, ChatEvidence>): ChatResponse["webContext"] {
-  const cited = new Set([...`${recipe.text}\n${recipe.webText ?? ""}`.matchAll(/\[(\d+(?:\s*,\s*\d+)*)\]/g)]
-    .flatMap(([, numbers = ""]) => numbers.split(",").map(Number)));
-  if (recipe.webText === null && cited.size === 0) return null;
-  const sources = webContextIn(evidence)?.sources.filter(({ n }) => cited.has(n)) ?? [];
-  if (recipe.webText === null || cited.size === 0 || sources.length !== cited.size) {
-    throw new ChatError("ungrounded_answer", "The answer cited web sources the search did not keep. Please retry.");
-  }
-  return { text: recipe.webText, sources };
+/** The source numbers a text cites, as [3] or [1, 2]. */
+function citations(text: string | null): Set<number> {
+  return new Set([...(text ?? "").matchAll(/\[(\d+(?:\s*,\s*\d+)*)\]/g)].flatMap(([, numbers = ""]) => numbers.split(",").map(Number)));
 }
 
-export function hydrateAnswer(recipe: z.infer<typeof answerRecipeSchema>, evidence: ReadonlyMap<string, ChatEvidence>, model: string, receipts: ChatResponse["tools"]): ChatResponse {
-  const webContext = citedWebContext(recipe, evidence);
+/** The web block: every web citation must be a source the search kept, and web text must cite at least one. */
+function citedWebContext(webText: string | null, cited: Set<number>, evidence: ReadonlyMap<string, ChatEvidence>): ChatResponse["webContext"] {
+  if (webText === null && cited.size === 0) return null;
+  const web = webContextIn(evidence);
+  // Without a web search, [n] can only be a researched company's sources, cited through that result's resultId.
+  if (!web) throw new ChatError("ungrounded_answer", "The answer cited sources as [n] without citing the result that holds them in resultId. Please retry.");
+  const sources = web.sources.filter(({ n }) => cited.has(n));
+  if (webText === null || cited.size === 0 || sources.length !== cited.size) {
+    throw new ChatError("ungrounded_answer", "The answer cited web sources the search did not keep. Please retry.");
+  }
+  return { text: webText, sources };
+}
+
+/** An answer about a researched company may cite only that company's research sources. */
+function citedResearchSources(text: string, research: ResearchedFacts): WebSource[] {
+  const cited = citations(text);
+  const sources = research.sources.filter(({ n }) => cited.has(n));
+  if (sources.length !== cited.size) throw new ChatError("ungrounded_answer", "The answer cited sources the research does not have. Please retry.");
+  return sources;
+}
+
+export function hydrateAnswer(answer: z.infer<typeof answerRecipeSchema>, evidence: ReadonlyMap<string, ChatEvidence>, model: string, receipts: ChatResponse["tools"]): ChatResponse {
+  // Nemotron often quotes a researched company's research without citing its resultId. With exactly one researched
+  // company in play, that is the result it means; its [n] are still checked against that research's sources.
+  const researchIds = [...evidence].flatMap(([id, result]) => ("kind" in result && result.kind === "researched_supplier" ? [id] : []));
+  const uncited = answer.resultId === null || !evidence.has(answer.resultId);
+  // Without a web search there is no web context: text Nemotron put in webText belongs to the answer itself.
+  const merged = !webContextIn(evidence) && answer.webText !== null ? { ...answer, text: `${answer.text}\n\n${answer.webText}`, webText: null } : answer;
+  const recipe = uncited && researchIds.length === 1 ? { ...merged, resultId: researchIds[0] ?? null } : merged;
+  const cited = recipe.resultId === null ? undefined : evidence.get(recipe.resultId);
+  const research = cited && "kind" in cited && cited.kind === "researched_supplier" ? cited : null;
+  // About a researched company the text cites that company's sources; everywhere else [n] means a web source.
+  const webContext = citedWebContext(recipe.webText, citations(research ? recipe.webText : `${recipe.text}\n${recipe.webText ?? ""}`), evidence);
   // The dataset block always rests on dataset evidence; web text only adds general context to it.
-  if (webContext && (recipe.resultId === null || evidence.get(recipe.resultId) === webContextIn(evidence))) {
+  if (webContext && (cited === undefined || cited === webContextIn(evidence))) {
     throw new ChatError("ungrounded_answer", "The answer did not cite its dataset facts next to the web context. Please retry.");
   }
-  return chatResponseSchema.parse({ ...hydrateDatasetAnswer(recipe, evidence, model, receipts), webContext });
+  const researchSources = research ? citedResearchSources(recipe.text, research) : [];
+  return chatResponseSchema.parse({ ...hydrateDatasetAnswer(recipe, evidence, model, receipts), webContext, researchSources });
 }
 
 function hydrateDatasetAnswer(recipe: z.infer<typeof answerRecipeSchema>, evidence: ReadonlyMap<string, ChatEvidence>, model: string, receipts: ChatResponse["tools"]): ChatResponse {
   if (recipe.resultId === null) {
     if (recipe.supplierIds.length || recipe.metricKeys.length || evidence.size) throw new ChatError("ungrounded_answer", "The answer did not reference its supplier data. Please retry.");
     return chatResponseSchema.parse({
-      answer: "I can filter, rank and compare up to 20 anonymized suppliers, explain their risk scores, and suggest which risk criteria matter most for train seats. Ask about supplier IDs or seat procurement priorities. Real-company research and component qualifications are not available here.",
+      answer: "I can filter, rank and compare up to 20 anonymized suppliers, explain their risk scores, suggest which risk criteria matter most for train seats, add web context about a risk driver, and answer about real companies you researched with the \"+\" under the top 20. Component qualifications are not available here.",
       model, view: null, lastView: null, tools: receipts,
     });
   }
   const result = evidence.get(recipe.resultId);
   // Seat priorities and explanations are prose about the page; supplier cards only come from dataset rows.
   if (result && !("rows" in result)) {
+    // A researched company has no SUPP id to name, and prose shows no cards, so its supplierIds carry nothing.
+    const researched = "kind" in result && (result.kind === "researched_supplier" || result.kind === "researched_missing");
     const named = coveredSuppliers(result).map(({ id }) => id);
-    if (recipe.supplierIds.some((id) => !named.includes(id))) throw new ChatError("ungrounded_answer", "The answer named suppliers its explanation does not cover. Please retry.");
+    if (!researched && recipe.supplierIds.some((id) => !named.includes(id))) throw new ChatError("ungrounded_answer", "The answer named suppliers its explanation does not cover. Please retry.");
     return chatResponseSchema.parse({ answer: recipe.text, model, view: null, lastView: null, tools: receipts, ...("runCount" in result && { seatCriteria: result }) });
   }
   if (!result || new Set(recipe.supplierIds).size !== recipe.supplierIds.length
@@ -412,6 +485,7 @@ const SELF_TRACED: Meter = { onUsage: () => {}, addCredits: () => {} };
 function pageLabel(page: PageContext) {
   if (page.page === "seat") return `Read your seat ${page.seatId} shortlist`;
   if (page.page === "driver") return `Read the ${CRITERION_BY_KEY[page.driverKey].label.toLowerCase()} driver`;
+  if (page.page === "researched") return `Read the research on ${page.supplierId}`;
   return `Read ${page.supplierId} under your weights`;
 }
 
@@ -429,7 +503,8 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
     }) },
     ...(loaded ? [
       { role: "assistant" as const, content: null, tool_calls: [{ id: PAGE_RESULT_ID, type: "function" as const, function: { name: "read_page", arguments: "{}" } }] },
-      { role: "tool" as const, tool_call_id: PAGE_RESULT_ID, content: JSON.stringify({ resultId: PAGE_RESULT_ID, ...loaded.summary, facts: loaded.facts }) },
+      // Only facts are citable; a page without them (the seat page) offers no resultId to cite.
+      { role: "tool" as const, tool_call_id: PAGE_RESULT_ID, content: JSON.stringify({ ...(facts && { resultId: PAGE_RESULT_ID }), ...loaded.summary, facts }) },
     ] : []),
   ];
   const evidence = new Map<string, ChatEvidence>(facts ? [[PAGE_RESULT_ID, facts]] : []);
@@ -442,6 +517,11 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
   const callIds = new Set<string>();
   // Nemotron sometimes insists on a tool that does not exist; after one such call it answers with what it has.
   let strayed = false;
+  // Explicit requests decide the first tool: "from the web" searches, a researched company's name loads its research
+  // (unless its own page already did). Nemotron still writes the arguments and the answer.
+  const named = mentionedResearched(request.message, await listResearched())
+    .filter(({ id }) => !(page?.page === "researched" && page.supplierId === id));
+  const forced = ASKS_FOR_WEB.test(request.message) ? "search_context" : named.length > 0 ? "researched_supplier" : null;
   for (let round = 0; round < 5; round++) {
     signal.throwIfAborted();
     // Seat priorities are answered as they are; more lookups would only blur them. Once web text is in the
@@ -457,7 +537,7 @@ export async function answerChat(request: ChatRequest, signal: AbortSignal, onSt
       ({ onUsage }) => final
         ? completeNemotron(messages, [], signal, recipeSchema, { onUsage, thinking: writer, maxTokens: writer ? 8_192 : undefined })
         : completeNemotron(messages, offered, signal, undefined, {
-          onUsage, ...(round === 0 && ASKS_FOR_WEB.test(request.message) && { toolChoice: { type: "function", function: { name: "search_context" } } }),
+          onUsage, ...(round === 0 && forced && { toolChoice: { type: "function", function: { name: forced } } }),
         }).catch((error: unknown) => {
           // A runaway prose reply hits the token limit; the schema-bound retry below writes the answer again, briefly.
           if (error instanceof ChatError && error.code === "incomplete_answer") return { message: RUNAWAY_REPLY, model: "", usage: null };

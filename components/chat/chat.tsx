@@ -20,6 +20,7 @@ import { AssistantAvatar, assistantName } from "./assistant-avatar"
 import { useChatFocus } from "./chat-focus"
 import { ChatMessage } from "./chat-message"
 import { StepLines } from "./chat-trace"
+import type { ResearchRequest } from "./research-message"
 import { SeatBriefing } from "./seat-briefing"
 import type { ChatMessage as ChatMessageData, ChatStatus } from "./types"
 
@@ -29,9 +30,10 @@ type ChatThreadProps = {
   error: string | null
   /** The pending answer's steps so far. */
   liveSteps: ChatStep[]
+  onResearch: (request: ResearchRequest) => void
 }
 
-export function ChatThread({ messages, status, error, liveSteps }: ChatThreadProps) {
+export function ChatThread({ messages, status, error, liveSteps, onResearch }: ChatThreadProps) {
   const { page } = useChatFocus()
   if (messages.length === 0 && page?.page === "seat") return <SeatBriefing focus={page} />
   if (messages.length === 0) {
@@ -60,7 +62,7 @@ export function ChatThread({ messages, status, error, liveSteps }: ChatThreadPro
                 messageId={message.id}
                 scrollAnchor={message.role === "user"}
               >
-                <ChatMessage message={message} />
+                <ChatMessage message={message} researching={status === "researching"} onResearch={onResearch} />
               </MessageScrollerItem>
             ))}
             {status === "pending" && (

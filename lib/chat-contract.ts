@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { researchedIdSchema } from "./research/contract.ts";
 import { CRITERIA } from "./suppliers/criteria.ts";
 import { seatCriteriaResponseSchema } from "./seat-criteria-contract.ts";
 import { shortlistInstructionSchema } from "./seat-shortlist-contract.ts";
@@ -71,6 +72,8 @@ export const pageContextSchema = z.discriminatedUnion("page", [
   z.strictObject({ page: z.literal("seat"), seatId: seatIdSchema, weights: weightsSchema, instruction: z.string().trim().max(300).nullable() }),
   z.strictObject({ page: z.literal("driver"), driverKey: criterionKeySchema, seatId: seatIdSchema.nullable(), weights: weightsSchema }),
   z.strictObject({ page: z.literal("supplier"), supplierId: supplierIdSchema, seatId: seatIdSchema.nullable(), weights: weightsSchema }),
+  /** A real company the agents researched from public sources; not part of the anonymized dataset. */
+  z.strictObject({ page: z.literal("researched"), supplierId: researchedIdSchema, seatId: seatIdSchema.nullable(), weights: weightsSchema }),
 ]);
 export type PageContext = z.infer<typeof pageContextSchema>;
 
@@ -79,6 +82,8 @@ export const pageActionSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("set_weights"), weights: weightsSchema, instruction: z.string().trim().max(300).nullable() }),
   z.strictObject({ type: z.literal("highlight_driver"), driverKey: criterionKeySchema }),
   z.strictObject({ type: z.literal("open_supplier"), supplierId: supplierIdSchema }),
+  /** The research agents saved a new real company; pages that list researched suppliers load them again. */
+  z.strictObject({ type: z.literal("supplier_added"), supplierId: researchedIdSchema }),
 ]);
 export type PageAction = z.infer<typeof pageActionSchema>;
 export const nextSeatSuppliersSchema = z.strictObject({
@@ -92,6 +97,8 @@ export const explainSupplierSchema = z.strictObject({
   openAlternative: z.boolean().default(false),
 });
 export const explainDriverSchema = z.strictObject({ driverKey: criterionKeySchema });
+/** A researched company by its EXT_ id or its name, with or without legal form. */
+export const researchedSupplierQuerySchema = z.strictObject({ supplier: z.string().trim().min(2).max(120) });
 /** Web context for one risk driver. Queries are guarded on the server against naming dataset suppliers. */
 export const searchContextSchema = z.strictObject({
   driverKey: criterionKeySchema,
@@ -143,7 +150,7 @@ export const webSourceSchema = z.object({
   url: z.url({ protocol: /^https?$/ }),
   domain: z.string(),
   publishedDate: z.string().nullable(),
-  quote: z.string().max(300),
+  quote: z.string().max(400),
 });
 export type WebSource = z.infer<typeof webSourceSchema>;
 export const chatResponseSchema = z.object({
@@ -164,6 +171,8 @@ export const chatResponseSchema = z.object({
   actions: z.array(pageActionSchema).default([]),
   /** General context from the web, labelled apart from the dataset answer; never about a dataset supplier. */
   webContext: z.object({ text: z.string(), sources: z.array(webSourceSchema).min(1) }).nullable().default(null),
+  /** The researched company's sources the answer cites as [n]; about that company, from public research. */
+  researchSources: z.array(webSourceSchema).default([]),
 });
 export type ChatResponse = z.infer<typeof chatResponseSchema>;
 
@@ -182,7 +191,7 @@ export const chatStepSchema = z.object({
   id: z.string(),
   label: z.string(),
   /** Where the step gets its facts; model steps name their models through `calls`. */
-  source: z.enum(["dataset", "tavily", "nemotron"]),
+  source: z.enum(["dataset", "research", "tavily", "nemotron"]),
   status: z.enum(["running", "done", "error"]),
   ms: z.number().int().min(0).nullable(),
   calls: z.array(modelCallSchema),

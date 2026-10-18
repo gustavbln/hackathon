@@ -142,7 +142,7 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
   const router = useRouter();
   const { setPage, onAction, ask } = useChatFocus();
   const matrix = useSupplierScores();
-  const { researched } = useResearchedSuppliers();
+  const { researched, reload } = useResearchedSuppliers();
   const keys = useMemo(() => shortlist.criteria.map(({ key }) => key), [shortlist]);
   // Nemotron's heaviest drivers for seats, kept in axis order so the spider reads the same every run.
   const shown = useMemo(() => {
@@ -230,8 +230,10 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
       commit(next, action.instruction);
     } else if (action.type === "highlight_driver") {
       setActive(action.driverKey);
+    } else if (action.type === "supplier_added") {
+      reload();
     }
-  }), [onAction, commit, shown]);
+  }), [onAction, commit, shown, reload]);
   const focusCriterion = shortlist.criteria.find(({ key }) => key === focus);
 
   return (

@@ -28,7 +28,7 @@ export default async function SupplierPage({ params, searchParams }: PageProps<"
     if (!researched) notFound();
     return (
       <ChatWorkspace>
-        <DetailShell backHref={context.backHref} section="Researched supplier / Seats" page={null}>
+        <DetailShell backHref={context.backHref} section="Researched supplier / Seats" page={{ page: "researched", supplierId: researched.id, seatId: context.seatId, weights: context.weights }}>
           <section className="pt-7 pb-6 sm:pt-9" aria-labelledby="supplier-heading">
             <p className="blueprint-label mb-2">03 / Researched supplier · public sources</p>
             <h1 id="supplier-heading" className="text-3xl font-medium tracking-tight sm:text-4xl">{researched.name}</h1>

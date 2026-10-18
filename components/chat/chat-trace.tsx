@@ -16,13 +16,13 @@ import type { ChatStep, ModelCall } from "@/lib/chat-contract"
 
 import type { ChatTrace } from "./types"
 
-const SOURCE_LABEL: Record<ChatStep["source"], string> = { dataset: "dataset", tavily: "Tavily", nemotron: "Nemotron" }
+const SOURCE_LABEL: Record<ChatStep["source"], string> = { dataset: "dataset", research: "research", tavily: "Tavily", nemotron: "Nemotron" }
 const usd = new Intl.NumberFormat("en", { style: "currency", currency: "USD", minimumFractionDigits: 3, maximumFractionDigits: 3 })
 const tokens = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 })
 const seconds = (ms: number) => `${(ms / 1000).toFixed(1)} s`
 
 /** "nvidia/Nemotron-3-Ultra-550b-a55b" reads "Ultra". */
-function modelName(model: string) {
+export function modelName(model: string) {
   const name = /super-vl|ultra|super|lightning|nano/i.exec(model)?.[0]
   return name ? name[0].toUpperCase() + name.slice(1) : model
 }
