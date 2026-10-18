@@ -118,7 +118,7 @@ function ShortlistLoading() {
     <div className="flex flex-col gap-4 p-5" aria-busy="true">
       <p className="flex items-center gap-2 text-sm text-[var(--blueprint-muted)]">
         <AssistantAvatar thinking className="size-5" />
-        Nemotron rates every criterion three times…
+        NVIDIA Nemotron is weighting the 18 risk criteria for seats, averaged over three independent runs…
       </p>
       {Array.from({ length: 8 }, (_, index) => (
         <Skeleton key={index} className="h-4 rounded-none bg-[var(--blueprint-grid)]" />
