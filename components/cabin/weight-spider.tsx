@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, type PointerEvent as ReactPointerEvent, type KeyboardEvent } from "react";
 import { CRITERION_BY_KEY, type CriterionKey } from "@/lib/suppliers/criteria";
 import { cn } from "@/lib/utils";
@@ -10,6 +9,8 @@ const CENTER = SIZE / 2;
 const RADIUS = 132;
 const RINGS = [0.25, 0.5, 0.75, 1];
 const KEY_STEP = 0.05;
+/** Room left and right for the longest labels, so a phone-width panel never clips them. */
+const LABEL_PAD = 44;
 
 interface WeightSpiderProps {
   /** Axis order, clockwise from 12 o'clock; fixed while dragging so nothing jumps. */
@@ -21,11 +22,12 @@ interface WeightSpiderProps {
   onChange: (key: CriterionKey, value: number) => void;
   /** Called when a drag or key press ends, to commit the weighting. */
   onCommit: () => void;
-  hrefFor: (key: CriterionKey) => string;
+  /** A driver was clicked or grabbed: the panel explains it. */
+  onSelect: (key: CriterionKey) => void;
 }
 
 /** A spider chart whose points are handles: drag a driver out to weight it more, in to weight it less. */
-export function WeightSpider({ keys, values, active, onActive, onChange, onCommit, hrefFor }: WeightSpiderProps) {
+export function WeightSpider({ keys, values, active, onActive, onChange, onCommit, onSelect }: WeightSpiderProps) {
   const svg = useRef<SVGSVGElement>(null);
   const total = keys.reduce((sum, key) => sum + values[key], 0) || 1;
   const angle = (index: number) => -Math.PI / 2 + (index * 2 * Math.PI) / keys.length;
@@ -41,6 +43,7 @@ export function WeightSpider({ keys, values, active, onActive, onChange, onCommi
     onPointerDown: (event: ReactPointerEvent<SVGElement>) => {
       event.currentTarget.setPointerCapture(event.pointerId);
       onActive(keys[index]);
+      onSelect(keys[index]);
       dragTo(event, index);
     },
     onPointerMove: (event: ReactPointerEvent<SVGElement>) => {
@@ -71,7 +74,12 @@ export function WeightSpider({ keys, values, active, onActive, onChange, onCommi
   }
 
   return (
-    <svg ref={svg} viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full max-w-[30rem] touch-none overflow-visible select-none" aria-label="Risk driver weights">
+    <svg
+      ref={svg}
+      viewBox={`${-LABEL_PAD} 0 ${SIZE + 2 * LABEL_PAD} ${SIZE}`}
+      className="w-full max-w-[36rem] touch-none overflow-visible select-none"
+      aria-label="Risk driver weights"
+    >
       {RINGS.map((share) => (
         <polygon key={share} points={ring(share)} fill="none" stroke="var(--blueprint-rule)" strokeWidth={1} />
       ))}
@@ -102,21 +110,31 @@ export function WeightSpider({ keys, values, active, onActive, onChange, onCommi
         const anchor = Math.abs(cos) < 0.2 ? "middle" : cos > 0 ? "start" : "end";
         const percent = Math.round((values[key] / total) * 100);
         return (
-          <Link key={key} href={hrefFor(key)} onMouseEnter={() => onActive(key)} onMouseLeave={() => onActive(null)}>
-            <text
-              x={label.x}
-              y={label.y}
-              dy={Math.sin(angle(index)) > 0.9 ? 8 : 3}
-              textAnchor={anchor}
-              className={cn(
-                "fill-[var(--blueprint-muted)] text-[10px] transition-colors hover:fill-[var(--blueprint-ink)] hover:underline",
-                active === key && "fill-[var(--blueprint-ink)] font-medium",
-              )}
-            >
-              {CRITERION_BY_KEY[key].label}
-              <tspan className="font-mono text-[9px]"> {percent}%</tspan>
-            </text>
-          </Link>
+          <text
+            key={key}
+            x={label.x}
+            y={label.y}
+            dy={Math.sin(angle(index)) > 0.9 ? 8 : 3}
+            textAnchor={anchor}
+            role="button"
+            tabIndex={0}
+            aria-label={`Explain ${CRITERION_BY_KEY[key].label}`}
+            onClick={() => onSelect(key)}
+            onKeyDown={(event) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              onSelect(key);
+            }}
+            onMouseEnter={() => onActive(key)}
+            onMouseLeave={() => onActive(null)}
+            className={cn(
+              "cursor-pointer fill-[var(--blueprint-muted)] text-[10px] outline-none transition-colors hover:fill-[var(--blueprint-ink)] hover:underline focus-visible:underline",
+              active === key && "fill-[var(--blueprint-ink)] font-medium",
+            )}
+          >
+            {CRITERION_BY_KEY[key].label}
+            <tspan className="font-mono text-[9px]"> {percent}%</tspan>
+          </text>
         );
       })}
 

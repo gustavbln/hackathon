@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowUpIcon, XIcon } from "lucide-react";
+import { ArrowRightIcon, ArrowUpIcon, XIcon } from "lucide-react";
 
 import { AssistantAvatar } from "@/components/chat/assistant-avatar";
 import { useChatFocus } from "@/components/chat/chat-focus";
@@ -229,6 +229,9 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
   const [committed, setCommitted] = useState(values);
   const [instruction, setInstruction] = useState(startWeights ? null : shortlist.instruction);
   const [active, setActive] = useState<CriterionKey | null>(null);
+  // The driver the buyer clicked stays explained in the side area; hovering another one previews it.
+  const [selected, setSelected] = useState<CriterionKey | null>(null);
+  const focus = active ?? selected;
 
   const total = keys.reduce((sum, key) => sum + values[key], 0) || 1;
   const weights = Object.fromEntries(keys.map((key) => [key, values[key] / total])) as Weights;
@@ -242,13 +245,13 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
         id: matrix.ids[row] ?? "",
         name: matrix.names[row] ?? "",
         risk,
-        activePoints: active ? weights[active] * (matrix.scores[row * matrix.keys.length + matrix.keys.indexOf(active)] ?? 0) : null,
+        activePoints: focus ? weights[focus] * (matrix.scores[row * matrix.keys.length + matrix.keys.indexOf(focus)] ?? 0) : null,
       }))
     : shortlist.suppliers.map(({ id, name, risk, contributions }) => ({
         id,
         name,
         risk,
-        activePoints: active ? (contributions[active] ?? 0) : null,
+        activePoints: focus ? (contributions[focus] ?? 0) : null,
       }));
 
   const commit = useCallback((next: Record<CriterionKey, number>, nextInstruction: string | null = null) => {
@@ -276,14 +279,14 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
       setActive(action.driverKey);
     }
   }), [onAction, commit]);
-  const activeCriterion = shortlist.criteria.find(({ key }) => key === active);
+  const focusCriterion = shortlist.criteria.find(({ key }) => key === focus);
 
   return (
     <div className="flex flex-col gap-6 p-5">
       <SupplierColumns
         suppliers={top}
         supplierCount={shortlist.supplierCount}
-        active={active}
+        active={focus}
         onOpen={(id) => router.push(`/suppliers/${id}?${query}`)}
       />
 
@@ -293,11 +296,11 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
           <WeightSpider
             keys={keys}
             values={values}
-            active={active}
+            active={focus}
             onActive={setActive}
             onChange={(key, value) => setValues((current) => ({ ...current, [key]: value }))}
             onCommit={() => commit(values)}
-            hrefFor={(key) => `/drivers/${key}?${query}`}
+            onSelect={setSelected}
           />
         </section>
 
@@ -306,19 +309,43 @@ function ShortlistResult({ shortlist, seatId, startWeights }: { shortlist: SeatS
             <p className="blueprint-label mb-1">
               {edited ? "Your weighting" : shortlist.source === "nemotron" ? "Nemotron's weighting" : "EN-standard weighting"}
             </p>
-            {activeCriterion ? (
-              <>
-                <p className="font-medium">
-                  {activeCriterion.label} · {(weights[activeCriterion.key] * 100).toFixed(1)}%
-                </p>
-                <p className="mt-1 text-xs leading-relaxed text-[var(--blueprint-muted)]">
-                  {activeCriterion.reason ?? CRITERION_BY_KEY[activeCriterion.key].description}
-                </p>
-              </>
+            {focusCriterion ? (
+              <div className="mt-2 flex flex-col gap-2 border-l-2 border-[var(--series-2)] pl-3 animate-in fade-in-0 duration-200">
+                <div className="flex items-start justify-between gap-2">
+                  <p className="font-medium">
+                    {focusCriterion.label}
+                    <span className="ml-2 font-mono text-xs font-normal tabular-nums">{(weights[focusCriterion.key] * 100).toFixed(1)}%</span>
+                  </p>
+                  {focusCriterion.key === selected && (
+                    <Button
+                      variant="ghost"
+                      size="icon-xs"
+                      onClick={() => setSelected(null)}
+                      aria-label={`Close ${focusCriterion.label}`}
+                      className="-mt-0.5 rounded-none hover:bg-[var(--blueprint-grid)] hover:text-[var(--blueprint-ink)]"
+                    >
+                      <XIcon strokeWidth={1.5} />
+                    </Button>
+                  )}
+                </div>
+                <p className="leading-relaxed">{CRITERION_BY_KEY[focusCriterion.key].description}</p>
+                {focusCriterion.reason && (
+                  <p className="text-xs leading-relaxed text-[var(--blueprint-muted)]">
+                    <span className="blueprint-label mr-1.5">{shortlist.source === "nemotron" ? "Nemotron for seats" : "For seats"}</span>
+                    {focusCriterion.reason}
+                  </p>
+                )}
+                <Link
+                  href={`/drivers/${focusCriterion.key}?${query}`}
+                  className="mt-1 inline-flex w-fit items-center gap-1.5 text-xs font-medium underline-offset-4 hover:underline"
+                >
+                  Open the {focusCriterion.label.toLowerCase()} page <ArrowRightIcon className="size-3.5" aria-hidden="true" />
+                </Link>
+              </div>
             ) : (
               <p className="text-xs leading-relaxed text-[var(--blueprint-muted)]">
                 Drag a point outward to weight a driver more, inward to weight it less. The columns re-rank across
-                all {shortlist.supplierCount.toLocaleString("en")} suppliers as you drag. Click a driver for its details.
+                all {shortlist.supplierCount.toLocaleString("en")} suppliers as you drag. Click a driver to see what it means.
               </p>
             )}
           </div>

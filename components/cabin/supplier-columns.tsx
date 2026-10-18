@@ -57,7 +57,7 @@ export function SupplierColumns({ suppliers, supplierCount, active, onOpen }: Su
             return (
               <li
                 key={supplier.id}
-                className="absolute bottom-0 flex h-full justify-center transition-[left] duration-500 ease-out animate-in fade-in-0 motion-reduce:transition-none"
+                className="absolute bottom-0 flex h-full justify-center px-px transition-[left] duration-500 ease-out animate-in fade-in-0 motion-reduce:transition-none"
                 style={{ left: `${index * slot}%`, width: `${slot}%` }}
               >
                 <Tooltip>
@@ -72,7 +72,8 @@ export function SupplierColumns({ suppliers, supplierCount, active, onOpen }: Su
                         className="relative flex w-full flex-col justify-end overflow-hidden rounded-t-[4px] bg-[var(--series-1)] transition-[height] duration-500 ease-out group-hover:brightness-110 group-focus-visible:ring-2 group-focus-visible:ring-[var(--blueprint-ink)]"
                         style={{ height: `${height}%` }}
                       >
-                        <span className="absolute inset-x-0 top-1 text-center font-mono text-[9px] font-semibold text-white tabular-nums">
+                        {/* Narrow panels have no room for the value inside the column; the tooltip carries it. */}
+                        <span className="absolute inset-x-0 top-1 hidden text-center font-mono text-[9px] font-semibold text-white tabular-nums @min-[560px]/shortlist:block">
                           {supplier.risk.toFixed(1)}
                         </span>
                         <span className="w-full bg-[var(--series-2)] transition-[height] duration-300" style={{ height: `${height > 0 ? (activeHeight / height) * 100 : 0}%` }} />
