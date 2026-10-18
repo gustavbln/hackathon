@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRightIcon, ArrowUpIcon, XIcon } from "lucide-react";
+import { ArrowRightIcon, XIcon } from "lucide-react";
 
 import { AssistantAvatar } from "@/components/chat/assistant-avatar";
 import { useChatFocus } from "@/components/chat/chat-focus";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { PageContext } from "@/lib/chat-contract";
-import { seatShortlistSchema, type SeatShortlist, type ShortlistSource } from "@/lib/seat-shortlist-contract";
+import { seatShortlistSchema, type SeatShortlist } from "@/lib/seat-shortlist-contract";
 import { CRITERION_BY_KEY, type CriterionKey, type Weights } from "@/lib/suppliers/criteria";
 import { encodeWeights } from "@/lib/suppliers/profiles";
 import { topByWeights } from "@/lib/suppliers/scoring";
@@ -26,13 +26,8 @@ type Load =
   | { state: "error"; message: string }
   | { state: "ready"; shortlist: SeatShortlist };
 
-type ShortlistRequest = { source: ShortlistSource; instruction: string | null };
-
-const requestKey = ({ source, instruction }: ShortlistRequest) => `${source}:${instruction ?? ""}`;
-
-async function fetchShortlist({ source, instruction }: ShortlistRequest, signal: AbortSignal) {
-  const params = new URLSearchParams({ source, ...(instruction && { instruction }) });
-  const response = await fetch(`/api/seat-shortlist?${params}`, { signal });
+async function fetchShortlist(signal: AbortSignal) {
+  const response = await fetch("/api/seat-shortlist?source=nemotron", { signal });
   const body: unknown = await response.json();
   if (!response.ok) {
     const message = (body as { error?: { message?: string } }).error?.message;
@@ -49,12 +44,7 @@ interface SeatShortlistPanelProps {
 }
 
 export function SeatShortlistPanel({ seatId, initialWeights = null, onClose }: SeatShortlistPanelProps) {
-  const [request, setRequest] = useState<ShortlistRequest>({ source: "nemotron", instruction: null });
-  const [startWeights, setStartWeights] = useState(initialWeights);
-  // A missing entry means "not fetched yet"; ready and failed results stay cached per request.
-  const [loads, setLoads] = useState<Record<string, Load>>({});
-  const key = requestKey(request);
-  const entry = loads[key];
+  const [entry, setEntry] = useState<Load | null>(null);
   const load = entry ?? { state: "loading" };
   const { setPage } = useChatFocus();
   useEffect(() => () => setPage(null), [setPage]);
@@ -62,24 +52,16 @@ export function SeatShortlistPanel({ seatId, initialWeights = null, onClose }: S
   useEffect(() => {
     if (entry) return;
     const controller = new AbortController();
-    fetchShortlist(request, controller.signal).then(
-      (shortlist) => setLoads((current) => ({ ...current, [key]: { state: "ready", shortlist } })),
+    fetchShortlist(controller.signal).then(
+      (shortlist) => setEntry({ state: "ready", shortlist }),
       (error: unknown) => {
         if (controller.signal.aborted) return;
         const message = error instanceof Error ? error.message : "The seat shortlist failed. Please retry.";
-        setLoads((current) => ({ ...current, [key]: { state: "error", message } }));
+        setEntry({ state: "error", message });
       },
     );
     return () => controller.abort();
-  }, [request, key, entry]);
-
-  function retry() {
-    setLoads((current) => {
-      const next = { ...current };
-      delete next[key];
-      return next;
-    });
-  }
+  }, [entry]);
 
   return (
     <section
@@ -106,33 +88,21 @@ export function SeatShortlistPanel({ seatId, initialWeights = null, onClose }: S
         </div>
       </header>
 
-      <RerankForm
-        instruction={request.instruction}
-        disabled={load.state === "loading"}
-        onRerank={(instruction) => {
-          // An explicit Nemotron re-rank replaces the buyer's dragged weights.
-          setStartWeights(null);
-          setRequest({ source: "nemotron", instruction });
-        }}
-      />
-
       <div className="min-h-0 flex-1 overflow-y-auto">
-        {load.state === "loading" && <ShortlistLoading source={request.source} />}
+        {load.state === "loading" && <ShortlistLoading />}
         {load.state === "error" && (
           <div role="alert" className="flex flex-col items-start gap-3 p-5 text-sm">
             <p>{load.message}</p>
-            <Button variant="outline" size="sm" className="rounded-none border-[var(--blueprint-rule)] bg-transparent" onClick={retry}>
+            <Button variant="outline" size="sm" className="rounded-none border-[var(--blueprint-rule)] bg-transparent" onClick={() => setEntry(null)}>
               Retry
             </Button>
           </div>
         )}
         {load.state === "ready" && (
-          // A new weighting from the server or the assistant starts a fresh drag state.
           <ShortlistResult
-            key={load.shortlist.criteria.map(({ key: criterion, weightPercent }) => `${criterion}${weightPercent.toFixed(2)}`).join()}
             shortlist={load.shortlist}
             seatId={seatId}
-            startWeights={startWeights}
+            startWeights={initialWeights}
           />
         )}
       </div>
@@ -140,69 +110,13 @@ export function SeatShortlistPanel({ seatId, initialWeights = null, onClose }: S
   );
 }
 
-/** The buyer steers the weights in their own words; Nemotron re-scores, the ranking follows. */
-function RerankForm({ instruction, disabled, onRerank }: {
-  instruction: string | null; disabled: boolean; onRerank: (instruction: string | null) => void;
-}) {
-  const [draft, setDraft] = useState("");
-  const text = draft.trim();
-
-  if (instruction) {
-    return (
-      <div className="flex items-center justify-between gap-3 border-b border-[var(--blueprint-rule)] py-2 pr-2 pl-5 text-xs">
-        <p className="min-w-0 truncate">
-          <span className="blueprint-label mr-2">Re-ranked</span>
-          {instruction}
-        </p>
-        <Button variant="ghost" size="sm" className="h-7 shrink-0 rounded-none text-xs hover:bg-[var(--blueprint-grid)]" onClick={() => onRerank(null)}>
-          Reset
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <form
-      className="flex items-center gap-2 border-b border-[var(--blueprint-rule)] py-1.5 pr-2 pl-5"
-      onSubmit={(event) => {
-        event.preventDefault();
-        if (!text || disabled) return;
-        onRerank(text.slice(0, 300));
-        setDraft("");
-      }}
-    >
-      <label htmlFor="seat-rerank" className="blueprint-label shrink-0">Re-rank</label>
-      <input
-        id="seat-rerank"
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-        maxLength={300}
-        placeholder="e.g. ESG matters most, sentiment barely matters"
-        className="h-8 min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--blueprint-muted)]"
-      />
-      <Button
-        type="submit"
-        variant="ghost"
-        size="icon-sm"
-        disabled={!text || disabled}
-        aria-label="Re-rank with Nemotron"
-        className="rounded-none hover:bg-[var(--blueprint-grid)] hover:text-[var(--blueprint-ink)]"
-      >
-        <ArrowUpIcon strokeWidth={1.5} />
-      </Button>
-    </form>
-  );
-}
-
-function ShortlistLoading({ source }: { source: ShortlistSource }) {
+function ShortlistLoading() {
   return (
     <div className="flex flex-col gap-4 p-5" aria-busy="true">
-      {source === "nemotron" && (
-        <p className="flex items-center gap-2 text-sm text-[var(--blueprint-muted)]">
-          <AssistantAvatar thinking className="size-5" />
-          Nemotron rates every criterion three times…
-        </p>
-      )}
+      <p className="flex items-center gap-2 text-sm text-[var(--blueprint-muted)]">
+        <AssistantAvatar thinking className="size-5" />
+        Nemotron rates every criterion three times…
+      </p>
       {Array.from({ length: 8 }, (_, index) => (
         <Skeleton key={index} className="h-4 rounded-none bg-[var(--blueprint-grid)]" />
       ))}
