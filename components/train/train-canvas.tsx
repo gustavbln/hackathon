@@ -3,15 +3,15 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrthographicCamera } from "@react-three/drei";
 import { Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { MathUtils, Mesh, Vector3, type Group, type OrthographicCamera as Camera } from "three";
+import { MathUtils, Mesh, Vector3, type OrthographicCamera as Camera } from "three";
 import { TrainModel } from "./train-model";
 import { TrainFallback } from "./train-fallback";
 import { CabinTarget } from "@/components/cabin/cabin-target";
 
-const ROTATION_SECONDS = 20;
 /** Scroll progress eased at both ends, so the fly-in starts and lands softly. */
 const ease = (progress: number) => progress * progress * (3 - 2 * progress);
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+const OVERVIEW_POSITION: [number, number, number] = [22, 34, 30];
 
 function subscribeMotion(callback: () => void) {
   const query = window.matchMedia(REDUCED_MOTION);
@@ -24,56 +24,76 @@ function getReducedMotion() {
 }
 
 function TrainArrangement({ reducedMotion, onReady, onCabinSelect, progress }: { reducedMotion: boolean; onReady: () => void; onCabinSelect?: () => void; progress: number }) {
-  const group = useRef<Group>(null);
   useEffect(onReady, [onReady]);
-  useFrame((_, delta) => {
-    if (!group.current || reducedMotion) return;
-    // Clamp long background-tab frames so returning to the page never causes a jump.
-    const step = Math.min(delta, 0.1);
-    const travel = ease(progress);
-    // The spin fades out while the train turns broadside, both in proportion to the scroll.
-    const angle = MathUtils.euclideanModulo(group.current.rotation.y + Math.PI, Math.PI * 2) - Math.PI;
-    group.current.rotation.y = MathUtils.damp(angle, 0, 4 * travel, step) + step * (Math.PI * 2 / ROTATION_SECONDS) * (1 - travel);
-  });
+  const advance = reducedMotion ? 0 : 6 * ease(progress);
 
   return (
-    <group ref={group} rotation={[0, -0.2, 0]}>
-      {onCabinSelect ? <CabinTarget onSelect={onCabinSelect}><TrainModel /></CabinTarget> : <TrainModel />}
+    <group rotation={[0, -0.2, 0]}>
+      <group position={[advance, 0, 0]}>
+        {onCabinSelect ? <CabinTarget onSelect={onCabinSelect}><TrainModel /></CabinTarget> : <TrainModel />}
+      </group>
     </group>
   );
 }
 
 function SceneCamera({ progress, reducedMotion }: { progress: number; reducedMotion: boolean }) {
   const camera = useRef<Camera>(null);
-  const carriageCenter = useRef(new Vector3());
+  const windowMesh = useRef<Mesh | null>(null);
+  const windowCenter = useRef(new Vector3());
+  const destination = useRef(new Vector3());
   const { width, height } = useThree((state) => state.size);
-  // Fit the two-car train's turning radius (about 11.5 m to the nose) with room for the capabilities around it.
+  // Leave room around the overview, then keep the window close-up modest.
   const zoom = Math.min(width / 28, height / 18) * 0.7;
   useFrame((state, delta) => {
     if (!camera.current) return;
-    const travel = reducedMotion ? 0 : ease(progress);
+    const travel = reducedMotion ? 0 : ease(MathUtils.clamp((progress - 0.15) / 0.85, 0, 1));
     const smooth = reducedMotion ? 1 : 1 - Math.exp(-8 * Math.min(delta, 0.1));
-    const carriage = state.scene.getObjectByName("Passenger_carriage") ?? state.scene.getObjectByName("Passenger carriage");
-    if (carriage instanceof Mesh) {
-      if (!carriage.geometry.boundingBox) carriage.geometry.computeBoundingBox();
-      carriage.geometry.boundingBox?.getCenter(carriageCenter.current);
-      carriage.localToWorld(carriageCenter.current);
+    if (!windowMesh.current) {
+      const carriage = state.scene.getObjectByName("Passenger_carriage") ?? state.scene.getObjectByName("Passenger carriage");
+      if (carriage instanceof Mesh) {
+        carriage.geometry.computeBoundingBox();
+        const centerX = carriage.geometry.boundingBox?.getCenter(windowCenter.current).x ?? 0;
+        let nearest = Infinity;
+        state.scene.traverse((object) => {
+          if (!(object instanceof Mesh) || !object.name.replaceAll("_", " ").startsWith("Passenger carriage passenger window")) return;
+          object.geometry.computeBoundingBox();
+          const center = object.geometry.boundingBox?.getCenter(windowCenter.current);
+          if (center && center.z > 0 && Math.abs(center.x - centerX) < nearest) {
+            nearest = Math.abs(center.x - centerX);
+            windowMesh.current = object;
+          }
+        });
+      }
     }
-    const x = carriageCenter.current.x * travel;
-    const z = carriageCenter.current.z * travel;
-    camera.current.position.x = MathUtils.lerp(camera.current.position.x, 24 * (1 - travel) + x, smooth);
-    camera.current.position.y = MathUtils.lerp(camera.current.position.y, 26 - 23.2 * travel, smooth);
-    camera.current.position.z = MathUtils.lerp(camera.current.position.z, 36 - 30 * travel + z, smooth);
-    // Exponential zoom reads as constant speed; a polynomial one crawls, then lurches.
-    camera.current.zoom = MathUtils.lerp(camera.current.zoom, zoom * Math.pow(15, travel), smooth);
-    camera.current.lookAt(x, 1.8 + travel, z);
+    const window = windowMesh.current;
+    if (window) {
+      window.geometry.boundingBox?.getCenter(windowCenter.current);
+      window.updateWorldMatrix(true, false);
+      window.localToWorld(windowCenter.current);
+    }
+    const { x, y, z } = windowCenter.current;
+    destination.current.set(
+      OVERVIEW_POSITION[0] + x * travel,
+      OVERVIEW_POSITION[1] + (y - 1.8) * travel,
+      OVERVIEW_POSITION[2] + z * travel,
+    );
+    camera.current.position.lerp(destination.current, smooth);
+    const targetZoom = zoom * Math.pow(4, travel);
+    camera.current.zoom = MathUtils.lerp(camera.current.zoom, targetZoom, smooth);
+    // Keep the viewing angle fixed: the train approaches along its track instead of orbiting.
+    camera.current.lookAt(
+      camera.current.position.x - OVERVIEW_POSITION[0],
+      camera.current.position.y - OVERVIEW_POSITION[1] + 1.8,
+      camera.current.position.z - OVERVIEW_POSITION[2],
+    );
     camera.current.updateProjectionMatrix();
+    if (camera.current.position.distanceToSquared(destination.current) > 0.000001 || Math.abs(camera.current.zoom - targetZoom) > 0.001) state.invalidate();
   });
   return (
     <OrthographicCamera
       makeDefault
       ref={camera}
-      position={[24, 26, 36]}
+      position={OVERVIEW_POSITION}
       near={0.1}
       far={200}
       zoom={zoom}
@@ -95,7 +115,7 @@ export default function TrainCanvas({ onCabinSelect, progress = 0 }: { onCabinSe
       <Canvas
         orthographic
         dpr={[1, 1.5]}
-        frameloop={reducedMotion ? "demand" : "always"}
+        frameloop="demand"
         gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
         fallback={<TrainFallback />}
         // Fade only the canvas so the no-WebGL fallback remains visible.
