@@ -217,8 +217,9 @@ Each person connects the Mobbin MCP in their own agent. It does not go into this
   Source: `components/train/create-train.ts`; regenerate with
   `docker compose exec web node --experimental-strip-types scripts/export-train.mjs`.
   Blueprint colors live in `app/globals.css` (`--train-*`) and are baked into the export.
-  The landing and cabin now use one canvas. `train-countryside.tsx` is the shared landscape;
-  `train-journey-layout.ts` defines the camera path through the transparent central-carriage window.
+  The landing and cabin use one canvas. `train-depot.tsx` recreates the workshop from the supplied
+  Siemens photo, with `--depot-*` theme tokens. `train-journey-layout.ts` sequences the door lift,
+  departure and camera path through the transparent central-carriage window. The train GLB stays unchanged.
 - Model: [ICE-3 by J-m@n](https://3dwarehouse.sketchup.com/model/e6593c7243820ab45bef0d098ed74c1d/ICE-3),
   the real ICE 3/Velaro shape. GLB, 5.6 MB, 126k triangles, 4 cars. Units are inches: scale by 0.0254.
 - Licence (3D Warehouse General Model License): fine inside our app, never offered as a standalone

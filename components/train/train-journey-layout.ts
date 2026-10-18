@@ -17,7 +17,19 @@ const smoothstep = (value: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export function trainJourneyPose(progress: number, portrait: boolean) {
+export const DEPOT_FRONT_X = 42;
+export const DEPOT_DEPARTURE_DISTANCE = 84;
+
+export function depotJourney(progress: number) {
+  const door = smoothstep(progress / 0.2);
+  const departure = smoothstep((progress - 0.2) / 0.4);
+  const boarding = smoothstep((progress - 0.6) / 0.4);
+
+  // Moving the depot preserves the cabin's existing coordinates and seat controls.
+  return { door, departure, boarding, offset: -DEPOT_DEPARTURE_DISTANCE * departure };
+}
+
+function boardingPose(progress: number, portrait: boolean) {
   const travel = MathUtils.clamp(progress, 0, 1);
   const distance = portrait ? 140 : 65;
   const start = new Vector3((portrait ? 0.96 : 0.52) * distance, (portrait ? 0.3 : 0.27) * distance, (portrait ? 0.28 : 0.81) * distance);
@@ -40,4 +52,22 @@ export function trainJourneyPose(progress: number, portrait: boolean) {
   const quaternion = new Quaternion().setFromRotationMatrix(new Matrix4().lookAt(position, lookAt, new Vector3(0, 1, 0)));
   quaternion.slerp(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -0.04), smoothstep((travel - 0.9) / 0.1));
   return { position, quaternion, fov: MathUtils.lerp(portrait ? 50 : 36, portrait ? 80 : 62, smoothstep((travel - 0.67) / 0.33)) };
+}
+
+export function trainJourneyPose(progress: number, portrait: boolean) {
+  const { departure, boarding } = depotJourney(progress);
+  const destination = boardingPose(boarding, portrait);
+  if (progress >= 0.6) return destination;
+
+  const position = portrait ? trainPointToCabin(142, 20, 34) : trainPointToCabin(110, 12, 22);
+  const lookAt = trainPointToCabin(DEPOT_FRONT_X, 8.5, portrait ? 3 : 6);
+  const quaternion = new Quaternion().setFromRotationMatrix(
+    new Matrix4().lookAt(position, lookAt, new Vector3(0, 1, 0)),
+  );
+
+  return {
+    position: position.lerp(destination.position, departure),
+    quaternion: quaternion.slerp(destination.quaternion, departure),
+    fov: MathUtils.lerp(portrait ? 54 : 40, destination.fov, departure),
+  };
 }

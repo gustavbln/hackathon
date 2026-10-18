@@ -18,9 +18,9 @@ export default function Home() {
               Runs on NVIDIA Nemotron
             </p>
           </div>
-          <section className="mt-[min(12svh,7rem)] max-w-3xl space-y-5" aria-labelledby="landing-heading">
+          <section className="mt-[min(7svh,4rem)] max-w-3xl space-y-4" aria-labelledby="landing-heading">
             <p className="blueprint-label text-[var(--blueprint-ink)]">Financial Risk Assessment / Supplier intelligence for rail</p>
-            <h1 id="landing-heading" className="text-[clamp(2.5rem,6vw,4.75rem)] leading-none font-medium tracking-[-0.035em]">
+            <h1 id="landing-heading" className="text-[clamp(2rem,4.5vw,3.75rem)] leading-none font-medium tracking-[-0.035em]">
               Know your suppliers. Keep production moving.
             </h1>
             <p className="max-w-sm text-base text-[var(--blueprint-ink)] sm:text-lg">

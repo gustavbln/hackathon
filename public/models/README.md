@@ -17,6 +17,8 @@ docker compose exec web node --experimental-strip-types scripts/export-train.mjs
 
 `components/train/train-model.tsx` loads the asset into the same client-only React Three Fiber canvas as the interactive cabin. The central carriage has real openings and transparent glass, with the actual seats and cabin visible through them.
 
-`train-countryside.tsx` supplies the shared sky, terrain, hills and trees for both exterior and interior views. `train-journey-layout.ts` aligns the exterior asset with the cabin, approaches a window, crosses the pane and settles into the normal aisle view. Focused tests verify window clearance, continuity and the final camera pose. `train-scene.tsx` enables the cabin controls without replacing the canvas or navigating away. Reduced-motion users retain a stationary exterior until entry.
+`train-depot.tsx` recreates the white arched roofs, brick facade and Siemens workshop sign from the user-supplied reference photograph as a native 3D environment. Its materials use the `--depot-*` theme tokens. The depot and yard remain visible from the cabin windows. This is an illustrative reconstruction, not a surveyed model of the factory.
+
+`train-journey-layout.ts` sequences the lifting garage door, the train's departure and the original window entry. The environment moves relative to the train so the cabin keeps its existing coordinates and seat interactions. The GLB is unchanged; its short baked tracks are hidden in favour of the depot's continuous rails. Focused tests verify stage order, workshop clearance, window clearance, continuity and the final camera pose. `train-scene.tsx` enables cabin controls in the same canvas. The button plays the door lift and departure before the 1.5-second window entry; scrolling can scrub the sequence in either direction. Reduced-motion users retain a stationary exterior until entry.
 
 `high-speed-train-preview.png` is the older blueprint illustration, retained as a design reference.

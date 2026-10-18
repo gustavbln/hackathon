@@ -4,10 +4,11 @@ import { Canvas } from "@react-three/fiber";
 import { useCursor } from "@react-three/drei";
 import { Suspense, useCallback, useRef, useState, type ReactNode } from "react";
 import type { Group } from "three";
-import { TrainCountryside } from "./train-countryside";
+import { TrainDepotWorld } from "./train-depot-world";
+import { readDepotPalette } from "./depot-palette";
 import { TrainJourneyCamera } from "./train-journey-camera";
 import { TrainModel } from "./train-model";
-import { TRAIN_TO_CABIN } from "./train-journey-layout";
+import { depotJourney, TRAIN_TO_CABIN } from "./train-journey-layout";
 import { CabinControls, type CabinView } from "./cabin-controls";
 import { CabinFocus } from "./cabin-focus";
 import { cabinBoxGeometry } from "./cabin-geometry";
@@ -143,22 +144,28 @@ export default function CabinCanvas({ fallback, zoom, setZoom, resetView, rotati
   const world = useRef<Group>(null);
   const seats = useRef<Group>(null);
   const [palette] = useState(readCabinPalette);
+  const [depotPalette] = useState(readDepotPalette);
   const [trainReady, setTrainReady] = useState(false);
   const ready = useCallback(() => setTrainReady(true), []);
   const waiting = journeyProgress !== undefined && !trainReady;
+  const exteriorProgress = journeyProgress === undefined ? 1 : reducedMotion ? (journeyProgress >= 0.99 ? 1 : 0) : journeyProgress;
+  const cabinLight = depotJourney(exteriorProgress).boarding;
 
   return (
     <>
-      {waiting && <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--train-sky)] text-sm" role="status">Preparing the train and countryside…</div>}
-      <Canvas camera={{ position: [0, 1.65, 4.6], near: 0.03, far: 600 }} dpr={[1, 1.5]} frameloop="demand" gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
+      {waiting && <div className="absolute inset-0 z-10 flex items-center justify-center bg-[var(--depot-sky)] text-sm" role="status">Preparing the train and workshop…</div>}
+      <Canvas shadows camera={{ position: [0, 1.65, 4.6], near: 0.03, far: 1200 }} dpr={[1, 1.5]} frameloop="demand" gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
         fallback={fallback} style={{ touchAction: journeyProgress !== undefined ? "pan-y" : "none" }} aria-label="Explore cabin components. Select a seat to open supplier sourcing.">
         {journeyProgress !== undefined && <TrainJourneyCamera progress={journeyProgress} reducedMotion={reducedMotion} />}
         {journeyProgress === undefined && <CabinControls zoom={zoom} setZoom={setZoom} resetView={resetView} dragged={dragged} enabled={!selection.selectedSeatId} />}
-        <ambientLight intensity={1.4} />
-        <directionalLight position={[0, 2.5, 3]} intensity={1.6} />
+        <ambientLight intensity={0.8 + cabinLight * 0.6} />
+        <directionalLight position={[0, 2.5, 3]} intensity={1.6 * cabinLight} />
+        <directionalLight position={[65, 85, 45]} intensity={2 * (1 - cabinLight)} castShadow={cabinLight < 0.99}
+          shadow-mapSize={[2048, 2048]} shadow-camera-left={-125} shadow-camera-right={125}
+          shadow-camera-top={110} shadow-camera-bottom={-110} shadow-camera-far={350} shadow-bias={-0.0002} shadow-normalBias={0.05} />
         {journeyProgress !== undefined && <Suspense fallback={null}><group matrix={TRAIN_TO_CABIN} matrixAutoUpdate={false}><TrainModel onReady={ready} /></group></Suspense>}
         <group ref={world}>
-          <TrainCountryside palette={palette} />
+          <TrainDepotWorld progress={exteriorProgress} palette={depotPalette} />
           <CabinShell palette={palette} interactive={!selection.selectedSeatId} />
           {CABIN_PARTS.map(({ label, boxes }) => (
             <CabinPart key={label} label={label} enabled={!selection.selectedSeatId}>{(active) => (
