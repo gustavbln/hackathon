@@ -110,20 +110,13 @@ Data:
 - Verify Nebius's supported reasoning and tool parameters before using them; don't assume NVIDIA's
   request options transfer unchanged. Reasoning text is separate from the answer.
 
-## Financial research agent (real seat makers)
+## Research agent (real seat makers)
 
-A buyer names a real company; the agent identifies the legal entity, maps its company group, gathers
-financial evidence and scores it. Spec: the team's "Anforderungen Financial Risk Agent" document.
-
-- Contract: `lib/market/model.ts` (spec data model, streamed events). Deterministic score:
-  `lib/market/score.ts` (four equally weighted ratios, null instead of partial averages, historic
-  after 24 months). Company groups: `lib/market/groups.ts` (current ownership and joint ventures only).
-- Pipeline: resolve (Tavily + GLEIF, Ultra decides) → group (GLEIF) → research (Lightning binds each
-  claim to an entity) → deepen (Super-VL proposes follow-ups) → judge (Ultra, thinking on) → read
-  (two independent reads, code checks quotes and numbers) → score.
-- API: `POST /api/research` streams a live run; `GET /api/research` lists recorded runs in
-  `data/research/` (the labelled cache); `GET /api/research?run=<id>` replays one.
-- The researched score is not the dataset's `Financial_Health_Score`; never show them as the same.
+The buyer names a real company in the chat; a scout (Nemotron Ultra) identifies it, one agent per weighted seat driver
+searches (Tavily), reads the best pages in full, keeps verbatim quotes (Nemotron Lightning, checked in code) and writes a
+cited report with a score (Nemotron Ultra); an editor writes the cited briefing. Code: `lib/research/`. API:
+`POST /api/research/supplier` streams a run, `GET` lists researched companies saved in `data/research/EXT_*.json`.
+The researched scores are estimates from public sources, not the dataset's scores; never show them as the same.
 
 ## Docker only
 
@@ -154,8 +147,7 @@ Split by folder so we rarely touch the same files.
 - Gustav, seat charts and detail pages: the spider and columns in the seat panel
   (`components/cabin/weight-spider.tsx`, `supplier-columns.tsx`), the supplier drill-down
   (`app/suppliers/[id]`, `components/leaderboard/`), the driver page (`app/drivers/`,
-  `components/drivers/`), `lib/suppliers/` and `lib/market/`. The research agent at `/financial` is on
-  hold; company groups are out of scope until v1.1.
+  `components/drivers/`), `lib/suppliers/` and `lib/research/`. Company groups are out of scope until v1.1.
 
 `lib/` holds data access, scoring and tool functions: one source of truth that the UI, the chatbot
 and the agents all call. `lib/suppliers/` is the dataset foundation: `criteria.ts` (the 18 criteria
