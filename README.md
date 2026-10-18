@@ -4,8 +4,11 @@
 Team rules: [AGENTS.md](AGENTS.md).
 
 From the landing scene, choose **Enter cabin** to open `/cabin`: a blueprint interior with
-16 clickable seats. Click/tap a seat or use the keyboard-accessible seat selector to highlight it.
-This first iteration provides selection feedback only; it does not trigger supplier or AI requests.
+16 clickable seats, overhead luggage racks and ICE-inspired seat detailing. Drag to look around
+from a fixed position; scroll, pinch or use the zoom buttons to zoom. Reset view returns to the aisle.
+With the panorama focused, arrow keys look around and +/- zoom. Click/tap a seat or use the
+keyboard-accessible seat selector to highlight it. Selection does not trigger supplier or AI requests.
+The interior is a stylised original, informed by [DB’s ICE 4 overview](https://www.bahn.de/service/ueber-uns/zugtypen/ice-4), not an exact vehicle replica.
 
 The chat backend uses NVIDIA Nemotron through Nebius. Copy the private hackathon files into
 `data/supplier_risk_dataset.csv` and `data/risk_criteria_description.md` (gitignored).

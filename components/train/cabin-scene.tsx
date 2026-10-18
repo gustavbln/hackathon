@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import { Component, useState, type ReactNode } from "react";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { CABIN_SEATS } from "./cabin-layout";
+import { Button } from "@/components/ui/button";
+import { Minus, Plus, RotateCcw } from "lucide-react";
 
 function CabinFallback({ loading = false }: { loading?: boolean }) {
   return (
@@ -28,18 +30,26 @@ class CabinBoundary extends Component<{ children: ReactNode }, { failed: boolean
 
 export function CabinScene() {
   const [selectedSeatId, setSelectedSeatId] = useState<string | null>(null);
+  const [zoom, setZoom] = useState(1);
+  const [resetView, setResetView] = useState(0);
 
   return (
     <section className="mt-6 flex flex-1 flex-col" aria-label="Interactive blueprint cabin">
       <div className="relative min-h-[420px] flex-1 overflow-hidden rounded-sm border border-[var(--blueprint-rule)] sm:min-h-[480px]">
         <div className="absolute inset-0">
           <CabinBoundary>
-            <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={setSelectedSeatId} fallback={<CabinFallback />} />
+            <CabinCanvas selectedSeatId={selectedSeatId} onSeatSelect={setSelectedSeatId} zoom={zoom} setZoom={setZoom} resetView={resetView} fallback={<CabinFallback />} />
           </CabinBoundary>
         </div>
         <span className="blueprint-label pointer-events-none absolute top-4 left-4">Cabin 01 / Perspective</span>
-        <span className="blueprint-label pointer-events-none absolute right-4 bottom-4">Passenger seating · 2 + 2</span>
+        <div className="absolute right-3 bottom-3 flex items-center gap-1 rounded-lg border border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] p-1">
+          <Button variant="ghost" size="icon" aria-label="Zoom out" disabled={zoom <= 0.85} onClick={() => setZoom((value) => Math.max(0.85, value - 0.2))}><Minus /></Button>
+          <span className="w-12 text-center font-mono text-xs" aria-live="polite">{Math.round(zoom * 100)}%</span>
+          <Button variant="ghost" size="icon" aria-label="Zoom in" disabled={zoom >= 2.2} onClick={() => setZoom((value) => Math.min(2.2, value + 0.2))}><Plus /></Button>
+          <Button variant="ghost" size="icon" aria-label="Reset view" onClick={() => { setZoom(1); setResetView((value) => value + 1); }}><RotateCcw /></Button>
+        </div>
       </div>
+      <p className="blueprint-label mt-3">Drag to look around · Scroll or pinch to zoom</p>
       <footer className="flex flex-wrap items-center justify-between gap-4 py-5">
         <p className="text-sm text-[var(--blueprint-muted)]" role="status" aria-live="polite">
           {selectedSeatId ? `Seat ${selectedSeatId} selected` : "Select any seat to begin"}
