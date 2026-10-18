@@ -1,15 +1,7 @@
 import { CRITERIA, TOTAL_RISK_WEIGHTS, type CriterionKey, type Weights } from "./criteria.ts";
 
-export const COMPONENTS = [
-  { id: "seats", label: "Seats & interior" },
-  { id: "all", label: "Any component" },
-] as const;
-
-export type ComponentId = (typeof COMPONENTS)[number]["id"];
-
-export const COMPONENT_LABEL = Object.fromEntries(
-  COMPONENTS.map((option) => [option.id, option.label]),
-) as Record<ComponentId, string>;
+/** `seats` is the demo component; `all` is the dataset's own weighting. */
+export type ComponentId = "seats" | "all";
 
 /** Multiplies one criterion's weight, with the reason a buyer sees. */
 export interface Boost {
@@ -62,8 +54,4 @@ export function parseWeights(value: unknown): Weights | null {
   const total = parts.reduce((sum, part) => sum + part, 0);
   if (parts.length !== CRITERIA.length || parts.some((part) => !Number.isFinite(part) || part < 0) || total <= 0) return null;
   return Object.fromEntries(CRITERIA.map(({ key }, index) => [key, parts[index] / total])) as Weights;
-}
-
-export function parseComponent(value: unknown): ComponentId {
-  return COMPONENTS.find((component) => component.id === value)?.id ?? "seats";
 }

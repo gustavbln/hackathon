@@ -151,10 +151,11 @@ Split by folder so we rarely touch the same files.
 - Frontend owner: all pages and components, including chat, app shell, 3D train, explore and compare.
 - Dennis, chatbot functionality: `app/api/chat/` and shared server-side data, tools and Nemotron calls
   in `lib/`. Return typed data for supplier cards, comparisons and charts; leave frontend work to its owner.
-- Gustav, supplier benchmark and the financial research agent: `app/suppliers/`,
-  `components/leaderboard/`, `app/financial/`, `components/financial/`, `app/api/research/`,
-  `lib/market/`. The board ranks the dataset suppliers for a component (risk fingerprint, exact "why"
-  breakdown, alternatives, top-20 matrix). The research agent investigates real seat makers (below).
+- Gustav, seat charts and detail pages: the spider and columns in the seat panel
+  (`components/cabin/weight-spider.tsx`, `supplier-columns.tsx`), the supplier drill-down
+  (`app/suppliers/[id]`, `components/leaderboard/`), the driver page (`app/drivers/`,
+  `components/drivers/`), `lib/suppliers/` and `lib/market/`. The research agent at `/financial` is on
+  hold; company groups are out of scope until v1.1.
 
 `lib/` holds data access, scoring and tool functions: one source of truth that the UI, the chatbot
 and the agents all call. `lib/suppliers/` is the dataset foundation: `criteria.ts` (the 18 criteria
