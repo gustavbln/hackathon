@@ -6,7 +6,8 @@ It uses no third-party model, logos, textures, or manufacturer-specific geometry
 ![Geometry preview in the original light palette](high-speed-train-preview.png)
 
 - Three cars: two streamlined power cars and a central passenger carriage.
-- Warm gray body surfaces, slate contour lines, windows, windscreens, doors, gangways, bogies and wheels.
+- Warm ivory paper surfaces, graphite contour lines, muted windows, windscreens, doors, gangways, bogies and wheels.
+- Unlit materials preserve the paper palette through rotation, with no metallic highlights.
 - X runs along the train, Y is up; the ground is Y = 0 and the train is centred along X and Z.
 - Approximately 35 metres long. Proportions are illustrative, not engineering measurements.
 - Named meshes allow later material overrides. No camera, lighting, track or animation is baked in.

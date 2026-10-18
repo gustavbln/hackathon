@@ -13,9 +13,10 @@ type Point = [number, number, number];
 export function createTrain(palette: TrainPalette) {
   const train = new THREE.Group();
   train.name = "Blueprint high-speed train";
-  const surface = new THREE.MeshStandardMaterial({ color: palette.surface, roughness: 0.85 });
-  const glass = new THREE.MeshStandardMaterial({ color: palette.glass, roughness: 0.65 });
-  const mechanical = new THREE.MeshStandardMaterial({ color: palette.mechanical, roughness: 0.9 });
+  // Unlit materials keep the warm paper colors consistent as the model turns.
+  const surface = new THREE.MeshBasicMaterial({ color: palette.surface });
+  const glass = new THREE.MeshBasicMaterial({ color: palette.glass });
+  const mechanical = new THREE.MeshBasicMaterial({ color: palette.mechanical });
   const ink = new THREE.LineBasicMaterial({ color: palette.line });
   const strokes: number[] = [];
 
@@ -91,13 +92,13 @@ export function createTrain(palette: TrainPalette) {
     mesh(name, geometry, surface, [0, 0, 0]);
 
     // Purposeful longitudinal curves and section ribs, without triangle diagonals.
-    for (let side = 0; side < 16; side++) {
+    for (let side = 0; side < 12; side++) {
       line(Array.from({ length: columns + 1 }, (_, row) =>
-        transform(section(-5.6 + 11.2 * row / columns, side / 16 * Math.PI * 2, cab, 0.012))));
+        transform(section(-5.6 + 11.2 * row / columns, side / 12 * Math.PI * 2, cab, 0.012))));
     }
-    for (let row = 0; row <= 20; row++) {
+    for (let row = 0; row <= 14; row++) {
       line(Array.from({ length: sides + 1 }, (_, side) =>
-        transform(section(-5.6 + 11.2 * row / 20, side / sides * Math.PI * 2, cab, 0.012))));
+        transform(section(-5.6 + 11.2 * row / 14, side / sides * Math.PI * 2, cab, 0.012))));
     }
 
     // Surface-following panels remain flush with the rounded shell.

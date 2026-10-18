@@ -49,10 +49,10 @@
 }
 
 :root {
-  --train-surface: #deddd5;
-  --train-line: #4d626d;
-  --train-glass: #b7c5c9;
-  --train-mechanical: #8d999b;
+  --train-surface: #f6f2e8;
+  --train-line: #81796b;
+  --train-glass: #d8d1c3;
+  --train-mechanical: #b6ad9e;
   --blueprint-paper: #f3f1eb;
   --blueprint-paper-deep: #e9e6df;
   --blueprint-ink: #35434a;
