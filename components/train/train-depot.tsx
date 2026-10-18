@@ -118,16 +118,6 @@ function createDepot(palette: DepotPalette) {
     part(new THREE.CircleGeometry(0.31, 16), "shadow", [43.13, 10.08, z], [0, Math.PI / 2, 0]);
   }
 
-  // A hazy skyline behind a belt of trees fills the horizon below the landing headline.
-  for (let i = 0; i < 16; i++) {
-    const height = 6 + i * 37 % 9 * 2;
-    box([8 + i % 2 * 4, height, 4 + i % 3], [-262 - i % 3 * 7, height / 2 - 0.4, -40 + i * 5], "shutter");
-  }
-  for (let i = 0; i < 70; i++) {
-    const height = 7 + i * 17 % 5 * 1.6;
-    part(new THREE.ConeGeometry(height * 0.3, height, 7), "trees", [-150 - i * 53 % 95, height / 2 - 0.4, -45 + i * 29 % 85]);
-  }
-
   for (let x = -60; x <= 38; x += 14) {
     for (const z of [-12.6, -4, 4, 12.6]) box([0.22, 7.8, 0.22], [x, 3.55, z], "steel");
     box([0.22, 0.3, 25.3], [x, 7.4, 0], "steel");

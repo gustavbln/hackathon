@@ -14,7 +14,6 @@ export type DepotPalette = {
   shadow: string;
   marking: string;
   sky: string;
-  trees: string;
 };
 
 function texture(width: number, height: number, paint: (context: CanvasRenderingContext2D) => void) {
@@ -92,7 +91,7 @@ export function depotMaterials(palette: DepotPalette) {
     roof: new MeshStandardMaterial({ color: palette.roof, roughness: 0.7, metalness: 0.35, side: DoubleSide }), steel: standard(palette.steel, 0.46, 0.65),
     glass: standard(palette.glass, 0.2, 0.4), ground: new MeshStandardMaterial({ map: grit(palette.ground, 1.7), roughness: 1 }),
     ballast: new MeshStandardMaterial({ map: grit(palette.ballast, 4), roughness: 1 }), shutter: standard(palette.shutter, 0.65, 0.32),
-    shadow: standard(palette.shadow), marking: standard(palette.marking), trees: standard(palette.trees, 1), brand: standard(palette.brand),
+    shadow: standard(palette.shadow), marking: standard(palette.marking), brand: standard(palette.brand),
     sign: new MeshBasicMaterial({ map: signMap, transparent: true, depthWrite: false }),
     safety: new MeshStandardMaterial({ map: safetyMap, roughness: 0.8 }),
     light: new MeshStandardMaterial({ color: palette.wall, emissive: palette.wall, emissiveIntensity: 1.1 }),
