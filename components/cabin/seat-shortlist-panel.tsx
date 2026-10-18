@@ -8,7 +8,6 @@ import { AssistantAvatar } from "@/components/chat/assistant-avatar";
 import { useChatFocus } from "@/components/chat/chat-focus";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { SeatFocus } from "@/lib/chat-contract";
 import { seatShortlistSchema, type SeatShortlist, type ShortlistSource } from "@/lib/seat-shortlist-contract";
 
@@ -35,7 +34,7 @@ async function fetchShortlist({ source, instruction }: ShortlistRequest, signal:
 }
 
 export function SeatShortlistPanel({ seatId, onClose }: { seatId: string; onClose: () => void }) {
-  const [request, setRequest] = useState<ShortlistRequest>({ source: "rules", instruction: null });
+  const [request, setRequest] = useState<ShortlistRequest>({ source: "nemotron", instruction: null });
   // A missing entry means "not fetched yet"; ready and failed results stay cached per request.
   const [loads, setLoads] = useState<Record<string, Load>>({});
   const key = requestKey(request);
@@ -97,23 +96,7 @@ export function SeatShortlistPanel({ seatId, onClose }: { seatId: string; onClos
           <p className="blueprint-label mt-0.5">Seat {seatId} / High-speed / Passenger seats</p>
         </div>
         <div className="flex items-center gap-3">
-          <ToggleGroup
-            type="single"
-            value={request.source}
-            onValueChange={(value) => value && setRequest({ source: value as ShortlistSource, instruction: null })}
-            aria-label="Weights"
-            className="gap-4"
-          >
-            {(["rules", "nemotron"] as const).map((option) => (
-              <ToggleGroupItem
-                key={option}
-                value={option}
-                className="h-auto rounded-none bg-transparent px-0 py-1 font-mono text-[10px] tracking-[0.13em] text-[var(--blueprint-muted)] uppercase hover:bg-transparent hover:text-[var(--blueprint-ink)] data-[state=on]:bg-transparent data-[state=on]:text-[var(--blueprint-ink)] data-[state=on]:underline data-[state=on]:underline-offset-[6px]"
-              >
-                {option === "rules" ? "EN standards" : "Nemotron"}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
+          <span className="blueprint-label">Nemotron</span>
           <Button
             variant="ghost"
             size="icon-sm"
@@ -255,11 +238,6 @@ function ShortlistResult({ shortlist }: { shortlist: SeatShortlist }) {
         >
           {showAll ? `Show top ${TOP_CRITERIA}` : `Show all ${shortlist.criteria.length}`}
         </button>
-        {shortlist.source === "rules" && (
-          <p className="mt-5 text-xs leading-relaxed text-[var(--blueprint-muted)]">
-            Dataset weights, raised where EN 45545 and seat production demand it.
-          </p>
-        )}
       </section>
 
       <section aria-labelledby="seat-shortlist-heading" className="min-w-0 p-5 @min-[680px]/shortlist:border-l @min-[680px]/shortlist:border-[var(--blueprint-rule)]">

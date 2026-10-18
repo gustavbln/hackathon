@@ -53,8 +53,8 @@ The chatbot can call this evaluator too: ask "What are the most important criter
 seats?". Its `seatCriteria` response renders as a compact priorities card with importance bars,
 brief reasons, and expandable details for all 18 criteria and all three evaluation scores.
 
-Seat shortlist: `GET /api/seat-shortlist?source=rules` uses the shared seat profile;
-`source=nemotron` uses the averaged AI weights. Both rank the dataset and return up to 20 suppliers
+The cabin seat shortlist uses `GET /api/seat-shortlist?source=nemotron` for averaged AI weights.
+The API also supports `source=rules` for the shared seat profile. Both return up to 20 suppliers
 with their three biggest risk contributions. The typed response is in `lib/seat-shortlist-contract.ts`.
 
 Checks: `docker compose exec web npm run lint`, `npm run typecheck`, `npm test`, `npm run build`
