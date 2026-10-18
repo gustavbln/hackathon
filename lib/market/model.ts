@@ -182,8 +182,19 @@ export const researchReportSchema = z.strictObject({
   assessment: assessmentSchema.nullable(),
 });
 
+/** One line in the list of recorded runs, which double as the labelled cache (spec §6). */
+export const researchRunSummarySchema = z.strictObject({
+  runId: id,
+  supplierName: z.string(),
+  recordedAt: z.iso.datetime(),
+  stopReason: researchRunSchema.shape.stopReason,
+  score: z.number().nullable(),
+});
+
 /** What the research route streams to the UI, one event per Server-Sent Event. */
 export const researchEventSchema = z.discriminatedUnion("type", [
+  /** First event of a replayed recording, so the UI can label it as cache. */
+  z.strictObject({ type: z.literal("cached"), runId: id, recordedAt: z.iso.datetime() }),
   z.strictObject({
     type: z.literal("step"),
     step: z.enum(STEP_IDS),
@@ -217,3 +228,4 @@ export type ResearchInput = z.infer<typeof researchInputSchema>;
 export type ResearchRun = z.infer<typeof researchRunSchema>;
 export type ResearchReport = z.infer<typeof researchReportSchema>;
 export type ResearchEvent = z.infer<typeof researchEventSchema>;
+export type ResearchRunSummary = z.infer<typeof researchRunSummarySchema>;
