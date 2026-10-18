@@ -13,22 +13,44 @@ Before each task, ask which of these it moves. None? Skip it.
 
 ## Hand-in
 
-- The repo. The README says what it does and how to run it.
-- A 2-minute video. Build toward that story: what isn't in the video barely counts.
-- Deadline: TBD
+1. Repo access with all code and data. The README says what it does and how to run it.
+2. A 2-minute screen recording. Build toward that story: what isn't in the video barely counts.
+3. A live deployed app link, plus login credentials for the jury. Hosting: TBD.
+
+Deadline: TBD
 
 ## Project
 
-- Idea: TBD
+- Idea: the Siemens brief below. Our own twist: TBD
 - Stack: Next.js 16 (App Router, TypeScript), Tailwind v4, shadcn/ui (Radix, nova preset)
 - Run: `cp .env.example .env`, fill in the keys, `docker compose up` → http://localhost:3000
 
 Fill in the idea and the deadline as soon as they're decided. Keep this file short.
 
-## Siemens track: supplier risk
+## Siemens track: Smart Supplier Selection for Trains
 
-- Challenge brief: TBD (paste the official wording)
-- Data: `data/supplier_risk_dataset.csv`, 10,000 anonymized suppliers, 46 columns. Column meanings:
+A train has tens of thousands of parts. Rail buyers pick each supplier from hundreds of options:
+on time, top quality, low risk. We build the tool that turns supplier risk data into a decision.
+
+Demo story: a buyer sourcing a critical component narrows the field, compares up to 20 suppliers
+side by side and justifies the final choice.
+
+What the brief asks for:
+
+1. UI: filter, rank and compare up to 20 suppliers at once. Beyond tables: risk profiles,
+   side-by-side views, *why* a supplier is risky.
+2. Chatbot grounded in the data, e.g. "Which of SUPP_00012, SUPP_00450 and SUPP_00731 has the
+   lowest financial risk?" or "Why is the Total Risk Index of SUPP_00018 so high?" Grounded means
+   the numbers come from the dataset through tool calls, never from the model's memory.
+3. Research agent: the buyer names a *real* company. The agent plans its research, crawls news,
+   public sources and company sites, digs deeper on red flags, and delivers a risk report with
+   source links. Search/crawl API: TBD.
+4. Surprise us (our wow points), e.g. multi-agent workflows, generated UIs for chat answers,
+   auto-generated shortlist memos.
+
+Data:
+
+- `data/supplier_risk_dataset.csv`, 10,000 anonymized suppliers, 46 columns. Column meanings:
   `data/risk_criteria_description.md`. Not in git while the repo is public: copy both files from
   the hackathon materials into `data/`.
 - 19 risk scores from 0 (no risk) to 100 (max risk), each with a `_Level` column
