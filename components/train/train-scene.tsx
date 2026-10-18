@@ -81,17 +81,18 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
     <figure
       ref={figure}
       className={`blueprint-scene relative my-5 ${cabinHref ? "h-[190svh] shrink-0" : "min-h-[680px] flex-1 sm:min-h-[620px]"}`}
-      aria-label="Explore the high-speed train. Scroll down to zoom into its passenger cabin."
+      aria-label="Face the high-speed train. Scroll straight through the windshield into the passenger cabin."
     >
       <div className={`${cabinHref ? "sticky top-0 h-svh" : "absolute inset-0 min-h-[620px]"} overflow-hidden`}
         style={cabinHref ? { height: `calc(100svh - ${topInset}px)` } : undefined}>
         {cabinHref && <Link href={cabinHref} prefetch={true} className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-30 focus:bg-[var(--blueprint-paper)] focus:p-3">Enter cabin</Link>}
         {children && <div className="relative z-10 px-2 pt-6 sm:pt-8" style={{ opacity: Math.max(0, 1 - progress * 4) }}>{children}</div>}
         {/* A fixed-size canvas: resizing it while scrolling re-renders WebGL every frame. The camera does the zoom. */}
-        <div className={`${onCabinSelect ? "" : "pointer-events-none "}absolute inset-x-0 top-0 h-svh`} aria-hidden="true">
+        <div className={`${onCabinSelect ? "" : "pointer-events-none "}absolute inset-x-0 top-0 h-svh`}
+          style={cabinHref ? { top: -topInset } : undefined} aria-hidden="true">
           <SceneBoundary><TrainCanvas onCabinSelect={onCabinSelect} progress={progress} /></SceneBoundary>
         </div>
-        <div className="absolute inset-0" style={{ opacity: Math.max(0, 1 - progress * 3), pointerEvents: "none" }}><TrainCapabilities /></div>
+        <div className="absolute inset-0 hidden sm:block" style={{ opacity: Math.max(0, 1 - progress * 3), pointerEvents: "none" }}><TrainCapabilities /></div>
         {cabinHref && <div className="pointer-events-none absolute inset-x-0 bottom-12 flex flex-col items-center gap-2" aria-hidden="true">
           <span className="blueprint-label">Scroll to enter the cabin</span>
           <ArrowDown className="size-4 text-[var(--blueprint-muted)]" strokeWidth={1.25} />
@@ -100,7 +101,7 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
         {cabinHref && <div className="pointer-events-none absolute inset-0 z-20 bg-[var(--blueprint-paper)]" aria-hidden="true"
           style={{ opacity: Math.min(0.8, Math.max(0, (progress - 0.85) / 0.13)) }} />}
         <figcaption className="blueprint-label absolute bottom-3 left-0">HS—03 / General arrangement</figcaption>
-        <span className="blueprint-label absolute right-0 bottom-3 hidden sm:block" aria-hidden="true">{progress > 0.35 ? "Passenger carriage" : "Axonometric view"}</span>
+        <span className="blueprint-label absolute right-0 bottom-3 hidden sm:block" aria-hidden="true">{progress > 0.35 ? "Through the windshield" : "Front view"}</span>
       </div>
     </figure>
   );

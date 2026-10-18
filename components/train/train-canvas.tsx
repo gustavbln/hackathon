@@ -1,9 +1,9 @@
 "use client";
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrthographicCamera } from "@react-three/drei";
+import { PerspectiveCamera } from "@react-three/drei";
 import { Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { MathUtils, Mesh, Vector3, type OrthographicCamera as Camera } from "three";
+import { MathUtils, type PerspectiveCamera as Camera } from "three";
 import { TrainModel } from "./train-model";
 import { TrainFallback } from "./train-fallback";
 import { CabinTarget } from "@/components/cabin/cabin-target";
@@ -11,7 +11,8 @@ import { CabinTarget } from "@/components/cabin/cabin-target";
 /** Scroll progress eased at both ends, so the fly-in starts and lands softly. */
 const ease = (progress: number) => progress * progress * (3 - 2 * progress);
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
-const OVERVIEW_POSITION: [number, number, number] = [22, 34, 30];
+const FRONT_POSITION: [number, number, number] = [16, 4.7, 0];
+const WINDSHIELD: [number, number, number] = [9, 3.45, 0];
 
 function subscribeMotion(callback: () => void) {
   const query = window.matchMedia(REDUCED_MOTION);
@@ -23,82 +24,42 @@ function getReducedMotion() {
   return window.matchMedia(REDUCED_MOTION).matches;
 }
 
-function TrainArrangement({ reducedMotion, onReady, onCabinSelect, progress }: { reducedMotion: boolean; onReady: () => void; onCabinSelect?: () => void; progress: number }) {
+function TrainArrangement({ onReady, onCabinSelect }: { onReady: () => void; onCabinSelect?: () => void }) {
   useEffect(onReady, [onReady]);
-  const advance = reducedMotion ? 0 : 6 * ease(progress);
 
   return (
-    <group rotation={[0, -0.2, 0]}>
-      <group position={[advance, 0, 0]}>
-        {onCabinSelect ? <CabinTarget onSelect={onCabinSelect}><TrainModel /></CabinTarget> : <TrainModel />}
-      </group>
+    <group>
+      {onCabinSelect ? <CabinTarget onSelect={onCabinSelect}><TrainModel /></CabinTarget> : <TrainModel />}
     </group>
   );
 }
 
 function SceneCamera({ progress, reducedMotion }: { progress: number; reducedMotion: boolean }) {
   const camera = useRef<Camera>(null);
-  const windowMesh = useRef<Mesh | null>(null);
-  const windowCenter = useRef(new Vector3());
-  const destination = useRef(new Vector3());
   const { width, height } = useThree((state) => state.size);
-  // Leave room around the overview, then keep the window close-up modest.
-  const zoom = Math.min(width / 28, height / 18) * 0.7;
+  const lens = width < 640 ? 30 : 38;
+  const fov = MathUtils.radToDeg(2 * Math.atan(Math.tan(MathUtils.degToRad(lens) / 2) * Math.max(1, height / width)));
   useFrame((state, delta) => {
     if (!camera.current) return;
-    const travel = reducedMotion ? 0 : ease(MathUtils.clamp((progress - 0.15) / 0.85, 0, 1));
-    const smooth = reducedMotion ? 1 : 1 - Math.exp(-8 * Math.min(delta, 0.1));
-    if (!windowMesh.current) {
-      const carriage = state.scene.getObjectByName("Passenger_carriage") ?? state.scene.getObjectByName("Passenger carriage");
-      if (carriage instanceof Mesh) {
-        carriage.geometry.computeBoundingBox();
-        const centerX = carriage.geometry.boundingBox?.getCenter(windowCenter.current).x ?? 0;
-        let nearest = Infinity;
-        state.scene.traverse((object) => {
-          if (!(object instanceof Mesh) || !object.name.replaceAll("_", " ").startsWith("Passenger carriage passenger window")) return;
-          object.geometry.computeBoundingBox();
-          const center = object.geometry.boundingBox?.getCenter(windowCenter.current);
-          if (center && center.z > 0 && Math.abs(center.x - centerX) < nearest) {
-            nearest = Math.abs(center.x - centerX);
-            windowMesh.current = object;
-          }
-        });
-      }
-    }
-    const window = windowMesh.current;
-    if (window) {
-      window.geometry.boundingBox?.getCenter(windowCenter.current);
-      window.updateWorldMatrix(true, false);
-      window.localToWorld(windowCenter.current);
-    }
-    const { x, y, z } = windowCenter.current;
-    destination.current.set(
-      OVERVIEW_POSITION[0] + x * travel,
-      OVERVIEW_POSITION[1] + (y - 1.8) * travel,
-      OVERVIEW_POSITION[2] + z * travel,
-    );
-    camera.current.position.lerp(destination.current, smooth);
-    const targetZoom = zoom * Math.pow(4, travel);
-    camera.current.zoom = MathUtils.lerp(camera.current.zoom, targetZoom, smooth);
-    // Keep the viewing angle fixed: the train approaches along its track instead of orbiting.
-    camera.current.lookAt(
-      camera.current.position.x - OVERVIEW_POSITION[0],
-      camera.current.position.y - OVERVIEW_POSITION[1] + 1.8,
-      camera.current.position.z - OVERVIEW_POSITION[2],
-    );
-    camera.current.updateProjectionMatrix();
-    if (camera.current.position.distanceToSquared(destination.current) > 0.000001 || Math.abs(camera.current.zoom - targetZoom) > 0.001) state.invalidate();
+    const travel = reducedMotion ? 0 : ease(progress);
+    const target = MathUtils.lerp(FRONT_POSITION[0], 11.5, travel);
+    camera.current.position.x = MathUtils.damp(camera.current.position.x, target, 10, Math.min(delta, 0.1));
+    // A straight approach preserves the pitch while the roof recedes behind the broad windshield.
+    camera.current.position.y = WINDSHIELD[1] + (camera.current.position.x - WINDSHIELD[0])
+      * (FRONT_POSITION[1] - WINDSHIELD[1]) / (FRONT_POSITION[0] - WINDSHIELD[0]);
+    camera.current.lookAt(...WINDSHIELD);
+    if (Math.abs(camera.current.position.x - target) > 0.001) state.invalidate();
   });
   return (
-    <OrthographicCamera
+    <PerspectiveCamera
       makeDefault
       ref={camera}
-      position={OVERVIEW_POSITION}
-      near={0.1}
+      position={FRONT_POSITION}
+      near={0.05}
       far={200}
-      zoom={zoom}
+      fov={fov}
       onUpdate={(camera) => {
-        camera.lookAt(0, 1.8, 0);
+        camera.lookAt(...WINDSHIELD);
         camera.updateProjectionMatrix();
       }}
     />
@@ -113,7 +74,6 @@ export default function TrainCanvas({ onCabinSelect, progress = 0 }: { onCabinSe
   return (
     <>
       <Canvas
-        orthographic
         dpr={[1, 1.5]}
         frameloop="demand"
         gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
@@ -126,7 +86,7 @@ export default function TrainCanvas({ onCabinSelect, progress = 0 }: { onCabinSe
         <ambientLight intensity={1.8} />
         <directionalLight position={[12, 25, 18]} intensity={2} />
         <Suspense fallback={null}>
-          <TrainArrangement reducedMotion={reducedMotion} onReady={handleReady} onCabinSelect={onCabinSelect} progress={progress} />
+          <TrainArrangement onReady={handleReady} onCabinSelect={onCabinSelect} />
         </Suspense>
       </Canvas>
     </>
