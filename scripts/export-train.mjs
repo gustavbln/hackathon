@@ -21,6 +21,8 @@ function token(name) {
 const train = createTrain({
   surface: token("surface"), line: token("line"),
   glass: token("glass"), mechanical: token("mechanical"),
+}, {
+  body: token("exterior"), stripe: token("livery"), glass: token("windshield"), headlight: token("headlight"),
 });
 try {
   const glb = await new GLTFExporter().parseAsync(train, { binary: true });

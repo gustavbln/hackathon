@@ -2,7 +2,7 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { PerspectiveCamera } from "@react-three/drei";
-import { Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { memo, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { MathUtils, type PerspectiveCamera as Camera } from "three";
 import { TrainModel } from "./train-model";
 import { TrainFallback } from "./train-fallback";
@@ -11,7 +11,7 @@ import { CabinTarget } from "@/components/cabin/cabin-target";
 /** Scroll progress eased at both ends, so the fly-in starts and lands softly. */
 const ease = (progress: number) => progress * progress * (3 - 2 * progress);
 const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
-const FRONT_POSITION: [number, number, number] = [16, 4.7, 0];
+const FRONT_POSITION: [number, number, number] = [19, 5.25, 0];
 const WINDSHIELD: [number, number, number] = [9, 3.45, 0];
 
 function subscribeMotion(callback: () => void) {
@@ -24,21 +24,32 @@ function getReducedMotion() {
   return window.matchMedia(REDUCED_MOTION).matches;
 }
 
-function TrainArrangement({ onReady, onCabinSelect }: { onReady: () => void; onCabinSelect?: () => void }) {
+const TrainArrangement = memo(function TrainArrangement({ onReady, onCabinSelect }: { onReady: () => void; onCabinSelect?: () => void }) {
   useEffect(onReady, [onReady]);
+  const [rail] = useState(() => getComputedStyle(document.documentElement).getPropertyValue("--train-rail").trim());
 
   return (
     <group>
+      {[-1.02, 1.02].map((z) => <mesh key={z} position={[-5, -0.03, z]}>
+        <boxGeometry args={[64, 0.07, 0.08]} />
+        <meshStandardMaterial color={rail} metalness={0.7} roughness={0.4} />
+      </mesh>)}
+      {Array.from({ length: 35 }, (_, index) => <mesh key={index} position={[-24 + index * 1.4, -0.1, 0]}>
+        <boxGeometry args={[0.18, 0.08, 2.7]} />
+        <meshStandardMaterial color={rail} roughness={0.9} />
+      </mesh>)}
       {onCabinSelect ? <CabinTarget onSelect={onCabinSelect}><TrainModel /></CabinTarget> : <TrainModel />}
     </group>
   );
-}
+});
 
 function SceneCamera({ progress, reducedMotion }: { progress: number; reducedMotion: boolean }) {
   const camera = useRef<Camera>(null);
   const { width, height } = useThree((state) => state.size);
+  const invalidate = useThree((state) => state.invalidate);
   const lens = width < 640 ? 30 : 38;
   const fov = MathUtils.radToDeg(2 * Math.atan(Math.tan(MathUtils.degToRad(lens) / 2) * Math.max(1, height / width)));
+  useEffect(() => { invalidate(); }, [progress, reducedMotion, fov, invalidate]);
   useFrame((state, delta) => {
     if (!camera.current) return;
     const travel = reducedMotion ? 0 : ease(progress);

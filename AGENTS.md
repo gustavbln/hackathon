@@ -212,6 +212,7 @@ Each person connects the Mobbin MCP in their own agent. It does not go into this
 ## 3D train (Yogos)
 
 - Landing asset: original procedural high-speed train in `public/models/high-speed-train.glb`.
+  ICE-inspired exterior and lights use `--train-exterior`, `--train-livery`, `--train-windshield`, `--train-headlight` and `--train-rail` theme tokens.
   Source: `components/train/create-train.ts`; regenerate with
   `docker compose exec web node --experimental-strip-types scripts/export-train.mjs`.
   Blueprint colors live in `app/globals.css` (`--train-*`) and are baked into the export.

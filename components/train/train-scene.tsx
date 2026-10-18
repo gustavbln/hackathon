@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowDown } from "lucide-react";
-import { Component, useEffect, useRef, useState, type ReactNode } from "react";
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { preload } from "react-dom";
 import { TrainFallback } from "./train-fallback";
 import { TRAIN_MODEL_URL } from "./train-asset";
@@ -31,7 +31,8 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
   const figure = useRef<HTMLElement>(null);
   const [progress, setProgress] = useState(0);
   const [topInset, setTopInset] = useState(128);
-  const onCabinSelect = cabinHref ? () => router.push(cabinHref) : undefined;
+  const enterCabin = useCallback(() => { if (cabinHref) router.push(cabinHref); }, [cabinHref, router]);
+  const onCabinSelect = cabinHref ? enterCabin : undefined;
 
   useEffect(() => {
     if (!cabinHref) return;
@@ -41,10 +42,8 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
     let armed = false;
     let frame = 0;
     let entry: ReturnType<typeof setTimeout> | undefined;
-    const arm = () => { armed = true; };
-    const key = (event: KeyboardEvent) => {
-      if (["ArrowDown", "PageDown", "End", " "].includes(event.key)) arm();
-    };
+    let touchY = 0;
+    const cancelEntry = () => { armed = false; clearTimeout(entry); entry = undefined; };
     const update = () => {
       frame = 0;
       if (!figure.current) return;
@@ -60,10 +59,23 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
       }
     };
     const scroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    const forward = () => { armed = true; scroll(); };
+    const wheel = (event: WheelEvent) => { if (event.deltaY > 0) forward(); else if (event.deltaY < 0) cancelEntry(); };
+    const touchStart = (event: TouchEvent) => { touchY = event.touches[0]?.clientY ?? 0; cancelEntry(); };
+    const touchMove = (event: TouchEvent) => {
+      const nextY = event.touches[0]?.clientY ?? touchY;
+      if (nextY < touchY) forward(); else if (nextY > touchY) cancelEntry();
+      touchY = nextY;
+    };
+    const key = (event: KeyboardEvent) => {
+      if (["ArrowDown", "PageDown", "End"].includes(event.key) || (event.key === " " && !event.shiftKey)) forward();
+      if (["ArrowUp", "PageUp", "Home"].includes(event.key) || (event.key === " " && event.shiftKey)) cancelEntry();
+    };
     window.addEventListener("scroll", scroll, { passive: true });
     window.addEventListener("resize", scroll);
-    window.addEventListener("wheel", arm, { passive: true });
-    window.addEventListener("touchstart", arm, { passive: true });
+    window.addEventListener("wheel", wheel, { passive: true });
+    window.addEventListener("touchstart", touchStart, { passive: true });
+    window.addEventListener("touchmove", touchMove, { passive: true });
     window.addEventListener("keydown", key);
     update();
     return () => {
@@ -71,8 +83,9 @@ export function TrainScene({ children, cabinHref }: { children?: ReactNode; cabi
       clearTimeout(entry);
       window.removeEventListener("scroll", scroll);
       window.removeEventListener("resize", scroll);
-      window.removeEventListener("wheel", arm);
-      window.removeEventListener("touchstart", arm);
+      window.removeEventListener("wheel", wheel);
+      window.removeEventListener("touchstart", touchStart);
+      window.removeEventListener("touchmove", touchMove);
       window.removeEventListener("keydown", key);
     };
   }, [cabinHref, router]);
