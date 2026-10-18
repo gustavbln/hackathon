@@ -7,10 +7,14 @@ import { Button } from "@/components/ui/button";
 import { CabinScene } from "./cabin-scene";
 import { TRAIN_MODEL_URL } from "./train-asset";
 
+const ENTRY_DURATION_MS = 1500;
+
 export function TrainScene({ children }: { children?: ReactNode }) {
   preload(TRAIN_MODEL_URL, { as: "fetch", crossOrigin: "anonymous" });
   const figure = useRef<HTMLElement>(null);
   const armed = useRef(false);
+  const entryFrame = useRef(0);
+  const entrySettleMs = useRef(900);
   const [progress, setProgress] = useState(0);
   const [entered, setEntered] = useState(false);
   const [topInset, setTopInset] = useState(180);
@@ -20,11 +24,16 @@ export function TrainScene({ children }: { children?: ReactNode }) {
     let frame = 0;
     let entry: ReturnType<typeof setTimeout> | undefined;
     const arm = () => {
+      cancelAnimationFrame(entryFrame.current);
+      entryFrame.current = 0;
+      entrySettleMs.current = 900;
+      clearTimeout(entry);
+      entry = undefined;
       armed.current = true;
       if (!frame) frame = requestAnimationFrame(update);
     };
     const key = (event: KeyboardEvent) => {
-      if (["ArrowDown", "PageDown", "End", " "].includes(event.key)) arm();
+      if (["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " ", "Escape"].includes(event.key)) arm();
     };
     const update = () => {
       frame = 0;
@@ -36,7 +45,7 @@ export function TrainScene({ children }: { children?: ReactNode }) {
       setProgress(next);
       if (next < 0.995) { clearTimeout(entry); entry = undefined; }
       if (next >= 0.995 && armed.current && entry === undefined) {
-        entry = setTimeout(() => setEntered(true), 900);
+        entry = setTimeout(() => setEntered(true), entrySettleMs.current);
       }
     };
     const scroll = () => { if (!frame) frame = requestAnimationFrame(update); };
@@ -48,6 +57,8 @@ export function TrainScene({ children }: { children?: ReactNode }) {
     update();
     return () => {
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(entryFrame.current);
+      entryFrame.current = 0;
       clearTimeout(entry);
       window.removeEventListener("scroll", scroll);
       window.removeEventListener("resize", scroll);
@@ -66,13 +77,31 @@ export function TrainScene({ children }: { children?: ReactNode }) {
 
   const enter = () => {
     if (!figure.current) return;
+    cancelAnimationFrame(entryFrame.current);
     armed.current = true;
-    window.scrollTo({
-      top: window.scrollY + figure.current.getBoundingClientRect().top + figure.current.offsetHeight - window.innerHeight,
-      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
-    });
+    const start = window.scrollY;
+    const destination = start + figure.current.getBoundingClientRect().top + figure.current.offsetHeight - window.innerHeight;
+    entrySettleMs.current = 250;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      entryFrame.current = 0;
+      window.scrollTo({ top: destination, behavior: "instant" });
+      setProgress(1);
+      return;
+    }
+
+    const startedAt = performance.now();
+    const animate = (now: number) => {
+      const time = Math.min(1, (now - startedAt) / ENTRY_DURATION_MS);
+      const eased = time * time * (3 - 2 * time);
+      // Native smooth scrolling chooses its own duration, so drive the existing journey explicitly.
+      window.scrollTo({ top: start + (destination - start) * eased, behavior: "instant" });
+      entryFrame.current = time < 1 ? requestAnimationFrame(animate) : 0;
+    };
+    entryFrame.current = requestAnimationFrame(animate);
   };
   const back = () => {
+    cancelAnimationFrame(entryFrame.current);
+    entryFrame.current = 0;
     armed.current = false;
     setEntered(false);
     setProgress(0);
