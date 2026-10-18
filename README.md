@@ -7,14 +7,17 @@ If another checkout already uses port 3000, run
 `docker compose -f compose.yaml -f compose.preview.yaml up --build -d` and open http://localhost:3001.
 This preview has separate dependency and Next.js cache volumes so the checkouts cannot overwrite each other's installs.
 
-From the landing scene, choose **Enter cabin** to open `/cabin`: a blueprint interior with
-16 clickable seats, overhead luggage racks and ICE-inspired seat detailing. Drag to look around
+Scroll down on the landing page to zoom toward the passenger carriage and enter `/cabin`.
+Scrolling back reverses the zoom; a keyboard entry link appears on focus. The cabin has
+40 clickable seats, upholstered cushions, overhead luggage racks, reading lights and transparent
+windows overlooking a stylised countryside. Drag to look around and outside
 from a fixed position; scroll, pinch or use the zoom buttons to zoom. Reset view returns to the aisle.
 With the panorama focused, arrow keys look around and +/- zoom. Click/tap a seat or use the
 keyboard-accessible seat selector to highlight it.
 The interior is a stylised original, informed by [DB’s ICE 4 overview](https://www.bahn.de/service/ueber-uns/zugtypen/ice-4), not an exact vehicle replica.
-Selecting a seat opens its top-20 supplier shortlist. Switch between the shared seat profile and
-three averaged Nemotron evaluations. Windows, the door and flooring open clearly labelled previews.
+Selecting a seat lifts the original chair into the left preview as the cabin fades and its
+top-20 shortlist slides in. One canvas stays mounted through selection and return.
+The priorities use three averaged Nemotron evaluations. Windows, the door and flooring open clearly labelled previews.
 The selected seat floats and rotates on the left while sourcing criteria and suppliers take the
 main panel on the right. Click the model or use Enter to pause rotation; reduced-motion preferences are respected.
 The selected view has one **Back to cabin** action in the page header, with no seat dropdown or extra rotation toolbar.

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type Dispatch, type SetStateAction, type RefObject } from "react";
 import { useThree } from "@react-three/fiber";
-import { MathUtils, PerspectiveCamera } from "three";
+import { MathUtils } from "three";
 
 export type CabinView = {
   zoom: number;
@@ -12,17 +12,9 @@ export type CabinView = {
 
 export const clampZoom = (zoom: number) => MathUtils.clamp(zoom, 0.85, 2.2);
 
-export function CabinControls({ zoom, setZoom, resetView, dragged }: CabinView & { dragged: RefObject<boolean> }) {
-  const { camera, gl, invalidate, size, get } = useThree();
+export function CabinControls({ setZoom, resetView, dragged, enabled = true }: CabinView & { dragged: RefObject<boolean>; enabled?: boolean }) {
+  const { camera, gl, invalidate, size } = useThree();
   const angles = useRef({ yaw: 0, pitch: -0.04 });
-
-  useEffect(() => {
-    const perspective = get().camera;
-    if (!(perspective instanceof PerspectiveCamera)) return;
-    perspective.fov = MathUtils.clamp((size.width < size.height ? 80 : 62) / zoom, 28, 90);
-    perspective.updateProjectionMatrix();
-    invalidate();
-  }, [get, size.width, size.height, zoom, invalidate]);
 
   useEffect(() => {
     angles.current = { yaw: 0, pitch: -0.04 };
@@ -31,6 +23,7 @@ export function CabinControls({ zoom, setZoom, resetView, dragged }: CabinView &
   }, [camera, resetView, invalidate]);
 
   useEffect(() => {
+    if (!enabled) return;
     const canvas = gl.domElement;
     const pointers = new Map<number, { x: number; y: number }>();
     let origin = { x: 0, y: 0 };
@@ -102,8 +95,9 @@ export function CabinControls({ zoom, setZoom, resetView, dragged }: CabinView &
       canvas.removeEventListener("lostpointercapture", up);
       canvas.removeEventListener("wheel", wheel);
       canvas.removeEventListener("keydown", key);
+      canvas.removeAttribute("tabindex");
     };
-  }, [camera, gl, invalidate, setZoom, dragged, size.height]);
+  }, [camera, gl, invalidate, setZoom, dragged, size.height, enabled]);
 
   return null;
 }
