@@ -8,10 +8,15 @@ export const assistantMessageSchema = z.object({ role: z.literal("assistant"), c
 export type AssistantMessage = z.infer<typeof assistantMessageSchema>;
 export type ModelMessage = { role: "system" | "user" | "assistant" | "tool"; content: string | null; tool_call_id?: string; tool_calls?: AssistantMessage["tool_calls"] };
 export type ModelTool = { type: "function"; function: { name: string; description: string; parameters: Record<string, unknown> } };
-const responseSchema = z.object({ model: z.string(), choices: z.array(z.object({ message: assistantMessageSchema, finish_reason: z.string().nullable() })).min(1).max(1) });
+const usageSchema = z.object({ prompt_tokens: z.number(), completion_tokens: z.number(), completion_tokens_details: z.object({ reasoning_tokens: z.number().nullish() }).nullish() });
+export type NemotronUsage = z.infer<typeof usageSchema>;
+const responseSchema = z.object({ model: z.string(), choices: z.array(z.object({ message: assistantMessageSchema, finish_reason: z.string().nullable() })).min(1).max(1), usage: usageSchema.optional() });
 const envSchema = z.object({ NEBIUS_API_KEY: z.string().trim().min(1), NEBIUS_MODEL: z.string().trim().min(1).default("nvidia/Nemotron-3-Ultra-550b-a55b") });
 
-export async function completeNemotron(messages: ModelMessage[], tools: ModelTool[], signal: AbortSignal, outputSchema?: Record<string, unknown>) {
+/** Per-call choices for pipelines that use several Nemotron models; defaults keep the chat's behaviour. */
+export type NemotronOptions = { model?: string; thinking?: boolean; mediumEffort?: boolean; maxTokens?: number };
+
+export async function completeNemotron(messages: ModelMessage[], tools: ModelTool[], signal: AbortSignal, outputSchema?: Record<string, unknown>, options: NemotronOptions = {}) {
   signal.throwIfAborted();
   const config = envSchema.safeParse(process.env);
   if (!config.success) throw new ChatError("ai_not_configured", "Set NEBIUS_API_KEY in the server environment.", 503);
@@ -22,9 +27,10 @@ export async function completeNemotron(messages: ModelMessage[], tools: ModelToo
       response = await fetch("https://api.tokenfactory.nebius.com/v1/chat/completions", {
         method: "POST", signal, cache: "no-store",
         headers: { Authorization: `Bearer ${config.data.NEBIUS_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: config.data.NEBIUS_MODEL, messages, ...(tools.length ? { tools, tool_choice: "auto" } : {}),
+        body: JSON.stringify({ model: options.model ?? config.data.NEBIUS_MODEL, messages, ...(tools.length ? { tools, tool_choice: "auto" } : {}),
           ...(outputSchema ? { response_format: { type: "json_schema", json_schema: { name: "response", strict: true, schema: outputSchema } } } : {}), temperature: 0.1,
-          max_tokens: 4_096, stream: false, chat_template_kwargs: { enable_thinking: false } }),
+          max_tokens: options.maxTokens ?? 4_096, stream: false,
+          chat_template_kwargs: { enable_thinking: options.thinking ?? false, ...(options.mediumEffort ? { medium_effort: true } : {}) } }),
       });
     } catch {
       signal.throwIfAborted();
@@ -44,7 +50,7 @@ export async function completeNemotron(messages: ModelMessage[], tools: ModelToo
     if (!parsed.success) throw new ChatError("invalid_provider_response", "Nemotron returned an invalid response. Please retry.");
     const choice = parsed.data.choices[0];
     if (!choice || choice.finish_reason === "length") throw new ChatError("incomplete_answer", "Nemotron could not finish its answer. Try a narrower question.");
-    return { message: choice.message, model: parsed.data.model };
+    return { message: choice.message, model: parsed.data.model, usage: parsed.data.usage ?? null };
   }
   throw new ChatError("provider_unavailable", "Nemotron could not be reached. Please retry.");
 }
