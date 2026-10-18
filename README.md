@@ -3,6 +3,10 @@
 `cp .env.example .env`, add your Nebius key and Nemotron model ID, `docker compose up`, then open http://localhost:3000.
 Team rules: [AGENTS.md](AGENTS.md).
 
+From the landing scene, choose **Enter cabin** to open `/cabin`: a blueprint interior with
+16 clickable seats. Click/tap a seat or use the keyboard-accessible seat selector to highlight it.
+This first iteration provides selection feedback only; it does not trigger supplier or AI requests.
+
 The chat backend uses NVIDIA Nemotron through Nebius. Copy the private hackathon files into
 `data/supplier_risk_dataset.csv` and `data/risk_criteria_description.md` (gitignored).
 It filters all 10,000 suppliers, ranks or compares up to 20, and explains weighted risk contributions.

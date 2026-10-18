@@ -1,6 +1,9 @@
 import { ChatDock } from "@/components/chat/chat-dock";
 import type { Metadata } from "next";
 import { TrainScene } from "@/components/train/train-scene";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Financial Risk Assessment | ComplyDo Solutions",
@@ -22,6 +25,9 @@ export default function Home() {
           <p className="text-lg font-medium tracking-tight sm:text-2xl">
             Know your suppliers. Keep production moving.
           </p>
+          <Button asChild variant="outline" className="mt-5 border-[var(--blueprint-rule)] bg-[var(--blueprint-paper-deep)] text-[var(--blueprint-ink)] hover:bg-[var(--train-surface)] hover:text-[var(--blueprint-ink)]">
+            <Link href="/cabin">Enter cabin <ArrowRight aria-hidden="true" /></Link>
+          </Button>
         </div>
       </TrainScene>
 
