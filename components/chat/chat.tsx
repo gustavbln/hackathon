@@ -14,10 +14,12 @@ import {
 } from "@/components/ui/message-scroller"
 import { Textarea } from "@/components/ui/textarea"
 import { Trace, TraceLine, TraceTitle } from "@/components/ui/trace"
+import type { ChatStep } from "@/lib/chat-contract"
 
 import { AssistantAvatar, assistantName } from "./assistant-avatar"
 import { useChatFocus } from "./chat-focus"
 import { ChatMessage } from "./chat-message"
+import { StepLines } from "./chat-trace"
 import { SeatBriefing } from "./seat-briefing"
 import type { ChatMessage as ChatMessageData, ChatStatus } from "./types"
 
@@ -25,9 +27,11 @@ type ChatThreadProps = {
   messages: ChatMessageData[]
   status: ChatStatus
   error: string | null
+  /** The pending answer's steps so far. */
+  liveSteps: ChatStep[]
 }
 
-export function ChatThread({ messages, status, error }: ChatThreadProps) {
+export function ChatThread({ messages, status, error, liveSteps }: ChatThreadProps) {
   const { page } = useChatFocus()
   if (messages.length === 0 && page?.page === "seat") return <SeatBriefing focus={page} />
   if (messages.length === 0) {
@@ -60,11 +64,12 @@ export function ChatThread({ messages, status, error }: ChatThreadProps) {
               </MessageScrollerItem>
             ))}
             {status === "pending" && (
-              <Trace>
+              <Trace className="gap-1.5" aria-live="polite">
                 <TraceLine status="running" className="text-[var(--blueprint-muted)]">
                   <AssistantAvatar thinking className="size-5" />
                   <TraceTitle>{assistantName} is preparing your answer…</TraceTitle>
                 </TraceLine>
+                <StepLines steps={liveSteps} />
               </Trace>
             )}
             {status === "error" && error && (

@@ -148,6 +148,38 @@ export const chatResponseSchema = z.object({
 });
 export type ChatResponse = z.infer<typeof chatResponseSchema>;
 
+/** One Nemotron call, priced from the usage Nebius reported. */
+export const modelCallSchema = z.object({
+  model: z.string(),
+  promptTokens: z.number().int().min(0),
+  completionTokens: z.number().int().min(0),
+  reasoningTokens: z.number().int().min(0),
+  costUsd: z.number().min(0),
+});
+export type ModelCall = z.infer<typeof modelCallSchema>;
+
+/** One line of the live trace. It arrives as "running", then again under the same id as "done" or "error". */
+export const chatStepSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+  /** Where the step gets its facts; model steps name their models through `calls`. */
+  source: z.enum(["dataset", "tavily", "nemotron"]),
+  status: z.enum(["running", "done", "error"]),
+  ms: z.number().int().min(0).nullable(),
+  calls: z.array(modelCallSchema),
+  /** Tavily credits spent; cached searches cost none. */
+  credits: z.number().int().min(0),
+});
+export type ChatStep = z.infer<typeof chatStepSchema>;
+
+/** What `POST /api/chat` streams, one Server-Sent Event each: steps, then the whole validated answer or an error. */
+export const chatEventSchema = z.discriminatedUnion("type", [
+  z.object({ type: z.literal("step"), step: chatStepSchema }),
+  z.object({ type: z.literal("done"), response: chatResponseSchema }),
+  z.object({ type: z.literal("error"), error: z.object({ code: z.string(), message: z.string() }) }),
+]);
+export type ChatEvent = z.infer<typeof chatEventSchema>;
+
 export class ChatError extends Error {
   code: string;
   status: number;

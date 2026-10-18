@@ -1,6 +1,5 @@
 import "server-only";
 import { CRITERIA, CRITERION_BY_KEY, riskLevel, type CriterionKey, type Weights } from "./suppliers/criteria.ts";
-import { buildShortlist } from "./seat-shortlist.ts";
 import { loadDatasetSuppliers } from "./suppliers/dataset.ts";
 import { buildProfile } from "./suppliers/profiles.ts";
 import { contributions, findAlternatives, rankSuppliers, type RankedSupplier } from "./suppliers/scoring.ts";
@@ -8,7 +7,6 @@ import { contributions, findAlternatives, rankSuppliers, type RankedSupplier } f
 /** The supplier page shows three alternatives; the chat names the same ones. */
 const ALTERNATIVE_COUNT = 3;
 const WATCH_OUT_SCORE = 50;
-const CRITICAL_SCORE = 75;
 
 const round = (value: number) => Math.round(value * 10) / 10;
 
@@ -23,7 +21,8 @@ export function explainSupplier(target: RankedSupplier, ranked: readonly RankedS
   const found = findAlternatives(supplier, ranked, weights, ALTERNATIVE_COUNT);
   return {
     kind: "supplier_explanation" as const,
-    supplier: { id: supplier.id, name: supplier.name, rank: target.rank, of: ranked.length, risk: round(target.risk.worst) },
+    // Weighted under the page's weights; not the dataset's Total_Risk_Index.
+    supplier: { id: supplier.id, name: supplier.name, rank: target.rank, of: ranked.length, weightedRisk: round(target.risk.worst) },
     drivers: parts.map(({ criterion, points }) => ({
       key: criterion,
       label: CRITERION_BY_KEY[criterion].label,
@@ -44,7 +43,7 @@ export function explainSupplier(target: RankedSupplier, ranked: readonly RankedS
         id: entry.supplier.id,
         name: entry.supplier.name,
         rank: entry.rank,
-        risk: round(entry.risk.worst),
+        weightedRisk: round(entry.risk.worst),
         driverScore: entry.supplier.scores[found.driver],
       })),
     },
@@ -78,20 +77,3 @@ export function explainDriver(driverKey: CriterionKey, weights: Weights) {
 }
 export type DriverExplanation = ReturnType<typeof explainDriver>;
 
-/** The seat shortlist as the cabin shows it: rank, weighted risk, top three drivers, plus any Critical score. */
-export async function shortlistFacts(weights: Weights) {
-  const suppliers = await loadDatasetSuppliers();
-  const byId = new Map(suppliers.map((supplier) => [supplier.id, supplier]));
-  return {
-    kind: "shortlist_facts" as const,
-    suppliers: buildShortlist(suppliers, weights).map(({ id, name, rank, risk, drivers }) => ({
-      id, name, rank, risk,
-      topDrivers: drivers.map(({ label, points }) => ({ label, points })),
-      critical: CRITERIA.flatMap(({ key, label }) => {
-        const score = byId.get(id)?.scores[key] ?? null;
-        return score !== null && score >= CRITICAL_SCORE ? [{ label, score }] : [];
-      }),
-    })),
-  };
-}
-export type ShortlistFacts = Awaited<ReturnType<typeof shortlistFacts>>;

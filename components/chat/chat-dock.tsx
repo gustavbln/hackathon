@@ -8,7 +8,8 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet"
 import { Sidebar, SidebarProvider, useSidebar } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 
-import { chatResponseSchema, type PageAction, type PageContext } from "@/lib/chat-contract"
+import { chatEventSchema, type ChatStep, type PageAction, type PageContext } from "@/lib/chat-contract"
+import { readEvents } from "@/lib/sse"
 import { CRITERION_BY_KEY } from "@/lib/suppliers/criteria"
 import { encodeWeights } from "@/lib/suppliers/profiles"
 
@@ -26,7 +27,8 @@ function toHistory(messages: ChatMessage[]) {
   )
 }
 
-async function askChat(text: string, previous: ChatMessage[], page: PageContext | null) {
+/** Streams one answer: each step goes to `onStep` as it happens, then the whole validated answer resolves. */
+async function askChat(text: string, previous: ChatMessage[], page: PageContext | null, onStep: (step: ChatStep) => void) {
   const lastAnswer = previous.findLast((message) => message.role === "assistant")
   const lastView = lastAnswer?.role === "assistant" ? lastAnswer.response.lastView : null
   const response = await fetch("/api/chat", {
@@ -39,12 +41,22 @@ async function askChat(text: string, previous: ChatMessage[], page: PageContext 
       ...(page && { page }),
     }),
   })
-  const body: unknown = await response.json()
-  if (!response.ok) {
-    const message = (body as { error?: { message?: string } }).error?.message
+  if (!response.ok || !response.body) {
+    const body: unknown = await response.json().catch(() => null)
+    const message = (body as { error?: { message?: string } } | null)?.error?.message
     throw new Error(message ?? "The chat request failed. Please retry.")
   }
-  return chatResponseSchema.parse(body)
+  for await (const event of readEvents(response.body, chatEventSchema)) {
+    if (event.type === "step") onStep(event.step)
+    else if (event.type === "done") return event.response
+    else throw new Error(event.error.message)
+  }
+  throw new Error("The answer stopped before it was complete. Please retry.")
+}
+
+/** Steps arrive as "running", then again under the same id when they finish. */
+function upsertStep(steps: ChatStep[], step: ChatStep) {
+  return steps.some(({ id }) => id === step.id) ? steps.map((current) => (current.id === step.id ? step : current)) : [...steps, step]
 }
 
 export function ChatWorkspace({ children }: { children: ReactNode }) {
@@ -81,6 +93,7 @@ function ChatPanel() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [status, setStatus] = useState<ChatStatus>("ready")
   const [error, setError] = useState<string | null>(null)
+  const [liveSteps, setLiveSteps] = useState<ChatStep[]>([])
   const { isMobile, open, setOpen, openMobile, setOpenMobile } = useSidebar()
   const { page, applyActions, onAsk } = useChatFocus()
   const router = useRouter()
@@ -114,10 +127,17 @@ function ChatPanel() {
     setStatus("pending")
     setError(null)
     setMessages([...previous, { id: crypto.randomUUID(), role: "user", text }])
+    setLiveSteps([])
+    const started = performance.now()
+    let steps: ChatStep[] = []
     try {
-      const response = await askChat(text, previous, page)
+      const response = await askChat(text, previous, page, (step) => {
+        steps = upsertStep(steps, step)
+        setLiveSteps(steps)
+      })
       apply(response.actions)
-      setMessages((current) => [...current, { id: crypto.randomUUID(), role: "assistant", response }])
+      const trace = { steps, elapsedMs: Math.round(performance.now() - started) }
+      setMessages((current) => [...current, { id: crypto.randomUUID(), role: "assistant", response, trace }])
       setStatus("ready")
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : "The chat request failed. Please retry.")
@@ -149,7 +169,7 @@ function ChatPanel() {
           {isMobile ? <ArrowLeftIcon strokeWidth={1.5} /> : <XIcon strokeWidth={1.5} />}
         </Button>
       </header>
-      <ChatThread messages={messages} status={status} error={error} />
+      <ChatThread messages={messages} status={status} error={error} liveSteps={liveSteps} />
       <div className="shrink-0 border-t border-[var(--blueprint-rule)] pb-[env(safe-area-inset-bottom)] focus-within:border-[var(--blueprint-muted)]">
         <PromptChips prompts={promptsFor(page)} disabled={status === "pending"} onPick={send} />
         <ChatComposer disabled={status === "pending"} onSend={send} />

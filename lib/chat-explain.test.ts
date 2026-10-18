@@ -22,7 +22,7 @@ test("explain a supplier with the page's weights and rounding", () => {
   const explanation = explainSupplier(entry, ranked, weights);
   assert.equal(explanation.supplier.rank, 3);
   const total = CRITERIA.reduce((sum, { key }) => sum + weights[key] * (target.scores[key] ?? 0), 0);
-  assert.equal(explanation.supplier.risk, Math.round(total * 10) / 10);
+  assert.equal(explanation.supplier.weightedRisk, Math.round(total * 10) / 10);
   // Compliance is doubled for seats, so it leads; shares are rounded like the page's "x% of the risk".
   assert.deepEqual(explanation.drivers[0], {
     key: "compliance", label: "Compliance", score: 98,
