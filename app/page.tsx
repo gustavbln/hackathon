@@ -23,7 +23,7 @@ export default function Home() {
             <h1 id="landing-heading" className="text-[clamp(2.5rem,6vw,4.75rem)] leading-none font-medium tracking-[-0.035em]">
               Know your suppliers. Keep production moving.
             </h1>
-            <p className="max-w-lg text-base text-[var(--blueprint-ink)] sm:text-lg">
+            <p className="max-w-sm text-base text-[var(--blueprint-ink)] sm:text-lg">
               Weighted risk for 10,000 suppliers, part by part, from the train down to the seat.
             </p>
           </section>
