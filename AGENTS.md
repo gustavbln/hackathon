@@ -13,7 +13,8 @@ Before each task, ask which of these it moves. None? Skip it.
 
 ## Hand-in
 
-1. Repo access with all code and data. The README says what it does and how to run it.
+1. Repo access with all code and data. The README is the jury's first look: what it does, our core
+   achievements, the architecture at a glance, how to run it.
 2. A 2-minute screen recording. Build toward that story: what isn't in the video barely counts.
 3. A live deployed app link, plus login credentials for the jury. Hosting: TBD.
 
@@ -47,9 +48,34 @@ What the brief asks for:
    the numbers come from the dataset through tool calls, never from the model's memory.
 3. Research agent: the buyer names a *real* company. The agent plans its research, crawls news,
    public sources and company sites, digs deeper on red flags, and delivers a risk report with
-   source links. Search/crawl API: TBD.
+   source links. Search: Tavily (we have 8,000 credits, key `TAVILY_API_KEY`).
 4. Surprise us (our wow points), e.g. multi-agent workflows, generated UIs for chat answers,
    auto-generated shortlist memos.
+
+What the Siemens stakeholder told us (our talk, 2026-10-18):
+
+- **Who it's for:** Siemens procurement buys this risk dataset from a data provider, which has
+  special contracts and buys from other data vendors. Their real ask: present it beautifully, in a
+  UI that supports decisions, and show them how others would do it. "Anyone vibe-codes a mid-quality
+  UI in an hour. A really good UI is hard, and the difference shows."
+- **Chatbot is a must:** buyers ask questions about the dataset. It may live inside the UI instead of
+  being a separate app.
+- **The research agent is the real agentic use case:** "We only have fake data. I'd love real data.
+  Can an agent get it?" A crawler that connects data about real companies, with traceable, reliable
+  sources. Narrowing is fine (e.g. only German public sources, only environmental data). Nobody is
+  expected to match the bought dataset; the agent supplements it.
+- **Their biggest concrete pain point, company groups:** suppliers belong to groups of legal
+  entities (parents, subsidiaries: legal and business ties, not the supply chain). If 18 of 20
+  companies in a group already had a credit default, buying from the other 2 must raise an alarm.
+  Siemens pays a separate provider for this graph; public options like North Data are paid. An
+  agent that builds the group graph and flags group-wide risk hits their problem exactly.
+- **Real component, real suppliers:** taking one part (e.g. brakes) and researching its real
+  suppliers is ideal. Technical depth earns extra points, but what counts is how much we get out.
+  Small companies with no public data are fine.
+- **How they judge:** 2–4 jurors, about 10 teams in about 2 hours. They watch the video, maybe click
+  the live app while it plays, maybe point an AI agent at the repo. So: core achievements stated
+  crisply, a README that gives an instant overview and shows clean infrastructure (a Nebius juror
+  looks at infra), and a live app that works without explanation.
 
 Data:
 
