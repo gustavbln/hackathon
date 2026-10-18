@@ -1,15 +1,51 @@
 # AGENTS.md
 
 Hackathon repo. 3 people, everyone (and every agent) commits straight to `main`.
-Priority one: great UI/UX. Priority two: it works in the demo. Clean code comes last.
+
+## How we're judged
+
+- 50% technical execution: it really works, end to end, on the real dataset. Judges get the repo.
+- 30% wow effect and creativity: great UI/UX is our edge, so it stays priority one.
+- 20% how well it addresses the Siemens track challenge (below).
+- NVIDIA side challenge: we qualify by using Nemotron, so every AI feature runs on Nemotron (below).
+
+Before each task, ask which of these it moves. None? Skip it.
+
+## Hand-in
+
+- The repo. The README says what it does and how to run it.
+- A 2-minute video. Build toward that story: what isn't in the video barely counts.
+- Deadline: TBD
 
 ## Project
 
 - Idea: TBD
 - Stack: Next.js 16 (App Router, TypeScript), Tailwind v4, shadcn/ui (Radix, nova preset)
-- Run: `docker compose up` → http://localhost:3000
+- Run: `cp .env.example .env`, fill in the keys, `docker compose up` → http://localhost:3000
 
-Fill in the idea as soon as it's decided. Keep this file short.
+Fill in the idea and the deadline as soon as they're decided. Keep this file short.
+
+## Siemens track: supplier risk
+
+- Challenge brief: TBD (paste the official wording)
+- Data: `data/supplier_risk_dataset.csv`, 10,000 anonymized suppliers, 46 columns. Column meanings:
+  `data/risk_criteria_description.md`. Not in git while the repo is public: copy both files from
+  the hackathon materials into `data/`.
+- 19 risk scores from 0 (no risk) to 100 (max risk), each with a `_Level` column
+  (Low/Medium/High/Critical). `Total_Risk_Index` is the weighted average.
+- Operational columns: `Purchase Order Volume (EUR)` (our exposure), `Order Change Rate`,
+  `Supplier Delivery Rating`, `Order Confirmation Rate` (all 0–100%), `Sourcing Risk Level`
+  (Low/Medium/High: how hard to replace), `Supply Chain Complexity` (Simple/Moderate/Complex).
+- Careful: delivery rating and confirmation rate are good when high, unlike the risk scores.
+
+## Nemotron (NVIDIA side challenge)
+
+- All LLM calls go to NVIDIA's OpenAI-compatible API at `https://integrate.api.nvidia.com/v1`,
+  key in `NVIDIA_API_KEY` (get one at build.nvidia.com). Server-side only, never from the browser.
+- Models (catalog checked 2026-10-18): `nvidia/nemotron-3-super-120b-a12b` (default),
+  `nvidia/nemotron-3.5-lightning-30b-a3b` (fast), `nvidia/nemotron-3-ultra-550b-a55b` (strongest),
+  `nvidia/nemotron-3-embed-1b` (embeddings). Live list: `curl https://integrate.api.nvidia.com/v1/models`.
+- Show it: the UI and the video make clear the AI runs on NVIDIA Nemotron.
 
 ## Docker only
 
@@ -78,7 +114,9 @@ Each person connects the Mobbin MCP in their own agent. It does not go into this
 
 ## Code
 
-- UI polish aside, the simplest thing that works. Hardcoding, mocks and fake data are fine.
+- Real data and real Nemotron calls wherever the demo shows them. Judges read the repo: no fake
+  results they could spot.
+- Otherwise the simplest thing that works, readable over clever.
 - No tests unless something keeps breaking the demo.
 - Secrets go in `.env` (gitignored). List the variable names in `.env.example`.
 
