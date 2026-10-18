@@ -134,13 +134,15 @@ Split by folder so we rarely touch the same files.
 - Dennis, chatbot functionality: `app/api/chat/` and shared server-side data, tools and Nemotron calls
   in `lib/`. Return typed data for supplier cards, comparisons and charts; leave frontend work to its owner.
 - Gustav, supplier benchmark and real suppliers: `app/suppliers/`, `components/leaderboard/`,
-  `lib/market/`. A leaderboard like AI model benchmarks: the overall ranking for the chosen profile,
-  plus one chart per criterion comparing the top 20.
+  `lib/market/`. Ranking for the chosen component, a focus panel per supplier (risk fingerprint,
+  exact "why" breakdown, watch-outs, alternative risk profiles) and a top-20 matrix where only high
+  and critical scores are coloured.
 
 `lib/` holds data access, scoring and tool functions: one source of truth that the UI, the chatbot
 and the agents all call. `lib/suppliers/` is the dataset foundation: `criteria.ts` (the 18 criteria
-with their exact weights), `dataset.ts` (server-only CSV loader), `profiles.ts` (weights per
-component and train type, each boost with its reason) and `scoring.ts` (profile risk and ranking). Shared files (`lib/`, `app/layout.tsx`, `app/globals.css`, `components/ui/`,
+with their exact weights), `dataset.ts` (rows from the shared loader in `lib/suppliers.ts`, keyed by criterion), `profiles.ts`
+(weights per component, each boost with its reason) and `scoring.ts` (profile risk, ranking, "why"
+contributions, alternatives). Shared files (`lib/`, `app/layout.tsx`, `app/globals.css`, `components/ui/`,
 `package.json`): small changes only, tell the team.
 
 Chat backend: `POST /api/chat`; request/response types and schemas in `lib/chat-contract.ts`.

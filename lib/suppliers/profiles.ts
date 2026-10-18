@@ -1,22 +1,12 @@
-import { CRITERIA, TOTAL_RISK_WEIGHTS, type CriterionKey, type Weights } from "./criteria";
-
-export const TRAIN_TYPES = [
-  { id: "high-speed", label: "High-speed" },
-  { id: "regional", label: "Regional" },
-  { id: "metro", label: "Metro" },
-] as const;
+import { CRITERIA, TOTAL_RISK_WEIGHTS, type CriterionKey, type Weights } from "./criteria.ts";
 
 export const COMPONENTS = [
   { id: "seats", label: "Seats & interior" },
   { id: "all", label: "Any component" },
 ] as const;
 
-export type TrainType = (typeof TRAIN_TYPES)[number]["id"];
 export type ComponentId = (typeof COMPONENTS)[number]["id"];
 
-export const TRAIN_TYPE_LABEL = Object.fromEntries(
-  TRAIN_TYPES.map((option) => [option.id, option.label]),
-) as Record<TrainType, string>;
 export const COMPONENT_LABEL = Object.fromEntries(
   COMPONENTS.map((option) => [option.id, option.label]),
 ) as Record<ComponentId, string>;
@@ -30,7 +20,6 @@ export interface Boost {
 
 export interface Profile {
   component: ComponentId;
-  trainType: TrainType;
   /** Sums to 1. Without boosts it equals the dataset's Total_Risk_Index weights. */
   weights: Weights;
   boosts: Boost[];
@@ -49,42 +38,18 @@ const COMPONENT_BOOSTS: Record<ComponentId, Boost[]> = {
   ],
 };
 
-const SEAT_TRAIN_TYPE_BOOSTS: Record<TrainType, Boost[]> = {
-  "high-speed": [
-    {
-      criterion: "compliance",
-      factor: 1.25,
-      reason: "Long tunnels mean a long way to a place of safety (EN 45545 operation category 3).",
-    },
-  ],
-  regional: [],
-  metro: [
-    {
-      criterion: "compliance",
-      factor: 1.5,
-      reason: "Metro tunnels allow no side evacuation (operation category 4), which needs hazard level HL3.",
-    },
-  ],
-};
-
-export function buildProfile(component: ComponentId, trainType: TrainType): Profile {
-  const boosts = [
-    ...COMPONENT_BOOSTS[component],
-    ...(component === "seats" ? SEAT_TRAIN_TYPE_BOOSTS[trainType] : []),
-  ];
+export function buildProfile(component: ComponentId): Profile {
+  const boosts = COMPONENT_BOOSTS[component];
+  if (boosts.length === 0) return { component, weights: TOTAL_RISK_WEIGHTS, boosts };
   const raw = { ...TOTAL_RISK_WEIGHTS };
   for (const boost of boosts) raw[boost.criterion] *= boost.factor;
   const total = CRITERIA.reduce((sum, criterion) => sum + raw[criterion.key], 0);
   const weights = Object.fromEntries(
     CRITERIA.map((criterion) => [criterion.key, raw[criterion.key] / total]),
   ) as Weights;
-  return { component, trainType, weights, boosts };
+  return { component, weights, boosts };
 }
 
 export function parseComponent(value: unknown): ComponentId {
   return COMPONENTS.find((component) => component.id === value)?.id ?? "seats";
-}
-
-export function parseTrainType(value: unknown): TrainType {
-  return TRAIN_TYPES.find((trainType) => trainType.id === value)?.id ?? "high-speed";
 }

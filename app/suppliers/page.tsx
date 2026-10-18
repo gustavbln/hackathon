@@ -7,10 +7,10 @@ export const metadata: Metadata = {
 };
 
 export default async function SuppliersPage({ searchParams }: PageProps<"/suppliers">) {
-  const { component, train } = await searchParams;
+  const { component } = await searchParams;
   return (
     <main className="blueprint-page min-h-svh px-5 py-10 sm:px-10 lg:px-16">
-      <SupplierBoard component={component} trainType={train} />
+      <SupplierBoard component={component} />
     </main>
   );
 }

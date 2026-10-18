@@ -1,18 +1,14 @@
 import { TOTAL_RISK_WEIGHTS } from "@/lib/suppliers/criteria";
 import { loadDatasetSuppliers } from "@/lib/suppliers/dataset";
-import { buildProfile, parseComponent, parseTrainType } from "@/lib/suppliers/profiles";
-import { rankSuppliers } from "@/lib/suppliers/scoring";
+import { buildProfile, parseComponent } from "@/lib/suppliers/profiles";
+import { findAlternatives, rankSuppliers, type RankedSupplier } from "@/lib/suppliers/scoring";
 import { BoardView, type BoardRow } from "./board-view";
 
 const LEADERBOARD_SIZE = 100;
+const ALTERNATIVE_COUNT = 3;
 
-interface SupplierBoardProps {
-  component: unknown;
-  trainType: unknown;
-}
-
-export async function SupplierBoard({ component, trainType }: SupplierBoardProps) {
-  const profile = buildProfile(parseComponent(component), parseTrainType(trainType));
+export async function SupplierBoard({ component }: { component: unknown }) {
+  const profile = buildProfile(parseComponent(component));
   const loaded = await loadDatasetSuppliers().then(
     (suppliers) => ({ suppliers }),
     (error: unknown) => ({
@@ -33,15 +29,30 @@ export async function SupplierBoard({ component, trainType }: SupplierBoardProps
       ? new Map(rankSuppliers(loaded.suppliers, TOTAL_RISK_WEIGHTS).map((entry) => [entry.supplier.id, entry.rank]))
       : null;
 
-  const rows: BoardRow[] = ranked.slice(0, LEADERBOARD_SIZE).map(({ supplier, rank, risk }) => ({
-    id: supplier.id,
-    name: supplier.name,
-    origin: supplier.origin,
-    rank,
-    risk: Math.round(risk.worst * 10) / 10,
-    rankChange: defaultRanks ? (defaultRanks.get(supplier.id) ?? rank) - rank : null,
-    scores: supplier.scores,
-  }));
+  const toRow = ({ supplier, rank, risk }: RankedSupplier, withAlternatives: boolean): BoardRow => {
+    const found = withAlternatives ? findAlternatives(supplier, ranked, profile.weights, ALTERNATIVE_COUNT) : null;
+    return {
+      id: supplier.id,
+      name: supplier.name,
+      origin: supplier.origin,
+      rank,
+      risk: Math.round(risk.worst * 10) / 10,
+      rankChange: defaultRanks ? (defaultRanks.get(supplier.id) ?? rank) - rank : null,
+      scores: supplier.scores,
+      alternatives: found && {
+        driver: found.driver,
+        kind: found.kind,
+        rows: found.alternatives.map((entry) => toRow(entry, false)),
+      },
+    };
+  };
 
-  return <BoardView profile={profile} rows={rows} supplierCount={loaded.suppliers.length} />;
+  return (
+    <BoardView
+      key={profile.component}
+      profile={profile}
+      rows={ranked.slice(0, LEADERBOARD_SIZE).map((entry) => toRow(entry, true))}
+      supplierCount={loaded.suppliers.length}
+    />
+  );
 }
